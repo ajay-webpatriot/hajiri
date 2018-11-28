@@ -74,6 +74,14 @@
                             <?php echo $this->session->flashdata('warning'); ?>
                         </div>
                     <?php endif; ?>
+                    <?php if ($this->session->flashdata('error') != ''): ?>
+                        <div class="alert alert-error alert-dismissable">
+                            <i class="fa fa-check"></i>
+                            <button type="button" class="close" data-dismiss="alert" aria-hidden="true">×</button>
+                            <b>Error!</b> 
+                            <?php echo $this->session->flashdata('error'); ?>
+                        </div>
+                    <?php endif; ?>
                     <table id="tableMaterialCategory" class="tableFilter table table-striped table-hover table-bordered display responsive nowrap" cellspacing="0" width="100%">
                         <thead>
                             <tr>

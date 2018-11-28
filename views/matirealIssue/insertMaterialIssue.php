@@ -1,3 +1,8 @@
+<style type="text/css">
+    .totalQuantityClass{
+        padding-bottom: 10px;
+    }
+</style>
 <!-- Content Wrapper. Contains page content -->
 <div class="content-wrapper">
     <!-- Content Header (Page header) -->
@@ -22,13 +27,12 @@
                             <h4 class="box-title" style="padding-left: 10px;">General Details :</h4>
                         </div>
                     </div>
-                
-
-                    <form action="<?php echo base_url('admin/MaterialIssue/addIssueLog');?>" id="addIssueLog" class="form-horizontal" method="POST" enctype="multipart/form-data">
+                    <form action="<?php echo base_url('admin/MaterialIssue/addIssueLog');?>" id="addIssueLog" class="form-horizontal validateDontSubmit" method="POST" enctype="multipart/form-data">
                         <div class="box-body">
                            <!-- Issue Date start -->
                             <div class="form-group">
-                                <label for="date" class="col-sm-3 control-label">Issue Date:</label>
+                                <label for="date" class="col-sm-3 control-label">Issue Date <font color="red">*</font></label>
+
                                 <div class="col-sm-9">
                                     <input name="issueDate" id="date" placeholder="Issue Date" class="form-control datepicker" type="text" value="<?php echo (isset($_POST['issueDate'])) ? $_POST['issueDate'] : ''; ?>" required>
                                     <span class="error"><?php echo (form_error('issueDate')) ? form_error('issueDate') : ''; ?></span>
@@ -36,20 +40,32 @@
                             </div>
                             <!-- Issue Date end -->
                             <div class="form-group">
-                                <label for="date" class="col-sm-3 control-label">Issue No:</label>
+                                <label for="date" class="col-sm-3 control-label">Issue No <font color="red">*</font></label>
                                 <div class="col-sm-9">
                                     <input name="issueNo" id="issueNo" placeholder="Issue No" class="form-control" type="text" value="<?php echo (isset($_POST['issueNo'])) ? $_POST['issueNo'] : ''; ?>" required>
                                     <span class="error"><?php echo (form_error('issueNo')) ? form_error('issueNo') : ''; ?></span>
                                 </div>
                             </div>
-                            
-
                             <div class="form-group">
-                                    <label for="materialCategory" class="col-sm-3 control-label">Material Category:</label>
+                                <label for="project_name" class="col-sm-3 control-label">Project Name <font color="red">*</font></label>
+                                <div class="col-sm-9">
+                                    <select class="form-control project_name" name="project_name" required>
+                                        <option value="">Project Name </option>
+                                        <?php 
+                                        foreach($ActiveProjects as $value){
+                                            ?>
+                                          <option value="<?php echo $value->project_id; ?>"><?php echo $value->project_name; ?></option>
+                                        <?php } ?>
+                                    </select>
+                                    <span class="error"><?php echo form_error('project_name') ?></span>
+                                </div>
+                            </div>
+                            <div class="form-group">
+                                    <label for="materialCategory" class="col-sm-3 control-label">Material Category <font color="red">*</font></label>
                                     <div class="col-sm-9">
-                                        <select class="form-control" id="MaterialCategory" name="materialCategory" required>
+                                        <select class="form-control material_category" id="MaterialCategory" name="materialCategory" required>
                                             <option value="">Material Category</option>
-                                            <?php 
+                                            <?php  /*
                                             if($materialCategory != ''){
                                             foreach ($materialCategory as $Category) {
 
@@ -60,14 +76,14 @@
                                                 <option value="<?php echo $Category->id; ?>"><?php echo $Category->category; ?></option>
                                             <?php 
                                                 }
-                                            }
+                                            } */
                                             ?>
                                         </select>
                                         <span class="error"><?php echo form_error('materialCategory') ?></span>
                                     </div>
                                 </div>
                             <div class="form-group selectclass">
-                                <label for="MaterialName" class="col-sm-3 control-label">Material Name:</label>
+                                <label for="MaterialName" class="col-sm-3 control-label">Material Name <font color="red">*</font></label>
                                 <div class="col-sm-9" id="MaterialNames">
                                     <select class="form-control materialName" name="MaterialName" required>
                                         <option value="">Material Name </option>
@@ -80,15 +96,16 @@
                                             //} 
                                         //} ?>
                                     </select>
-                                    <span class="error"><?php echo form_error('supervisor_name') ?></span>
+                                    <span class="error"><?php echo form_error('MaterialName') ?></span>
                                 </div>
                             </div>
-                               
+                            <span class="totalQuantity col-md-12 col-md-offset-3" id="" style="color: green;"></span>
+
                             <div class="form-group">
-                                <label for="IssueQuantity" class="col-sm-3 control-label">Quantity:</label>
+                                <label for="IssueQuantity" class="col-sm-3 control-label">Quantity <font color="red">*</font></label>
                                 <div class="col-sm-6">
-                                    <input name="IssueQuantity" placeholder="Quantity" class="form-control" type="number" min="1" value="<?php echo (isset($_POST['IssueQuantity'])) ? $_POST['IssueQuantity'] : ''; ?>" required>
-                                    <span class="error"><?php echo (form_error('IssueQuantity')) ? form_error('IssueQuantity') : ''; ?></span>
+                                    <input name="IssueQuantity" placeholder="Quantity" class="form-control issueQuantity" type="number" min="1" value="<?php echo (isset($_POST['IssueQuantity'])) ? $_POST['IssueQuantity'] : ''; ?>" required>
+                                    <span class="error QuantityError"><?php echo (form_error('IssueQuantity')) ? form_error('IssueQuantity') : ''; ?></span>
                                 </div>
                                 <div class="col-sm-3">
                                     <span><b class="unit"></b></span>
@@ -96,7 +113,7 @@
                             </div> 
 
                             <div class="form-group">
-                                <label for="Issuefile" class="col-sm-3 control-label">Material Image:</label>
+                                <label for="Issuefile" class="col-sm-3 control-label">Material Image </label>
                                 <div class="col-sm-9">
                                     <input type="file" id="issuefile" accept="image/*" name="Issuefile"  />
                                     <span class="error"><?php echo (form_error('material_file')) ? form_error('material_file') : ''; ?></span>
@@ -104,7 +121,7 @@
                             </div>  
                             
                             <div class="form-group">
-                                <label for="ConsumtionPlace" class="col-sm-3 control-label">Consumption Place:</label>
+                                <label for="ConsumtionPlace" class="col-sm-3 control-label">consumption Place </label>
                                 <div class="col-sm-6">
                                     <div class="row">
                                         <div class="col-md-4">
@@ -136,7 +153,7 @@
                             </div> 
 
                             <div class="form-group">
-                                <label for="quantity" class="col-sm-3 control-label">Issue Comment:</label>
+                                <label for="quantity" class="col-sm-3 control-label">Issue Comment </label>
                                 <div class="col-sm-6">
                                    <textarea name="issueComment" id="" cols="30" rows="5"></textarea>
                                 </div>
@@ -175,29 +192,60 @@
         var selectCatId = $("#MaterialCategory option:selected").val();
         var ele=this;
         var optionHTML="<option value=''>Material Name</option>";
-        console.log(selectCatId);
         $.ajax({
             type:"GET",
             url: "<?php echo base_url('admin/MaterialIssue/materialIssueNames/'); ?>"+selectCatId,
             dataType: "json",
             success: function(data) {
-                console.log('============');
                 $.each(data, function(key, value) {
-                    console.log(value);
-                   
-                    optionHTML+='<option  data-unit="'+value.unit_measurement+'"  value="'+ value.id +'">'+ value.name +'</option>';
+                   optionHTML+='<option  data-unit="'+value.unit_measurement+'"  value="'+ value.id +'">'+ value.name +'</option>';
                 });
                 $(ele).parents(".form-group").next().find("select").html(optionHTML);
             }
         });
-
         $('#MaterialNames').html();
     });
 
     $(document).on("change",".materialName",function(){
+        
+        var material_id = $(".materialName").val();
+        var project_id = $(".project_name").val();
+        
+        if(material_id != '' && project_id != ''){
+            $.ajax({
+                type:"GET",
+                url: "<?php echo base_url('admin/MaterialIssue/getMaterialIssueQuantity/'); ?>?material_id="+material_id+"&project_id="+project_id,
+                dataType: "json",
+                success: function(data) {
+                    // var id = data;
+                    $('.totalQuantity').addClass('totalQuantityClass');
+                    $('.totalQuantity').html('Available Quantity '+data+' bags');
+                    $('.totalQuantity').attr('id', data);
+                }
+            });
+        }
             var unit_measurement = $(this).find('option:selected', this).attr('data-unit');
-            $(this).parents(".form-group").next().find(".unit").html(unit_measurement);
+            // $(this).parents(".form-group").next().find(".unit").html(unit_measurement);
+            $(".unit").html(unit_measurement);
+
         });
+         
+        $(document).on('submit','.validateDontSubmit',function (){
+            
+            var totalQuantity = $('.totalQuantity').attr('id');
+            var issueQuantity = $('.issueQuantity').val();
+            var status = false;
+            if(Number(issueQuantity) > Number(totalQuantity)){
+                $('.QuantityError').show();
+                $('.QuantityError').html('Please enter quantity more than '+totalQuantity);
+                status =  false;
+            }else{
+                status =  true;
+            }
+            return status;
+        })
+
+    
         
         // load material name using ajax
         // $(document).on("change",".material_category",function(){
@@ -228,5 +276,27 @@
     //         $(this).parents(".form-group").next().find(".unit").html(unit_measurement);
     //     });
     // });
+     // load supervisor name using ajax
+        $(document).on("change",".project_name",function(){
+            
+            var projectCategoryOption ="<option value=''>Material Category</option>";
+            var project_id = $(this).val();
+            var ele=this;
+            if(project_id) {   
+                $.ajax({
+                    url: "<?php echo base_url().'admin/MaterialLog/getSupervisorAjax/'?>"+project_id,
+                    type: "GET",
+                    dataType: "json",
+                    success:function(data) {
+                        $.each(data.getProjectCategory, function(key, value) {
+                            projectCategoryOption+='<option  value="'+ value.id +'">'+ value.category +'</option>';
+                        });
+                        $('.material_category').html(projectCategoryOption);
+                    }
+                });
+            }else{
+                $('.material_category').html(projectCategoryOption);
+            }
+        }); 
 
 </script>

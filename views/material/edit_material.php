@@ -43,7 +43,7 @@
                         <div class="box-body">
                             <input type="hidden" name="material_id" value="<?php echo (isset($result->id)) ? $result->id : ''; ?>">
                             <div class="form-group">
-                                <label for="category_id" class="col-sm-3 control-label">Project:</label>
+                                <label for="category_id" class="col-sm-3 control-label">Project <font color="red">*</font></label>
                                 <div class="col-sm-9">
                                     <select class="form-control project" name="project_id" required="required">
                                         <option value="">--Select Project--</option>
@@ -61,7 +61,7 @@
                                 </div>
                             </div>
                             <div class="form-group">
-                                <label for="category_id" class="col-sm-3 control-label">Material Category:</label>
+                                <label for="category_id" class="col-sm-3 control-label">Material Category <font color="red">*</font></label>
                                 <div class="col-sm-9">
                                     <select name="category_id" class="form-control category_id" required="required">
                                         <option value="">--Select Category--</option>
@@ -80,14 +80,14 @@
                             </div>
 
                             <div class="form-group">
-                                <label for="title" class="col-sm-3 control-label">Material Name:</label>
+                                <label for="title" class="col-sm-3 control-label">Material Name <font color="red">*</font></label>
                                 <div class="col-sm-9">
                                     <input name="material_name" placeholder="Material Name" class="form-control" type="text" value="<?php echo (isset($result->name)) ? $result->name : ''; ?>" required="required">
                                     <span class="error"><?php echo (form_error('material_name')) ? form_error('material_name') : ''; ?></span>
                                 </div>
                             </div>
                             <div class="form-group">
-                                <label for="title" class="col-sm-3 control-label">Unit of Measurement:</label>
+                                <label for="title" class="col-sm-3 control-label">Unit of Measurement <font color="red">*</font></label>
                                 <div class="col-sm-9">
                                     <input name="unit_measurement" placeholder="Unit of Measurement" class="form-control" type="text" value="<?php echo (isset($result->unit_measurement)) ? $result->unit_measurement : ''; ?>" required="required">
                                     <span class="error"><?php echo (form_error('unit_measurement')) ? form_error('unit_measurement') : ''; ?></span>
@@ -95,7 +95,7 @@
                             </div>
 
                             <div class="form-group">
-                                <label for="title" class="col-sm-3 control-label">HSN Code:</label>
+                                <label for="title" class="col-sm-3 control-label">HSN Code <font color="red">*</font></label>
                                 <div class="col-sm-9">
                                     <input name="hsn_code" placeholder="HSN Code" class="form-control" type="text" value="<?php echo (isset($result->hsn_code)) ? $result->hsn_code : ''; ?>" required="required">
                                     <span class="error"><?php echo (form_error('hsn_code')) ? form_error('hsn_code') : ''; ?></span>
@@ -103,7 +103,7 @@
                             </div>
 
                             <div class="form-group">
-                                <label for="title" class="col-sm-3 control-label">Bound Range:</label>
+                                <label for="title" class="col-sm-3 control-label">Bound Range <font color="red">*</font></label>
                                 <div class="col-sm-3">
                                     <input name="bound_start_range" placeholder="" class="form-control" type="number" min="1"  value="<?php echo (isset($result->bound_start_range)) ? $result->bound_start_range : ''; ?>" required="required">
                                     
@@ -118,7 +118,7 @@
                             
                             </div>
                             <div class="form-group" id='activeSelect'>
-                                <label for="status" class="col-sm-3 control-label">Status:</label>
+                                <label for="status" class="col-sm-3 control-label">Status <font color="red">*</font></label>
                                 <div class="col-sm-9">
                                     <select name="status" class="form-control">
                                         <option value="1" <?php echo ($result->status == "1") ? 'selected="selected"' : ''; ?>>Active</option>

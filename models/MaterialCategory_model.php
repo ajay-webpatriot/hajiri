@@ -30,6 +30,15 @@ class MaterialCategory_model extends CI_Model {
         $query = $this->db->get();
         return $query->result();
     }
+    
+    public function get_active_material_category_byProject($project_id) {
+        
+        $sql = "select name AS category, id,approximate_estimate_ratio,status FROM categories where id IN ( SELECT DISTINCT category_id FROM `materials` INNER JOIN material_projects on materials.id = material_projects.material_id WHERE material_projects.project_id = '".$project_id."') AND status = 1";
+
+       return $this->db->query( $sql, '' )->result_array();
+    }
+
+    // select * FROM categories where id IN ( SELECT DISTINCT category_id FROM `materials` INNER JOIN material_projects on materials.id = material_projects.material_id WHERE material_projects.project_id = 90) AND status = 1
 
     public function checkCategory($id) {
         $w = 'materials';
@@ -46,8 +55,8 @@ class MaterialCategory_model extends CI_Model {
     }
 
     public function update($table, $where, $data) {
-        $this->db->update($table, $data, $where);
-        return $this->db->affected_rows();
+        return $this->db->update($table, $data, $where);
+        // return $this->db->affected_rows();
     }
 
     public function delete($table, $col_name, $value) {
@@ -58,6 +67,14 @@ class MaterialCategory_model extends CI_Model {
         $this->db->select($table . '.status,');
         $this->db->from($table);
         $this->db->where('id', $id);
+        $query = $this->db->get();
+        return $query->row();
+    }
+    public function caheckIsExistCategory($id){
+        $default = 'categories';
+        $this->db->select('name');
+        $this->db->from($default);
+        $this->db->where($default . '.id', $id);
         $query = $this->db->get();
         return $query->row();
     }

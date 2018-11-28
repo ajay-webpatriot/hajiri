@@ -67,14 +67,14 @@ class Supplier_model extends CI_Model {
         return $query->row();
     }
     public function getProjectSupplier($id){
-       $this->db->select($this->table1.'.id,'.$this->table1.'.name');
-       $this->db->from($this->table1);
-       $this->db->join($this->table4,$this->table1.'.id = '.$this->table4.'.supplier_id');
-       $this->db->where($this->table4.'.project_id', $id);
-       $this->db->where($this->table1.'.status', 1);
-       $query = $this->db->get();
-       return $query->result();
-   }
+        $this->db->select($this->table1.'.id,'.$this->table1.'.name');
+        $this->db->from($this->table1);
+        $this->db->join($this->table4,$this->table1.'.id = '.$this->table4.'.supplier_id');
+        $this->db->where($this->table4.'.project_id', $id);
+        $this->db->where($this->table1.'.status', 1);
+        $query = $this->db->get();
+        return $query->result();
+    }
 }
 
 ?>

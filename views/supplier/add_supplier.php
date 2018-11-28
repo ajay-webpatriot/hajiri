@@ -43,35 +43,35 @@
                         <div class="box-body">
 
                             <div class="form-group">
-                                <label for="title" class="col-sm-3 control-label">Company Name:</label>
+                                <label for="title" class="col-sm-3 control-label">Company Name <font color="red">*</font></label>
                                 <div class="col-sm-9">
                                     <input name="company_name" placeholder="Company Name" class="form-control" type="text" value="<?php echo (isset($_POST['company_name'])) ? $_POST['company_name'] : ''; ?>" required="required">
                                     <span class="error"><?php echo (form_error('company_name')) ? form_error('company_name') : ''; ?></span>
                                 </div>
                             </div>
                             <div class="form-group">
-                                <label for="title" class="col-sm-3 control-label">Supplier Name:</label>
+                                <label for="title" class="col-sm-3 control-label">Supplier Name <font color="red">*</font></label>
                                 <div class="col-sm-9">
                                     <input name="supplier_name" placeholder="Supplier Name" class="form-control" type="text" value="<?php echo (isset($_POST['supplier_name'])) ? $_POST['supplier_name'] : ''; ?>" required="required">
                                     <span class="error"><?php echo (form_error('supplier_name')) ? form_error('supplier_name') : ''; ?></span>
                                 </div>
                             </div>
                             <div class="form-group">
-                                <label for="title" class="col-sm-3 control-label">Contact Number:</label>
+                                <label for="title" class="col-sm-3 control-label">Contact Number <font color="red">*</font></label>
                                 <div class="col-sm-9">
                                     <input name="contact_number" placeholder="Contact Number" class="form-control" type="text" value="<?php echo (isset($_POST['contact_number'])) ? $_POST['contact_number'] : ''; ?>" required="required">
                                     <span class="error"><?php echo (form_error('contact_number')) ? form_error('contact_number') : ''; ?></span>
                                 </div>
                             </div>
                             <div class="form-group">
-                                <label for="title" class="col-sm-3 control-label">GST No:</label>
+                                <label for="title" class="col-sm-3 control-label">GST No <font color="red">*</font></label>
                                 <div class="col-sm-9">
                                     <input name="gst_number" placeholder="GST No" class="form-control" type="text" value="<?php echo (isset($_POST['gst_number'])) ? $_POST['gst_number'] : ''; ?>" required="required">
                                     <span class="error"><?php echo (form_error('gst_number')) ? form_error('gst_number') : ''; ?></span>
                                 </div>
                             </div>
                             <div class="form-group">
-                                <label for="title" class="col-sm-3 control-label">Address:</label>
+                                <label for="title" class="col-sm-3 control-label">Address <font color="red">*</font></label>
                                 <div class="col-sm-9">
                                     
                                     <textarea name="address" required="required" placeholder="Address" class="form-control"><?php echo (isset($_POST['address'])) ? $_POST['address'] : ''; ?></textarea> 
@@ -80,14 +80,14 @@
                                 </div>
                             </div>
                             <div class="form-group">
-                                <label for="title" class="col-sm-3 control-label">Email Id:</label>
+                                <label for="title" class="col-sm-3 control-label">Email Id <font color="red">*</font></label>
                                 <div class="col-sm-9">
                                     <input name="email_id" placeholder="Email Id" class="form-control" type="text" value="<?php echo (isset($_POST['email_id'])) ? $_POST['email_id'] : ''; ?>" required="required">
                                     <span class="error"><?php echo (form_error('email_id')) ? form_error('email_id') : ''; ?></span>
                                 </div>
                             </div>
                             <div class="form-group">
-                                <label for="title" class="col-sm-3 control-label">Assign Project:</label>
+                                <label for="title" class="col-sm-3 control-label">Assign Project <font color="red">*</font></label>
                                 <div class="col-sm-9">
                                     
                                     <select placeholder="Select Project" class="form-control project" name="project_id[]" multiple="multiple" required="required">
@@ -104,7 +104,7 @@
                                     <span class="error"><?php echo (form_error('unit_measurement')) ? form_error('unit_measurement') : ''; ?></span> -->
                             </div>
                             <div class="form-group">
-                                <label for="title" class="col-sm-3 control-label">Assign Material Category:</label>
+                                <label for="title" class="col-sm-3 control-label">Assign Material Category <font color="red">*</font></label>
                                 <div class="col-sm-9">
                                     
                                     <select placeholder="Select Material Category" class="form-control category" name="category_id[]" multiple="multiple" required="required">

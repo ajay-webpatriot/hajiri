@@ -30,28 +30,27 @@ class materialLog extends CI_Controller {
 
             $this->form_validation->set_rules('challan_date', 'Date', 'trim|required');
             $this->form_validation->set_rules('challan_no', 'challan no', 'trim|required');
+            $this->form_validation->set_rules('project_name', 'Project Name', 'trim|required');
             $this->form_validation->set_rules('supplier_name', 'supplier name', 'required');
             $this->form_validation->set_rules('material_category[]', 'material category', 'required');
             $this->form_validation->set_rules('material_name[]', 'material name', 'required');
             $this->form_validation->set_rules('quantity[]', 'quantity', 'required');
 
-            if ( $this->form_validation->run() == false ) {
-                $this->session->set_flashdata( 'error', 'Sorry,  Error while adding Material details.' );
-                redirect( base_url( 'admin/MaterialLog/Entry/') );
-            }else{
-               
-                // resolved image issue s
-                // $associatedFileNames = array('challan_file' , 'material_file');
-                $challan_image=$_FILES['challan_file']['name'];
-                if (!empty($challan_image)) {
-                    $result = uploadStaffFile('uploads/materialLog/challan/', 'challan_file');
-                    if ($result['flag'] == 1) {
-                        $challan_image = $result['filePath'];
-                    } else {
-                        $fileError[$fileName] = $result['error'];
+            if ( $this->form_validation->run() == TRUE) {
+                // $this->session->set_flashdata( 'error', 'Sorry,  Error while adding Material details.' );
+                // redirect( base_url( 'admin/materialLog/Entry/') );
+            
+                $associatedFileNames = array('challan_file');
+                foreach ($associatedFileNames as $fileName) {
+                    if (!empty($_FILES[$fileName]['name'])) {
+                        $result = uploadStaffFile('uploads/materialLog/challan/', $fileName);
+                        if ($result['flag'] == 1) {
+                            $data['worker_qrcode_image'] = $result['filePath'];
+                        } else {
+                            $fileError[$fileName] = $result['error'];
+                        }
                     }
                 }
-                // resolved image issue e
                 
                 // material image upload work
                 $cntFile=0;
@@ -87,9 +86,8 @@ class materialLog extends CI_Controller {
                 $material_category = $this->input->post('material_category');
                 $material_name = $this->input->post('material_name');
                 $quantity = $this->input->post('quantity');
-                // resolved image issue s
-                // $challan_image = $_FILES['challan_file']['name'];
-                // resolved image issue e
+                $challan_image = $_FILES['challan_file']['name'];
+
                 $createdate = date_create($challan_date);
                 $date = date_format($createdate,'Y-m-d');
                 // insert material log 
@@ -127,14 +125,18 @@ class materialLog extends CI_Controller {
                 }
                 if($insertId){
                      $this->session->set_flashdata('success', 'Material Log Added Successfully!');
-                    redirect(base_url('admin/MaterialLog/index'));
+                    redirect(base_url('admin/materialLog/index'));
                 }
             }
         }
+        
         $data = $this->data;
-        $data['material_category'] = $this->MaterialCategory_model->get_active_material_category();
+        // $data['material_category'] = $this->MaterialCategory_model->get_active_material_category(90);
+        // echo "<pre>";
+        // print_r ($data['material_category']);
+        // exit();
         $data['material'] = $this->Material_model->get_active_material();
-        $data['supplier'] = $this->Supplier_model->get_active_supplier();
+        // $data['supplier'] = $this->Supplier_model->get_active_supplier();
 
         $data['projects'] = $this->project->get_active_projects();
         // $data['supervisor'] = $this->MaterialLog_model->getProjectSupervisor(90);
@@ -161,10 +163,24 @@ class materialLog extends CI_Controller {
        echo json_encode($result);
        exit;
     }
-    public function getSupervisorAjax($id) { 
-       $result = $this->MaterialLog_model->getProjectSupervisor($id);
-       echo json_encode($result);
-       exit;
+    public function getSupervisorAjax($id) {
+        
+        $getProjectSupervisor = array();
+        $getSupplierByProjectId = array();
+        $getCategoryByProjectId = array();
+        $getProjectSupervisor = $this->MaterialLog_model->getProjectSupervisor($id);
+        $getSupplierByProjectId = $this->Supplier_model->getProjectSupplier($id);
+        $getCategoryByProjectId = $this->MaterialCategory_model->get_active_material_category_byProject($id);
+        
+        echo json_encode([
+            'success'=> true, 
+            'getProjectSupervisor' => $getProjectSupervisor,
+            'getProjectSupplier' => $getSupplierByProjectId,
+            'getProjectCategory' => $getCategoryByProjectId
+        ]);  exit();
+        
+        // echo json_encode($result);
+        exit;
     }
     public function editEntry($id) {
 
@@ -175,17 +191,8 @@ class materialLog extends CI_Controller {
         $result_detail = $this->MaterialLog_model->get_materiallog_detail_by_id($id);
         $data['result_detail'] = $result_detail;
 
-
-
         if (isset( $_POST['submit']) || isset($_POST['verify'])){
-
-            // echo "<pre>";
-
-            // print_r($data['result']);
-            // print_r($_FILES);
-            // print_r($_POST);
-            // exit;
-
+ 
             $this->form_validation->set_rules('challan_date', 'Date', 'trim|required');
             $this->form_validation->set_rules('challan_no', 'challan no', 'trim|required');
             $this->form_validation->set_rules('supplier_name', 'supplier name', 'required');
@@ -198,18 +205,19 @@ class materialLog extends CI_Controller {
                 redirect( base_url( 'admin/materialLog/editEntry/') );
             }else{
                
-                // resolved image issue s
-                // $associatedFileNames = array('challan_file');
-                $challan_image=$_FILES['challan_file']['name'];
-                if (!empty($challan_image)) {
-                    $result = uploadStaffFile('uploads/materialLog/challan/', 'challan_file');
-                    if ($result['flag'] == 1) {
-                        $challan_image = $result['filePath'];
-                    } else {
-                        $fileError[$fileName] = $result['error'];
+                
+                $associatedFileNames = array('challan_file');
+                foreach ($associatedFileNames as $fileName) {
+                    if (!empty($_FILES[$fileName]['name'])) {
+                        $result = uploadStaffFile('uploads/materialLog/challan/', $fileName);
+                        if ($result['flag'] == 1) {
+                            $data['worker_qrcode_image'] = $result['filePath'];
+                        } else {
+                            $fileError[$fileName] = $result['error'];
+                        }
                     }
                 }
-                // resolved image issue e
+                
                 // material image upload work
                 $cntFile=0;
                 $material_image_arr=array();
@@ -244,9 +252,8 @@ class materialLog extends CI_Controller {
                 $material_category = $this->input->post('material_category');
                 $material_name = $this->input->post('material_name');
                 $quantity = $this->input->post('quantity');
-                // resolved image issue s
-                // $challan_image = $_FILES['challan_file']['name'];
-                // resolved image issue e 
+                $challan_image = $_FILES['challan_file']['name'];
+
                 $createdate = date_create($challan_date);
                 $date = date_format($createdate,'Y-m-d');
                 if (isset($_POST['verify'])) {
@@ -263,9 +270,7 @@ class materialLog extends CI_Controller {
                 $uploaded_challan_img="";
                 if($_FILES['challan_file']['name'] != "")
                 {
-                    // resolved image issue s
-                    $uploaded_challan_img=$challan_image;
-                    // resolved image issue e
+                    $uploaded_challan_img=$_FILES['challan_file']['name'];
                     if (file_exists('./uploads/materialLog/challan/'.$data['result']->challan_image))
                     {
                         unlink('./uploads/materialLog/challan/'.$data['result']->challan_image);
@@ -353,8 +358,20 @@ class materialLog extends CI_Controller {
                 }
             }
         }
+
+        $getProjectSupervisor = array();
+        $getSupplierByProjectId = array();
+        $getCategoryByProjectId = array();
+        if(isset($data['result']->project_id) && !empty($data['result']->project_id)) {
+            $project_id = $data['result']->project_id;
+
+            $getProjectSupervisor = $this->MaterialLog_model->getProjectSupervisor($project_id);
+            $getSupplierByProjectId = $this->Supplier_model->getProjectSupplier($project_id);
+            $getCategoryByProjectId = $this->MaterialCategory_model->get_active_material_category_byProject($project_id);
+        }
         
-        $data['material_category'] = $this->MaterialCategory_model->get_active_material_category();
+        // $data['material_category'] = $this->MaterialCategory_model->get_active_material_category();
+        $data['material_category'] = $getCategoryByProjectId;
 
         $data['material'] = $this->Material_model->get_active_material();
         $data['supplier'] = $this->Supplier_model->get_active_supplier();
@@ -362,11 +379,9 @@ class materialLog extends CI_Controller {
         $data['projects'] = $this->project->get_active_projects();
         // $data['supervisor'] = $this->MaterialLog_model->getProjectSupervisor();
 
-        
-
         $data['title'] = 'Edit Material Entry';
         $data['description'] = 'Edit Material Entry';
-        $data['page'] = 'MaterialLog/materialLog_edit';
+        $data['page'] = 'materialLog/materialLog_edit';
         $this->load->view('includes/template', $data);
     }
 }

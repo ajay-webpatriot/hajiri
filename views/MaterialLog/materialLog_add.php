@@ -40,7 +40,7 @@
                         <div class="box-body">
                             <h4 class="box-title">General Details :</h4>
                             <div class="form-group">
-                                <label for="title" class="col-sm-3 control-label">Challan Date:</label>
+                                <label for="title" class="col-sm-3 control-label">Challan Date <font color="red">*</font></label>
                                 <div class="col-sm-9">
                                     <input name="challan_date" id="date" placeholder="Challan Date" class="form-control datepicker" type="text" value="<?php echo (isset($_POST['date'])) ? $_POST['date'] : ''; ?>" required>
                                     <span class="error"><?php echo (form_error('challan_date')) ? form_error('challan_date') : ''; ?></span>
@@ -48,36 +48,22 @@
                             </div> 
 
                             <div class="form-group">
-                                <label for="title" class="col-sm-3 control-label">Challan No:</label>
+                                <label for="title" class="col-sm-3 control-label">Challan No <font color="red">*</font></label>
                                 <div class="col-sm-9">
                                     <input name="challan_no" placeholder="Challan No" class="form-control" type="text" value="<?php echo (isset($results->challan_date)) ? $results->challan_date : ''; ?>" required>
                                     <span class="error"><?php echo (form_error('challan_date')) ? form_error('challan_date') : ''; ?></span>
                                 </div>
                             </div> 
                             <div class="form-group">
-                                <label for="title" class="col-sm-3 control-label">Challan Image:</label>
+                                <label for="title" class="col-sm-3 control-label">Challan Image <font color="red"> </font></label>
                                 <div class="col-sm-9">
                                     <input type="file" accept="image/*" id="challan_file" name="challan_file"  />
                                     <span class="error"><?php echo (form_error('challan_image')) ? form_error('challan_image') : ''; ?></span>
                                 </div>
                             </div>
-                            
+
                             <div class="form-group">
-                                <label for="supplier_name" class="col-sm-3 control-label">Supplier Name:</label>
-                                <div class="col-sm-9">
-                                    <select class="form-control supplier_name" name="supplier_name" required>
-                                        <option value="">Supplier Name </option>
-                                        <?php 
-                                        foreach ($supplier as $supp) {
-                                            ?>
-                                            <option value="<?php echo $supp->id; ?>"><?php echo $supp->name; ?></option>
-                                        <?php } ?>
-                                    </select>
-                                    <span class="error"><?php echo form_error('supplier_name') ?></span>
-                                </div>
-                            </div>
-                            <div class="form-group">
-                                <label for="project_name" class="col-sm-3 control-label">Project Name:</label>
+                                <label for="project_name" class="col-sm-3 control-label">Project Name <font color="red">*</font></label>
                                 <div class="col-sm-9">
                                     <select class="form-control project_name" name="project_name" required>
                                         <option value="">Project Name </option>
@@ -90,8 +76,24 @@
                                     <span class="error"><?php echo form_error('project_name') ?></span>
                                 </div>
                             </div>
+                            
                             <div class="form-group">
-                                <label for="supervisor_name" class="col-sm-3 control-label">Supervisor Name:</label>
+                                <label for="supplier_name" class="col-sm-3 control-label">Supplier Name <font color="red">*</font></label>
+                                <div class="col-sm-9">
+                                    <select class="form-control supplier_name" name="supplier_name" required>
+                                        <option value="">Supplier Name </option>
+                                        <?php /*
+                                        foreach ($supplier as $supp) {
+                                            ?>
+                                            <option value="<?php echo $supp->id; ?>"><?php echo $supp->name; ?></option>
+                                        <?php } */ ?>
+                                    </select>
+                                    <span class="error"><?php echo form_error('supplier_name') ?></span>
+                                </div>
+                            </div>
+                            
+                            <div class="form-group">
+                                <label for="supervisor_name" class="col-sm-3 control-label">Supervisor Name <font color="red">*</font></label>
                                 <div class="col-sm-9">
                                     <select class="form-control supervisor_name" name="supervisor_name" required>
                                         <option value="">Supervisor Name </option>
@@ -100,25 +102,26 @@
                                     <span class="error"><?php echo form_error('supervisor_name') ?></span>
                                 </div>
                             </div>
+
                             <h4 class="box-title">Add Material Details :</h4>
                             <div class="addMaterialDetail">
                                 <hr>
                                 <div class="form-group">
-                                    <label for="material_category" class="col-sm-3 control-label">Material Category:</label>
+                                    <label for="material_category" class="col-sm-3 control-label">Material Category <font color="red">*</font></label>
                                     <div class="col-sm-9">
                                         <select class="form-control material_category" name="material_category[]" required>
                                             <option value="">Material Category</option>
-                                            <?php 
+                                            <?php /*
                                             foreach ($material_category as $proj) {
                                                 ?>
                                                 <option value="<?php echo $proj->id; ?>"><?php echo $proj->category; ?></option>
-                                            <?php } ?>
+                                            <?php } */?>
                                         </select>
                                         <span class="error"><?php echo form_error('material_category') ?></span>
                                     </div>
                                 </div>
                                 <div class="form-group">
-                                    <label for="material_NAME" class="col-sm-3 control-label">Material Name:</label>
+                                    <label for="material_NAME" class="col-sm-3 control-label">Material Name <font color="red">*</font></label>
                                     <div class="col-sm-9">
                                         <select class="form-control material_name" name="material_name[]" required>
                                             <option value="">Material Name</option>
@@ -128,7 +131,7 @@
                                     </div>
                                 </div>
                                 <div class="form-group">
-                                    <label for="quantity" class="col-sm-3 control-label">Quantity:</label>
+                                    <label for="quantity" class="col-sm-3 control-label">Quantity <font color="red">*</font></label>
                                     <div class="col-sm-6">
                                         <input name="quantity[]" placeholder="Quantity" class="form-control" type="number" value="<?php echo (isset($results->quantity)) ? $results->quantity : ''; ?>" required>
                                         <span class="error"><?php echo (form_error('quantity')) ? form_error('quantity') : ''; ?></span>
@@ -138,7 +141,7 @@
                                     </div>
                                 </div> 
                                 <div class="form-group">
-                                    <label for="title" class="col-sm-3 control-label">Material Image:</label>
+                                    <label for="title" class="col-sm-3 control-label">Material Image </label>
                                     <div class="col-sm-9">
                                         <input type="file" id="material_file" accept="image/*" name="material_file[]"  />
                                         <span class="error"><?php echo (form_error('material_file')) ? form_error('material_file') : ''; ?></span>
@@ -210,6 +213,8 @@
         $(document).on("change",".project_name",function(){
 
             var optionHTML="<option value=''>Supervisor Name</option>";
+            var projectSupplierOption ="<option value=''>Supplier Name</option>";
+            var projectCategoryOption ="<option value=''>Material Category</option>";
             var project_id = $(this).val();
             var ele=this;
             if(project_id) {   
@@ -219,14 +224,27 @@
                     dataType: "json",
                     success:function(data) {
                         // $('select[name="city"]').empty();
-                        $.each(data, function(key, value) {
+                        $.each(data.getProjectSupervisor, function(key, value) {
                             optionHTML+='<option  value="'+ value.user_id +'">'+ value.supervisor_name +'</option>';
                         });
-                        $(ele).parents(".form-group").next().find("select").html(optionHTML);
+
+                        $.each(data.getProjectSupplier, function(key, value) {
+                            projectSupplierOption+='<option  value="'+ value.id +'">'+ value.name +'</option>';
+                        });
+
+                        $.each(data.getProjectCategory, function(key, value) {
+                            projectCategoryOption+='<option  value="'+ value.id +'">'+ value.category +'</option>';
+                        });
+                        // $(ele).parents(".form-group").next().find("select").html(optionHTML);
+                        $('.supervisor_name').html(optionHTML);
+                        $('.supplier_name').html(projectSupplierOption);
+                        $('.material_category').html(projectCategoryOption);
                     }
                 });
             }else{
-                $(ele).parents(".form-group").next().find("select").html(optionHTML);
+                $('.supplier_name').html(projectSupplierOption);
+                $('.supervisor_name').html(optionHTML);
+                $('.material_category').html(projectCategoryOption);
             }
         }); 
     });

@@ -28,13 +28,7 @@ class MaterialIssue extends CI_Controller {
     }
     public function addIssueLog(){
         if($this->input->post()){
-
             $Issuefile = $_FILES["Issuefile"];
-            // echo "<pre>";
-            // print_r($data);
-            // echo "==================";
-            // print_r($Issuefile);
-            // exit();
             
             $this->form_validation->set_rules('issueNo', 'Issue No', 'trim|required');    
             $this->form_validation->set_rules('issueDate', 'Date', 'trim|required');
@@ -42,12 +36,12 @@ class MaterialIssue extends CI_Controller {
             $this->form_validation->set_rules('IssueQuantity', 'Quantity', 'required');
             $this->form_validation->set_rules('materialCategory', 'Material Category', 'required');
             $this->form_validation->set_rules('sites', 'Consumption Place', 'required');
-            // $this->form_validation->set_rules('issueComment', 'Issue Comment', 'required');  
+            $this->form_validation->set_rules('project_name', 'Project Name', 'required');
             
             if ($this->form_validation->run() == false ) {
                 
                 $this->session->set_flashdata( 'error', 'Sorry,  Error while adding Material Issue details.' );
-                redirect( base_url( 'admin/MaterialIssue/addIssueLog/') );
+                // redirect( base_url( 'admin/MaterialIssue/addIssueLog/') );
             }else{
                 
                 $issue_image=$Issuefile['name'];
@@ -64,6 +58,7 @@ class MaterialIssue extends CI_Controller {
                     'date' => $date,
                     'issue_by'=>$this->session->userdata('id'),
                     'material_id'   => $this->input->post('MaterialName'),
+                    'project_id'   => $this->input->post('project_name'),
                     'quantity' => $this->input->post('IssueQuantity'),
                     'material_image'   =>  $issue_image,
                     'consumption_place'   => $this->input->post('sites'),
@@ -79,7 +74,7 @@ class MaterialIssue extends CI_Controller {
                 }
             }
         }
-        $data['materialCategory'] = $this->MaterialCategory_model->get_active_material_category();
+        // $data['materialCategory'] = $this->MaterialCategory_model->get_active_material_category();
         
         $data['ActiveProjects'] = $this->Project_model->get_active_projects();
         // echo '<pre>';
@@ -190,5 +185,23 @@ class MaterialIssue extends CI_Controller {
         // $this->MaterialLog_model->delete('material_entry_log', 'id', $id);
         // $this->MaterialLog_model->delete('material_entry_logdetail', 'material_entry_log_id', $id);
         $this->session->set_flashdata('success', 'Material Issue Log Deleted Successfully');
+    }
+    public function getMaterialIssueQuantity(){
+       
+        $material_id = $this->input->get('material_id');
+        $project_id = $this->input->get('project_id');
+        
+        $issue = $this->MaterialIssueModel->getMaterialIssueQuantitybyProjectId($project_id, $material_id);
+       
+        $entry = $this->MaterialLog_model->getMaterialEntryQuantitybyProjectId($project_id, $material_id);
+        
+        $entryQuantity = '';
+        $issueQuantity = '';
+        
+        $entryQuantity = isset($entry->entryQuantity)? $entry->entryQuantity : '';
+        $issueQuantity = isset($issue->issueQuantity)? $issue->issueQuantity : '';
+        
+        $quantity = $entryQuantity - $issueQuantity; 
+        echo json_encode($quantity);
     }
 }

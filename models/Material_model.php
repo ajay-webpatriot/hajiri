@@ -67,6 +67,13 @@ class Material_model extends CI_Model {
         $query = $this->db->get();
         return $query->row();
     }
+    public function caheckIsExistMaterial($id){
+        $this->db->select('name');
+        $this->db->from($this->table1);
+        $this->db->where($this->table1 . '.id', $id);
+        $query = $this->db->get();
+        return $query->row();
+    }
 }
 
 ?>

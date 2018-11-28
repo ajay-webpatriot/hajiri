@@ -91,7 +91,16 @@ class MaterialLog_model extends CI_Model {
         $this->db->update($table, $data, $where);
         return $this->db->affected_rows();
     }
+    public function getMaterialEntryQuantitybyProjectId($project_id, $material_id){
 
+        $this->db->select('SUM('.$this->table2.'.quantity) as entryQuantity');
+        $this->db->from($this->table1);
+        $this->db->join($this->table2, $this->table1. '.id = '. $this->table2.'.material_entry_log_id');
+        $this->db->where($this->table1 . '.project_id', $project_id);
+        $this->db->where($this->table1 . '.status !=', 'Deleted');
+        $query = $this->db->get();
+       return  $result = $query->row();
+    }
 }
 
 ?>

@@ -34,7 +34,7 @@ class Material extends CI_Controller {
             $this->form_validation->set_error_delimiters('<div class="error">', '</div>');
             $this->form_validation->set_rules('project_id', 'Project', 'callback_selectCategory_validate['.$this->input->post('project_id').']');
             $this->form_validation->set_rules('category_id', 'Material Category', 'callback_selectCategory_validate['.$this->input->post('category_id').']');
-            $this->form_validation->set_rules('material_name', 'Material Name', 'trim|required');
+            $this->form_validation->set_rules('material_name', 'Material Name', 'trim|required|is_unique[materials.name]');
             $this->form_validation->set_rules('unit_measurement', 'Unit of Measurement', 'trim|required');
             $this->form_validation->set_rules('hsn_code', 'HSN Code', 'trim|required');
             $this->form_validation->set_rules('bound_start_range', 'Bound Range', 'trim|required');
@@ -98,14 +98,24 @@ class Material extends CI_Controller {
         $fileError = array();
         
         if (isset($_POST['submit'])) {
+
+            $original_value = $this->Material->caheckIsExistMaterial($id);
+             
+            if($this->input->post('material_name') != $original_value->name){
+                $is_unique = '|is_unique[materials.name]';
+            }else{
+                $is_unique = '';
+            }
+
             $this->form_validation->set_error_delimiters('<div class="error">', '</div>');
             $this->form_validation->set_rules('project_id', 'Project', 'callback_selectCategory_validate['.$this->input->post('project_id').']');
             $this->form_validation->set_rules('category_id', 'Material Category', 'callback_selectCategory_validate['.$this->input->post('category_id').']');
-            $this->form_validation->set_rules('material_name', 'Material Name', 'trim|required');
+            $this->form_validation->set_rules('material_name', 'Material Name', 'trim|required'.$is_unique);
             $this->form_validation->set_rules('unit_measurement', 'Unit of Measurement', 'trim|required');
             $this->form_validation->set_rules('hsn_code', 'HSN Code', 'trim|required');
             $this->form_validation->set_rules('bound_start_range', 'Bound Range', 'trim|required');
             $this->form_validation->set_rules('bound_end_range', 'Bound Range', 'trim|required');
+
             
             if ($this->form_validation->run() == TRUE) {
                 
@@ -154,7 +164,6 @@ class Material extends CI_Controller {
             
         } else {
             $material_id = $this->Material->update('materials', array('id' => $id), array('status' => 1));
-           
         }
         
         $this->session->set_flashdata('success', 'Status Changed Successfully');

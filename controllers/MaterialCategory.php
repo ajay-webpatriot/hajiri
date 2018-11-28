@@ -26,9 +26,9 @@ class MaterialCategory extends CI_Controller {
 
         if (isset($_POST['submit'])) {
             // Add category
-            $this->form_validation->set_error_delimiters('<div class="error">', '</div>');
-            $this->form_validation->set_rules('categoryName', 'Category', 'trim|required|regex_match[/[a-zA-Z]/]');
-            
+            // $this->form_validation->set_error_delimiters('<div class="error">', '</div>');
+            $this->form_validation->set_rules('categoryName', 'Category', 'trim|required|is_unique[categories.name]|regex_match[/[a-zA-Z]/]');
+             
             if ($this->form_validation->run() == TRUE) {
                 $data = array(
                     'name' => $this->input->post('categoryName'),
@@ -45,30 +45,45 @@ class MaterialCategory extends CI_Controller {
                     $this->session->set_flashdata('error', 'Failed To Add Category.');
                     redirect(base_url('admin/MaterialCategory'));
                 }
+            }else{
+               $this->session->set_flashdata('error', validation_errors());
+               redirect(base_url('admin/MaterialCategory'));
             }
         }
 
         if (isset($_POST['edit'])) {
-            // update category
-            $this->form_validation->set_error_delimiters('<div class="error">', '</div>');
-            $this->form_validation->set_rules('categoryName', 'Category', 'trim|required|regex_match[/[a-zA-Z]/]');
+
+            $id = $this->input->post('catId');
+
+            $original_value = $this->MaterialCategory->caheckIsExistCategory($id);
             
-            if ($this->form_validation->run() == TRUE) {
+            if($this->input->post('categoryName') != $original_value->name){
+                $is_unique = '|is_unique[categories.name]';
+            }else{
+                $is_unique = '';
+            }
+
+            // update category
+            // $this->form_validation->set_error_delimiters('<div class="error">', '</div>');
+            $this->form_validation->set_rules('categoryName', 'Category', 'trim|required|regex_match[/[a-zA-Z]/]'.$is_unique);
+            
+            if ($this->form_validation->run() === TRUE) {
                 $data = array(
                     'name' => $this->input->post('categoryName'),
                     'approximate_estimate_ratio'=> $this->input->post('approximate_estimate_ratio')
                 );
-                $where = "id = ".$this->input->post('catId');
+                $where = "id = ".$id;
                 $cat_id = $this->MaterialCategory->update('categories',$where ,$data);
-                if ($cat_id) {
-
+                if ($cat_id) { 
                     $this->session->set_flashdata('success', 'Category Updated Successfully! ');
                     redirect(base_url('admin/MaterialCategory'));
-                   
                 } else {
-                    $this->session->set_flashdata('error', 'Failed To Update Category.');
+                    $this->session->set_flashdata('error', validation_errors());
                     redirect(base_url('admin/MaterialCategory'));
                 }
+            }else{
+                $this->session->set_flashdata('error', validation_errors());
+                redirect(base_url('admin/MaterialCategory'));
             }
         }
 

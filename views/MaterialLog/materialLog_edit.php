@@ -73,6 +73,23 @@
                                 </div>
                             </div>
                             <div class="form-group">
+                                <label for="project_name" class="col-sm-3 control-label">Project Name:</label>
+                                <div class="col-sm-9">
+                                    <select class="form-control project_name" name="project_name" required>
+                                        <option value="">Project Name </option>
+                                        <?php 
+                                        foreach ($projects as $proj) {
+                                                if( isset( $result->project_id ) && $proj->project_id == $result->project_id ){
+                                                    $selected = 'selected="selected"';
+                                                }
+                                            ?>
+                                            <option <?=$selected?> value="<?php echo $proj->project_id; ?>"><?php echo $proj->project_name; ?></option>
+                                        <?php } ?>
+                                    </select>
+                                    <span class="error"><?php echo form_error('project_name') ?></span>
+                                </div>
+                            </div>
+                            <div class="form-group">
                                 <label for="supplier_name" class="col-sm-3 control-label">Supplier Name:</label>
                                 <div class="col-sm-9">
                                     <select class="form-control supplier_name" name="supplier_name" required>
@@ -88,23 +105,6 @@
                                         <?php } ?>
                                     </select>
                                     <span class="error"><?php echo form_error('supplier_name') ?></span>
-                                </div>
-                            </div>
-                            <div class="form-group">
-                                <label for="project_name" class="col-sm-3 control-label">Project Name:</label>
-                                <div class="col-sm-9">
-                                    <select class="form-control project_name" name="project_name" required>
-                                        <option value="">Project Name </option>
-                                        <?php 
-                                        foreach ($projects as $proj) {
-                                                if( isset( $result->project_id ) && $proj->project_id == $result->project_id ){
-                                                    $selected = 'selected="selected"';
-                                                }
-                                            ?>
-                                            <option <?=$selected?> value="<?php echo $proj->project_id; ?>"><?php echo $proj->project_name; ?></option>
-                                        <?php } ?>
-                                    </select>
-                                    <span class="error"><?php echo form_error('project_name') ?></span>
                                 </div>
                             </div>
                             <div class="form-group">
@@ -280,6 +280,9 @@
 <script type="text/javascript">
 
     $(document).ready(function () {
+         
+        // projectByOption($('.project_name').val());
+
         var status="<?=$result->status?>";
 
        if(status == "Approved")
@@ -345,29 +348,81 @@
 
 
         // load supervisor name using ajax
-        $(document).on("change",".project_name",function(){
+        $(document).on("change",".project_name",function(){ 
 
-            var optionHTML="<option value=''>Supervisor Name</option>";
+            // var optionHTML="<option value=''>Supervisor Name</option>";
+            // var projectSupplierOption ="<option value=''>Supplier Name</option>";
+            // var projectCategoryOption ="<option value=''>Material Category</option>";
             var project_id = $(this).val();
-            var ele=this;
-            if(project_id) {   
-                $.ajax({
-                    url: "<?php echo base_url().'admin/MaterialLog/getSupervisorAjax/'?>"+project_id,
-                    type: "GET",
-                    dataType: "json",
-                    success:function(data) {
-                        // $('select[name="city"]').empty();
-                        $.each(data, function(key, value) {
-                            optionHTML+='<option  value="'+ value.user_id +'">'+ value.supervisor_name +'</option>';
-                        });
-                        $(ele).parents(".form-group").next().find("select").html(optionHTML);
-                    }
-                });
-            }else{
-                $(ele).parents(".form-group").next().find("select").html(optionHTML);
-            }
+            
+            // if(project_id) {
+                // $.ajax({
+                //     url: "<?php //echo base_url().'admin/MaterialLog/getSupervisorAjax/'?>"+project_id,
+                //     type: "GET",
+                //     dataType: "json",
+                //     success:function(data) {
+                        
+                //         $.each(data.getProjectSupervisor, function(key, value) {
+                //             optionHTML+='<option  value="'+ value.user_id +'">'+ value.supervisor_name +'</option>';
+                //         });
+
+                //         $.each(data.getProjectSupplier, function(key, value) {
+                //             projectSupplierOption+='<option  value="'+ value.id +'">'+ value.name +'</option>';
+                //         });
+
+                //         $.each(data.getProjectCategory, function(key, value) {
+                //             projectCategoryOption+='<option  value="'+ value.id +'">'+ value.category +'</option>';
+                //         });
+
+                //         $('.supervisor_name').html(optionHTML);
+                //         $('.supplier_name').html(projectSupplierOption);
+                //         $('.material_category').html(projectCategoryOption);
+                //     }
+                // });
+                projectByOption(project_id);
+            // }else{
+            //     $('.supervisor_name').html(optionHTML);
+            //     $('.supplier_name').html(projectSupplierOption);
+            //     $('.material_category').html(projectCategoryOption);
+            // }
         }); 
     });
+
+    function projectByOption(project_id){
+        var optionHTML="<option value=''>Supervisor Name</option>";
+        var projectSupplierOption ="<option value=''>Supplier Name</option>";
+        var projectCategoryOption ="<option value=''>Material Category</option>";
+
+        if(project_id != '' && project_id != undefined){
+            $.ajax({
+                url: "<?php echo base_url().'admin/MaterialLog/getSupervisorAjax/'?>"+project_id,
+                type: "GET",
+                dataType: "json",
+                success:function(data) {
+                    
+                    $.each(data.getProjectSupervisor, function(key, value) {
+                        optionHTML+='<option  value="'+ value.user_id +'">'+ value.supervisor_name +'</option>';
+                    });
+
+                    $.each(data.getProjectSupplier, function(key, value) {
+                        projectSupplierOption+='<option  value="'+ value.id +'">'+ value.name +'</option>';
+                    });
+
+                    $.each(data.getProjectCategory, function(key, value) {
+                        projectCategoryOption+='<option  value="'+ value.id +'">'+ value.category +'</option>';
+                    });
+
+                    $('.supervisor_name').html(optionHTML);
+                    $('.supplier_name').html(projectSupplierOption);
+                    $('.material_category').html(projectCategoryOption);
+                }
+            });
+        }else{
+            $('.supervisor_name').html(optionHTML);
+            $('.supplier_name').html(projectSupplierOption);
+            $('.material_category').html(projectCategoryOption);
+        }
+    }
 
     // Calculate total amount
     function rate_change_fun(ele)
@@ -386,7 +441,6 @@
         var rate=$(ele).parents(".form-group").next().find(".rate").val();
         var totalRate=quantity*rate;
         
-
         $(ele).parents(".form-group").next().next().find(".amountLabel").html(totalRate);
         $(ele).parents(".form-group").next().next().find(".amount").val(totalRate);
     }

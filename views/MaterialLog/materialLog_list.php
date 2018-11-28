@@ -44,7 +44,7 @@
                             <?php echo $this->session->flashdata('warning'); ?>
                         </div>
                     <?php endif; ?>
-                    <table id="table" class="tableFilter table table-striped table-hover table-bordered display responsive nowrap" cellspacing="0" width="100%">
+                    <table id="table" class="WR tableFilter table table-striped table-hover table-bordered display responsive nowrap" cellspacing="0" width="100%">
                         <thead>
                             <tr>
                                 <th>Challan No</th> 

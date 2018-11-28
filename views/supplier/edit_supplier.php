@@ -44,35 +44,35 @@
                             <input type="hidden" name="supplier_id" value="<?php echo (isset($result->id)) ? $result->id : ''; ?>">
                             
                             <div class="form-group">
-                                <label for="title" class="col-sm-3 control-label">Company Name:</label>
+                                <label for="title" class="col-sm-3 control-label">Company Name <font color="red">*</font></label>
                                 <div class="col-sm-9">
                                     <input name="company_name" placeholder="Company Name" class="form-control" type="text" value="<?php echo (isset($result->company_name)) ? $result->company_name : ''; ?>" required="required">
                                     <span class="error"><?php echo (form_error('company_name')) ? form_error('company_name') : ''; ?></span>
                                 </div>
                             </div>
                             <div class="form-group">
-                                <label for="title" class="col-sm-3 control-label">Supplier Name:</label>
+                                <label for="title" class="col-sm-3 control-label">Supplier Name <font color="red">*</font></label>
                                 <div class="col-sm-9">
                                     <input name="supplier_name" placeholder="Supplier Name" class="form-control" type="text" value="<?php echo (isset($result->name)) ? $result->name : ''; ?>" required="required">
                                     <span class="error"><?php echo (form_error('supplier_name')) ? form_error('supplier_name') : ''; ?></span>
                                 </div>
                             </div>
                             <div class="form-group">
-                                <label for="title" class="col-sm-3 control-label">Contact Number:</label>
+                                <label for="title" class="col-sm-3 control-label">Contact Number <font color="red">*</font></label>
                                 <div class="col-sm-9">
                                     <input name="contact_number" placeholder="Contact Number" class="form-control" type="text" value="<?php echo (isset($result->contact_number)) ? $result->contact_number : ''; ?>" required="required">
                                     <span class="error"><?php echo (form_error('contact_number')) ? form_error('contact_number') : ''; ?></span>
                                 </div>
                             </div>
                             <div class="form-group">
-                                <label for="title" class="col-sm-3 control-label">GST No:</label>
+                                <label for="title" class="col-sm-3 control-label">GST No <font color="red">*</font></label>
                                 <div class="col-sm-9">
                                     <input name="gst_number" placeholder="GST No" class="form-control" type="text" value="<?php echo (isset($result->gst_number)) ? $result->gst_number : ''; ?>" required="required">
                                     <span class="error"><?php echo (form_error('gst_number')) ? form_error('gst_number') : ''; ?></span>
                                 </div>
                             </div>
                             <div class="form-group">
-                                <label for="title" class="col-sm-3 control-label">Address:</label>
+                                <label for="title" class="col-sm-3 control-label">Address <font color="red">*</font></label>
                                 <div class="col-sm-9">
                                     
                                     <textarea name="address" required="required" placeholder="Address" class="form-control"><?php echo (isset($result->address)) ? $result->address : ''; ?></textarea> 
@@ -81,14 +81,14 @@
                                 </div>
                             </div>
                             <div class="form-group">
-                                <label for="title" class="col-sm-3 control-label">Email Id:</label>
+                                <label for="title" class="col-sm-3 control-label">Email Id <font color="red">*</font></label>
                                 <div class="col-sm-9">
                                     <input name="email_id" required="required" placeholder="Email Id" class="form-control" type="text" value="<?php echo (isset($result->email)) ? $result->email : ''; ?>" >
                                     <span class="error"><?php echo (form_error('email_id')) ? form_error('email_id') : ''; ?></span>
                                 </div>
                             </div>
                             <div class="form-group">
-                                <label for="title" class="col-sm-3 control-label">Assign Project:</label>
+                                <label for="title" class="col-sm-3 control-label">Assign Project <font color="red">*</font></label>
                                 <div class="col-sm-9">
                                     <select placeholder="Select Project" class="form-control project" name="project_id[]" multiple="multiple" required="required">
                                         
@@ -117,7 +117,7 @@
                             </div>
 
                             <div class="form-group">
-                                <label for="title" class="col-sm-3 control-label">Assign Material Category:</label>
+                                <label for="title" class="col-sm-3 control-label">Assign Material Category <font color="red">*</font></label>
                                 <div class="col-sm-9">
                                     <select placeholder="Select Material Category" class="form-control category" name="category_id[]" multiple="multiple" required="required">
                                         
@@ -144,7 +144,7 @@
                                 </div>
                             </div>
                             <div class="form-group" id='activeSelect'>
-                                <label for="status" class="col-sm-3 control-label">Status:</label>
+                                <label for="status" class="col-sm-3 control-label">Status <font color="red">*</font></label>
                                 <div class="col-sm-9">
                                     <select name="status" class="form-control">
                                         <option value="1" <?php echo ($result->status == "1") ? 'selected="selected"' : ''; ?>>Active</option>
