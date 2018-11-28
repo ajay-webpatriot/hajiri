@@ -40,17 +40,18 @@ class materialLog extends CI_Controller {
                 // $this->session->set_flashdata( 'error', 'Sorry,  Error while adding Material details.' );
                 // redirect( base_url( 'admin/materialLog/Entry/') );
             
-                $associatedFileNames = array('challan_file');
-                foreach ($associatedFileNames as $fileName) {
-                    if (!empty($_FILES[$fileName]['name'])) {
-                        $result = uploadStaffFile('uploads/materialLog/challan/', $fileName);
-                        if ($result['flag'] == 1) {
-                            $data['worker_qrcode_image'] = $result['filePath'];
-                        } else {
-                            $fileError[$fileName] = $result['error'];
-                        }
+                // resolved image issue s
+                // $associatedFileNames = array('challan_file' , 'material_file');
+                $challan_image=$_FILES['challan_file']['name'];
+                if (!empty($challan_image)) {
+                    $result = uploadStaffFile('uploads/materialLog/challan/', 'challan_file');
+                    if ($result['flag'] == 1) {
+                        $challan_image = $result['filePath'];
+                    } else {
+                        $fileError[$fileName] = $result['error'];
                     }
                 }
+                // resolved image issue e
                 
                 // material image upload work
                 $cntFile=0;
@@ -86,7 +87,9 @@ class materialLog extends CI_Controller {
                 $material_category = $this->input->post('material_category');
                 $material_name = $this->input->post('material_name');
                 $quantity = $this->input->post('quantity');
-                $challan_image = $_FILES['challan_file']['name'];
+                // resolved image issue s
+                // $challan_image = $_FILES['challan_file']['name'];
+                // resolved image issue e
 
                 $createdate = date_create($challan_date);
                 $date = date_format($createdate,'Y-m-d');
@@ -206,18 +209,18 @@ class materialLog extends CI_Controller {
             }else{
                
                 
-                $associatedFileNames = array('challan_file');
-                foreach ($associatedFileNames as $fileName) {
-                    if (!empty($_FILES[$fileName]['name'])) {
-                        $result = uploadStaffFile('uploads/materialLog/challan/', $fileName);
-                        if ($result['flag'] == 1) {
-                            $data['worker_qrcode_image'] = $result['filePath'];
-                        } else {
-                            $fileError[$fileName] = $result['error'];
-                        }
+                // resolved image issue s
+                // $associatedFileNames = array('challan_file');
+                $challan_image=$_FILES['challan_file']['name'];
+                if (!empty($challan_image)) {
+                    $result = uploadStaffFile('uploads/materialLog/challan/', 'challan_file');
+                    if ($result['flag'] == 1) {
+                        $challan_image = $result['filePath'];
+                    } else {
+                        $fileError[$fileName] = $result['error'];
                     }
                 }
-                
+                // resolved image issue e
                 // material image upload work
                 $cntFile=0;
                 $material_image_arr=array();
@@ -252,7 +255,9 @@ class materialLog extends CI_Controller {
                 $material_category = $this->input->post('material_category');
                 $material_name = $this->input->post('material_name');
                 $quantity = $this->input->post('quantity');
-                $challan_image = $_FILES['challan_file']['name'];
+                // resolved image issue s
+                // $challan_image = $_FILES['challan_file']['name'];
+                // resolved image issue e 
 
                 $createdate = date_create($challan_date);
                 $date = date_format($createdate,'Y-m-d');
@@ -270,7 +275,9 @@ class materialLog extends CI_Controller {
                 $uploaded_challan_img="";
                 if($_FILES['challan_file']['name'] != "")
                 {
-                    $uploaded_challan_img=$_FILES['challan_file']['name'];
+                    // resolved image issue s
+                    $uploaded_challan_img=$challan_image;
+                    // resolved image issue e
                     if (file_exists('./uploads/materialLog/challan/'.$data['result']->challan_image))
                     {
                         unlink('./uploads/materialLog/challan/'.$data['result']->challan_image);

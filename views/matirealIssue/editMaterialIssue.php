@@ -8,7 +8,7 @@
     </section>
     <ol class="breadcrumb margin-bottom0">
         <li><a href="<?php echo base_url('admin'); ?>"><i class="fa fa-dashboard"></i> Dashboard</a></li>
-        <li><a href="<?php echo base_url('admin/Materialissue'); ?>">Material Issue</a></li>
+        <li><a href="<?php echo base_url('admin/MaterialIssue'); ?>">Material Issue</a></li>
         <li class="active"><?php echo (isset($title) ? $title : ''); ?></li>
     </ol>
     <!-- Main content -->
@@ -128,7 +128,7 @@
                                         if($result->material_image != "")
                                         {
                                             ?>
-                                            <img src="<?=base_url('uploads/')?>materialIssue/<?=$result->material_image?>" width="100px" class="image"/>
+                                            <img src="<?=base_url('uploads/')?>MaterialIssue/<?=$result->material_image?>" width="100px" class="image"/>
                                             <?php
                                         }?>
                                 </div>

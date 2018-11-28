@@ -79,6 +79,7 @@
                                         <option value="">Project Name </option>
                                         <?php 
                                         foreach ($projects as $proj) {
+                                            $selected = "";
                                                 if( isset( $result->project_id ) && $proj->project_id == $result->project_id ){
                                                     $selected = 'selected="selected"';
                                                 }
