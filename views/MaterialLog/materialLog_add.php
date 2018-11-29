@@ -133,7 +133,7 @@
                                 <div class="form-group">
                                     <label for="quantity" class="col-sm-3 control-label">Quantity <font color="red">*</font></label>
                                     <div class="col-sm-6">
-                                        <input name="quantity[]" placeholder="Quantity" class="form-control" type="number" value="<?php echo (isset($results->quantity)) ? $results->quantity : ''; ?>" required>
+                                        <input name="quantity[]" min="1" placeholder="Quantity" class="form-control Quantity" type="number" value="<?php echo (isset($results->quantity)) ? $results->quantity : ''; ?>" required>
                                         <span class="error"><?php echo (form_error('quantity')) ? form_error('quantity') : ''; ?></span>
                                     </div>
                                     <div class="col-sm-3">
@@ -178,8 +178,6 @@
         $clone.find('img').remove();
         $clone.insertAfter($('[class^="addMaterialDetail"]').last());
     });
-
-
         // load material name using ajax
         $(document).on("change",".material_category",function(){
 
@@ -214,7 +212,7 @@
 
             var optionHTML="<option value=''>Supervisor Name</option>";
             var projectSupplierOption ="<option value=''>Supplier Name</option>";
-            var projectCategoryOption ="<option value=''>Material Category</option>";
+
             var project_id = $(this).val();
             var ele=this;
             if(project_id) {   
@@ -232,21 +230,35 @@
                             projectSupplierOption+='<option  value="'+ value.id +'">'+ value.name +'</option>';
                         });
 
-                        $.each(data.getProjectCategory, function(key, value) {
-                            projectCategoryOption+='<option  value="'+ value.id +'">'+ value.category +'</option>';
-                        });
-                        // $(ele).parents(".form-group").next().find("select").html(optionHTML);
                         $('.supervisor_name').html(optionHTML);
                         $('.supplier_name').html(projectSupplierOption);
-                        $('.material_category').html(projectCategoryOption);
                     }
                 });
             }else{
                 $('.supplier_name').html(projectSupplierOption);
                 $('.supervisor_name').html(optionHTML);
-                $('.material_category').html(projectCategoryOption);
             }
         }); 
+        $(document).on("change",".supplier_name",function(){
+            var CategoryOption ="<option value=''>Material Category</option>";
+            var supplier_id = $(this).val();
+            var projectCategoryOption ="<option value=''>Material Category</option>";
+            var ele=this;
+            if(supplier_id) { 
+                $.ajax({
+                    url: "<?php echo base_url().'admin/MaterialLog/getSupplierCategoryAjax/'?>"+supplier_id,
+                    type: "GET",
+                    dataType: "json",
+                    success:function(data) {
+                        $.each(data.getProjectCategory, function(key, value) {
+                            projectCategoryOption+='<option  value="'+ value.id +'">'+ value.category +'</option>';
+                        });
+                        $('.material_category').html(projectCategoryOption);
+                    }
+                });
+            }else{
+                $('.material_category').html(projectCategoryOption);
+            }
+        });
     });
-
 </script>

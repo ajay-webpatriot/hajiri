@@ -39,7 +39,7 @@
                     }
                     ?>
                     <!-- form start -->
-                    <form action="" id="add-material" class="form-horizontal" method="POST" enctype="multipart/form-data">
+                    <form action="" id="add-material" class="form-horizontal validateSubmit" method="POST" enctype="multipart/form-data">
                         <div class="box-body">
                             
                             <div class="form-group">
@@ -67,7 +67,7 @@
                             <div class="form-group">
                                 <label for="category_id" class="col-sm-3 control-label">Material Category <font color="red">*</font></label>
                                 <div class="col-sm-9">
-                                    <select name="category_id" class="form-control category_id" >
+                                    <select name="category_id" class="form-control category_id" required>
                                         <option value="">--Select Category--</option>
                                         <?php 
                                             foreach( $Categories as $Category ){ 
@@ -99,9 +99,9 @@
                             </div>
 
                             <div class="form-group">
-                                <label for="title" class="col-sm-3 control-label">HSN Code <font color="red">*</font></label>
+                                <label for="title" class="col-sm-3 control-label">HSN Code </label>
                                 <div class="col-sm-9">
-                                    <input name="hsn_code" placeholder="HSN Code" class="form-control" type="text" value="<?php echo (isset($_POST['hsn_code'])) ? $_POST['hsn_code'] : ''; ?>" required="required">
+                                    <input name="hsn_code" placeholder="HSN Code" class="form-control" type="text" value="<?php echo (isset($_POST['hsn_code'])) ? $_POST['hsn_code'] : ''; ?>">
                                     <span class="error"><?php echo (form_error('hsn_code')) ? form_error('hsn_code') : ''; ?></span>
                                 </div>
                             </div>
@@ -109,18 +109,18 @@
                             <div class="form-group">
                                 <label for="title" class="col-sm-3 control-label">Bound Range <font color="red">*</font></label>
                                 <div class="col-sm-3">
-                                    <input name="bound_start_range" placeholder="" class="form-control" type="number" min="1" value="<?php echo (isset($_POST['bound_start_range'])) ? $_POST['bound_start_range'] : ''; ?>" required="required">
+                                    <input name="bound_start_range" placeholder="" class="form-control bound_start_range" type="number" min="1" value="<?php echo (isset($_POST['bound_start_range'])) ? $_POST['bound_start_range'] : ''; ?>" required="required">
                                     
                                 </div>
                                 <label for="title" class="col-sm-1 control-label">To</label>
                                 <div class="col-sm-3">
-                                    <input name="bound_end_range" placeholder="" class="form-control" type="number" min="1" value="<?php echo (isset($_POST['bound_end_range'])) ? $_POST['bound_start_range'] : ''; ?>" required="required">
-                                    
+                                    <input name="bound_end_range" placeholder="" class="form-control bound_end_range" type="number" min="1" value="<?php echo (isset($_POST['bound_end_range'])) ? $_POST['bound_start_range'] : ''; ?>" required="required">
                                 </div>
-                                
-                                <span class="error"><?php echo (form_error('bound_start_range') || form_error('bound_end_range')) ? form_error('bound_end_range') : ''; ?></span>
-                            
+                                <div class="col-sm-12 col-sm-offset-3">
+                                    <span class="error bond_range_Error"><?php echo (form_error('bound_start_range') || form_error('bound_end_range')) ? form_error('bound_end_range') : ''; ?></span>
+                                </div>
                             </div>
+
                         <!-- /.box-body -->
                         
                         <div class="box-footer">
@@ -138,3 +138,22 @@
     <!-- /.content -->
 </div>
 <!-- /.content-wrapper -->
+
+<script type="text/javascript">
+   $(document).on('submit','.validateSubmit',function (){
+            
+        var bound_start_range = $('.bound_start_range').val();
+        var bound_end_range = $('.bound_end_range').val();
+        var status = false;
+
+        if(Number(bound_end_range) < Number(bound_start_range)){
+            $('.bond_range_Error').show();
+            $('.bond_range_Error').html('Please enter Bond end range is greater than or equal to the Bond start range.');
+            status =  false;
+        }else{
+            status =  true;
+            $('.bond_range_Error').hide();
+        }
+        return status;
+    });
+</script>

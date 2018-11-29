@@ -48,7 +48,6 @@ class MaterialLog_model extends CI_Model {
     }
     public function getProjectSupervisor($id)
     {
-
         $this->db->select("user.user_id,CONCAT(user.user_name,' ',user.user_last_name) as supervisor_name");
         $this->db->from("user");
         $this->db->join("user_project",'user_project.user_id = user.user_id');

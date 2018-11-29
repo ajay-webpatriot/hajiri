@@ -40,7 +40,6 @@ class MaterialCategory extends CI_Controller {
 
                     $this->session->set_flashdata('success', 'Category Added Successfully! ');
                     redirect(base_url('admin/MaterialCategory'));
-                   
                 } else {
                     $this->session->set_flashdata('error', 'Failed To Add Category.');
                     redirect(base_url('admin/MaterialCategory'));
@@ -87,7 +86,6 @@ class MaterialCategory extends CI_Controller {
             }
         }
 
-
         $data['title'] = 'Material Category List';
         $data['description'] = 'All categoy list';
         $data['page'] = 'materialcategory/materialcategory';
@@ -115,7 +113,7 @@ class MaterialCategory extends CI_Controller {
         );
         $check = $this->MaterialCategory->checkCategory($id);
         if($check->id == 0){
-            $worker_id = $this->MaterialCategory->delete('categories', 'id', $id);
+           $worker_id = $this->MaterialCategory->update('categories', array('id' => $id), array('is_deleted' => '1'));
             $this->session->set_flashdata('success', 'Category deleted successfully.');
         }else{
             $this->session->set_flashdata('warning', 'Category is already assigned to a material.');

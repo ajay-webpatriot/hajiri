@@ -32,18 +32,17 @@ class Supplier extends CI_Controller {
         
         
         if (isset($_POST['submit'])) {
+            
             $this->form_validation->set_error_delimiters('<div class="error">', '</div>');
             $this->form_validation->set_rules('company_name', 'Company Name', 'trim|required');
             $this->form_validation->set_rules('supplier_name', 'Supplier Name', 'trim|required');
             $this->form_validation->set_rules('address', 'Address', 'trim|required');
-            $this->form_validation->set_rules('gst_number', 'GST No', 'trim|required');
+            // $this->form_validation->set_rules('gst_number', 'GST No', 'trim|required');
             $this->form_validation->set_rules('email_id', 'Email Id', 'trim|required|valid_email');
             $this->form_validation->set_rules('contact_number', 'Contact Number', 'trim|required|numeric');
-            // echo "<pre>";
-            // print_r($_POST);exit;
+            
             if ($this->form_validation->run() == TRUE) {
                        
-
                 $data = array(
                     'name' => $this->input->post('supplier_name'),
                     'company_name' => $this->input->post('company_name'),
@@ -105,7 +104,7 @@ class Supplier extends CI_Controller {
             $this->form_validation->set_rules('company_name', 'Company Name', 'trim|required');
             $this->form_validation->set_rules('supplier_name', 'Supplier Name', 'trim|required');
             $this->form_validation->set_rules('address', 'Address', 'trim|required');
-            $this->form_validation->set_rules('gst_number', 'GST No', 'trim|required');
+            // $this->form_validation->set_rules('gst_number', 'GST No', 'trim|required');
             $this->form_validation->set_rules('email_id', 'Email Id', 'trim|required|valid_email');
             $this->form_validation->set_rules('contact_number', 'Contact Number', 'trim|required|numeric');
             
@@ -122,39 +121,33 @@ class Supplier extends CI_Controller {
                     'status' => $this->input->post('status'),
                 );
                  
-
                 $supplier_id = $this->Supplier->update('suppliers', array('id' => $id), $data);
 
                 $project_ids=  $this->input->post('project_id');
                 $category_ids=  $this->input->post('category_id');
-                // if ($supplier_id) {
-                    $this->Supplier->delete('supplier_projects', 'supplier_id', $id);
-                    foreach ($project_ids as $key => $value) {
-                        # code...
-                        $data=array(
-                            'supplier_id'=>$id,
-                            'project_id'=> $value
-                        );
+                 
+                $this->Supplier->delete('supplier_projects', 'supplier_id', $id);
+                foreach ($project_ids as $key => $value) {
+                    # code...
+                    $data=array(
+                        'supplier_id'=>$id,
+                        'project_id'=> $value
+                    );
+                    $this->Supplier->save('supplier_projects', $data);
+                }
 
-                        $this->Supplier->save('supplier_projects', $data);
-                    }
+                $this->Supplier->delete('supplier_categories', 'supplier_id', $id);
+                foreach ($category_ids as $key => $value) {
+                    # code...
+                    $data=array(
+                        'supplier_id'=>$id,
+                        'category_id'=> $value
+                    );
+                    $this->Supplier->save('supplier_categories', $data);
+                }
 
-                    $this->Supplier->delete('supplier_categories', 'supplier_id', $id);
-                    foreach ($category_ids as $key => $value) {
-                        # code...
-                        $data=array(
-                            'supplier_id'=>$id,
-                            'category_id'=> $value
-                        );
-                        $this->Supplier->save('supplier_categories', $data);
-                    }
-
-                    $this->session->set_flashdata('success', 'Supplier Updated Successfully. ');
-                    redirect(base_url('admin/supplier'));
-               // } else {
-               //      $this->session->set_flashdata('error', 'Failed To Update Supplier');
-               //      redirect(base_url('admin/supplier/editSupplier/' . $id));
-               //  }
+                $this->session->set_flashdata('success', 'Supplier Updated Successfully. ');
+                redirect(base_url('admin/supplier'));
             }
         }
 
@@ -163,7 +156,6 @@ class Supplier extends CI_Controller {
         $data['projects'] = $this->project->get_active_projects();
         $result = $this->Supplier->get_by_id($id);
         $data['result'] = $result;
-
         $data['title'] = 'Edit Supplier';
         $data['description'] = 'Edit Supervisor Description';
         $data['page'] = 'supplier/edit_supplier';
@@ -184,7 +176,7 @@ class Supplier extends CI_Controller {
     }
     
     public function ajax_delete($id) {
-        $this->Supplier->delete('suppliers', 'id', $id);
+        $supplier_id = $this->Supplier->update('suppliers', array('id' => $id), array('is_deleted' => '1'));
         $this->session->set_flashdata('success', 'Supplier Deleted Successfully');
     }
 }

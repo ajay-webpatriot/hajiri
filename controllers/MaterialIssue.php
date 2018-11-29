@@ -77,10 +77,7 @@ class MaterialIssue extends CI_Controller {
         // $data['materialCategory'] = $this->MaterialCategory_model->get_active_material_category();
         
         $data['ActiveProjects'] = $this->Project_model->get_active_projects();
-        // echo '<pre>';
-        // print_r($data);
-        // exit();
-        $data['title'] = 'Material Issue Add Data';
+        $data['title'] = 'Add Material Issue';
         $data['menu_title'] = 'Issue Log';
         $data['page'] = 'matirealIssue/insertMaterialIssue';
         $this->load->view('includes/template', $data);

@@ -63,10 +63,12 @@
                                     <?php
                                     if($result->challan_image != "")
                                     {
-                                        ?>
-                                        <img src="<?=base_url('uploads/')?>materialLog/challan/<?=$result->challan_image?>" width="100px" class="image"/>
-                                        <?php
-
+                                        $image =  ROOT_PATH.'/uploads/materialLog/challan/'.$result->challan_image;
+                                        if(file_exists($image)){
+                                            ?>
+                                            <img src="<?=base_url('uploads/')?>materialLog/challan/<?=$result->challan_image?>" width="100px" class="image"/>
+                                            <?php
+                                        }
                                     }
 
                                     ?>
@@ -147,10 +149,10 @@
                                             exit();*/
                                             foreach ($material_category as $proj) {
                                               $selected = '';
-                                              if( isset( $value->category_id ) && $proj->id == $value->category_id ){
+                                              if( isset( $value->category_id ) && $proj['id'] == $value->category_id ){
                                                 $selected = 'selected="selected"';
                                             }
-                                            echo '<option value="'.$proj->id.'" '.$selected.' >'.$proj->category.'</option>';
+                                            echo '<option value="'.$proj['id'].'" '.$selected.' >'.$proj['category'].'</option>';
                                         } ?>
                                     </select>
                                     <span class="error"><?php echo form_error('material_category') ?></span>
@@ -184,7 +186,7 @@
                             <div class="form-group">
                                 <label for="quantity" class="col-sm-3 control-label">Quantity:</label>
                                 <div class="col-sm-6">
-                                    <input name="quantity[]" placeholder="Quantity" onkeyup="quantity_change_fun(this)" onchange="quantity_change_fun(this)" class="form-control quantity" type="number" value="<?php echo (isset($value->quantity)) ? $value->quantity : ''; ?>" required>
+                                    <input name="quantity[]" min="1" placeholder="Quantity" onkeyup="quantity_change_fun(this)" onchange="quantity_change_fun(this)" class="form-control quantity" type="number" value="<?php echo (isset($value->quantity)) ? $value->quantity : ''; ?>" required>
                                     <span class="error"><?php echo (form_error('quantity')) ? form_error('quantity') : ''; ?></span>
                                 </div>
                                 <div class="col-sm-2">
@@ -218,32 +220,24 @@
                                         <br/>
                                         <?php
                                         if($value->material_image != "")
-                                        {
-                                            ?>
-                                            <img src="<?=base_url('uploads/')?>materialLog/material_image/<?=$value->material_image?>" width="100px" class="image"/>
-                                            <?php
+                                        {   
+                                            $material_image =  ROOT_PATH.'/uploads/materialLog/material_image/'.$value->material_image;
+                                            if(file_exists($material_image)){ ?>
+                                                <img src="<?=base_url('uploads/')?>materialLog/material_image/<?=$value->material_image?>" width="100px" class="image"/>
+                                                <?php
+                                            }
                                         }?>
                                     </div>
-
                                 </div>  
-                                
-                            
                     </div>
-                    <?php
-                        }
-
-                        ?>
-
-                        <!-- comment -->
-                        <div class="form-group">
-                            <label for="title" class="col-sm-3 control-label">Comment:</label>
-                            <div class="col-sm-9">
-                               <textarea rows="4" cols="50" name="comment"><?=$result->comment?></textarea>
+                    <?php } ?>
+                    <!-- comment -->
+                    <div class="form-group">
+                        <label for="title" class="col-sm-3 control-label">Comment:</label>
+                        <div class="col-sm-9">
+                           <textarea rows="4" cols="50" name="comment"><?=$result->comment?></textarea>
                         </div>
-
                     </div> 
-
-
                     <!-- /.box-body -->
                     <div class="box-footer">
                         <input type="button" id="add_more" class="btn btn-success" value="Add more">
@@ -350,50 +344,38 @@
 
         // load supervisor name using ajax
         $(document).on("change",".project_name",function(){ 
-
-            // var optionHTML="<option value=''>Supervisor Name</option>";
-            // var projectSupplierOption ="<option value=''>Supplier Name</option>";
-            // var projectCategoryOption ="<option value=''>Material Category</option>";
             var project_id = $(this).val();
-            
-            // if(project_id) {
-                // $.ajax({
-                //     url: "<?php //echo base_url().'admin/MaterialLog/getSupervisorAjax/'?>"+project_id,
-                //     type: "GET",
-                //     dataType: "json",
-                //     success:function(data) {
-                        
-                //         $.each(data.getProjectSupervisor, function(key, value) {
-                //             optionHTML+='<option  value="'+ value.user_id +'">'+ value.supervisor_name +'</option>';
-                //         });
-
-                //         $.each(data.getProjectSupplier, function(key, value) {
-                //             projectSupplierOption+='<option  value="'+ value.id +'">'+ value.name +'</option>';
-                //         });
-
-                //         $.each(data.getProjectCategory, function(key, value) {
-                //             projectCategoryOption+='<option  value="'+ value.id +'">'+ value.category +'</option>';
-                //         });
-
-                //         $('.supervisor_name').html(optionHTML);
-                //         $('.supplier_name').html(projectSupplierOption);
-                //         $('.material_category').html(projectCategoryOption);
-                //     }
-                // });
-                projectByOption(project_id);
-            // }else{
-            //     $('.supervisor_name').html(optionHTML);
-            //     $('.supplier_name').html(projectSupplierOption);
-            //     $('.material_category').html(projectCategoryOption);
-            // }
+            projectByOption(project_id);
         }); 
+        $(document).on("change",".supplier_name",function(){
+            
+            $('.material_name').html("<option value=''>Material Name</option>");
+            var CategoryOption ="<option value=''>Material Category</option>";
+            var supplier_id = $(this).val();
+            var projectCategoryOption ="<option value=''>Material Category</option>";
+            var ele=this;
+            if(supplier_id) { 
+                $.ajax({
+                    url: "<?php echo base_url().'admin/MaterialLog/getSupplierCategoryAjax/'?>"+supplier_id,
+                    type: "GET",
+                    dataType: "json",
+                    success:function(data) {
+                        $.each(data.getProjectCategory, function(key, value) {
+                            projectCategoryOption+='<option  value="'+ value.id +'">'+ value.category +'</option>';
+                        });
+                        $('.material_category').html(projectCategoryOption);
+                    }
+                });
+            }else{
+                $('.material_category').html(projectCategoryOption);
+            }
+        });
     });
 
     function projectByOption(project_id){
         var optionHTML="<option value=''>Supervisor Name</option>";
         var projectSupplierOption ="<option value=''>Supplier Name</option>";
-        var projectCategoryOption ="<option value=''>Material Category</option>";
-
+         
         if(project_id != '' && project_id != undefined){
             $.ajax({
                 url: "<?php echo base_url().'admin/MaterialLog/getSupervisorAjax/'?>"+project_id,
@@ -408,23 +390,16 @@
                     $.each(data.getProjectSupplier, function(key, value) {
                         projectSupplierOption+='<option  value="'+ value.id +'">'+ value.name +'</option>';
                     });
-
-                    $.each(data.getProjectCategory, function(key, value) {
-                        projectCategoryOption+='<option  value="'+ value.id +'">'+ value.category +'</option>';
-                    });
-
                     $('.supervisor_name').html(optionHTML);
                     $('.supplier_name').html(projectSupplierOption);
-                    $('.material_category').html(projectCategoryOption);
                 }
             });
         }else{
             $('.supervisor_name').html(optionHTML);
             $('.supplier_name').html(projectSupplierOption);
-            $('.material_category').html(projectCategoryOption);
         }
     }
-
+    
     // Calculate total amount
     function rate_change_fun(ele)
     {

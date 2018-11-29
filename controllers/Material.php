@@ -31,44 +31,65 @@ class Material extends CI_Controller {
         
         
         if (isset($_POST['submit'])) {
+
+           if(!empty($this->input->post('project_id'))){
+
+                $project_id  = $this->input->post('project_id');
+                $material_name = $this->input->post('material_name');
+
+                $original_value = $this->Material->caheckIsExistMaterial('', $project_id, $material_name);
+                 
+                if(!empty($original_value)){
+                    $is_unique = '|is_unique[materials.name]';
+                }else{
+                    $is_unique = '';
+                }
+            } 
+            
             $this->form_validation->set_error_delimiters('<div class="error">', '</div>');
             $this->form_validation->set_rules('project_id', 'Project', 'callback_selectCategory_validate['.$this->input->post('project_id').']');
             $this->form_validation->set_rules('category_id', 'Material Category', 'callback_selectCategory_validate['.$this->input->post('category_id').']');
-            $this->form_validation->set_rules('material_name', 'Material Name', 'trim|required|is_unique[materials.name]');
+            $this->form_validation->set_rules('material_name', 'Material Name', 'trim|required'.$is_unique);
             $this->form_validation->set_rules('unit_measurement', 'Unit of Measurement', 'trim|required');
-            $this->form_validation->set_rules('hsn_code', 'HSN Code', 'trim|required');
+            // $this->form_validation->set_rules('hsn_code', 'HSN Code', 'trim|required');
             $this->form_validation->set_rules('bound_start_range', 'Bound Range', 'trim|required');
             $this->form_validation->set_rules('bound_end_range', 'Bound Range', 'trim|required');
             
-            
             if ($this->form_validation->run() == TRUE) {
-                       
 
-                $data = array(
-                    'name' => $this->input->post('material_name'),
-                    'category_id' => $this->input->post('category_id'),
-                    'unit_measurement' => $this->input->post('unit_measurement'),
-                    'hsn_code' => $this->input->post('hsn_code'),
-                    'bound_start_range' => $this->input->post('bound_start_range'),
-                    'bound_end_range' => $this->input->post('bound_end_range'),
-                    'status' => 1,
-                );
-                 
-                $material_id = $this->Material->save('materials', $data);
-                if ($material_id) {
+                $bound_start_range = $this->input->post('bound_start_range');
+                $bound_end_range = $this->input->post('bound_end_range');
+
+                if($bound_start_range > $bound_end_range){
+                    $this->session->set_flashdata('error', 'Please enter Bond start range is greater than or equal to the Bond end range.');
+                } else{
 
                     $data = array(
-                        'material_id' => $material_id,
-                        'project_id' => $this->input->post('project_id'),
-                        
+                        'name' => $this->input->post('material_name'),
+                        'category_id' => $this->input->post('category_id'),
+                        'unit_measurement' => $this->input->post('unit_measurement'),
+                        'hsn_code' => $this->input->post('hsn_code'),
+                        'bound_start_range' => $this->input->post('bound_start_range'),
+                        'bound_end_range' => $this->input->post('bound_end_range'),
+                        'status' => 1,
                     );
-                    $material_project_id = $this->Material->save('material_projects', $data);
+                     
+                    $material_id = $this->Material->save('materials', $data);
+                    if ($material_id) {
 
-                    $this->session->set_flashdata("success", "Supervisor added successfully.");
-                    redirect(base_url('admin/material'));
-                } else {
-                    $this->session->set_flashdata('error', 'Failed To Add Material');
-                    redirect(base_url('admin/material/addMaterial'));
+                        $data = array(
+                            'material_id' => $material_id,
+                            'project_id' => $this->input->post('project_id'),
+                            
+                        );
+                        $material_project_id = $this->Material->save('material_projects', $data);
+
+                        $this->session->set_flashdata("success", "Supervisor added successfully.");
+                        redirect(base_url('admin/material'));
+                    } else {
+                        $this->session->set_flashdata('error', 'Failed To Add Material');
+                        redirect(base_url('admin/material/addMaterial'));
+                    }
                 }
             }
         }
@@ -84,8 +105,6 @@ class Material extends CI_Controller {
     }
     function selectCategory_validate($field, $id)
     {
-        
-        
         if($id != '') {
             return true;
         } else {
@@ -99,50 +118,52 @@ class Material extends CI_Controller {
         
         if (isset($_POST['submit'])) {
 
-            $original_value = $this->Material->caheckIsExistMaterial($id);
-             
-            if($this->input->post('material_name') != $original_value->name){
+            if(!empty($this->input->post('project_id'))){
+                $project_id = $this->input->post('project_id');
+                $material_name = $this->input->post('material_name');
+            }
+            //id, project_id, material Name
+            $original_value = $this->Material->caheckIsExistMaterial($id, $project_id, $material_name);
+            
+            if(!empty($original_value)){
                 $is_unique = '|is_unique[materials.name]';
             }else{
                 $is_unique = '';
             }
-
+            
             $this->form_validation->set_error_delimiters('<div class="error">', '</div>');
             $this->form_validation->set_rules('project_id', 'Project', 'callback_selectCategory_validate['.$this->input->post('project_id').']');
             $this->form_validation->set_rules('category_id', 'Material Category', 'callback_selectCategory_validate['.$this->input->post('category_id').']');
             $this->form_validation->set_rules('material_name', 'Material Name', 'trim|required'.$is_unique);
             $this->form_validation->set_rules('unit_measurement', 'Unit of Measurement', 'trim|required');
-            $this->form_validation->set_rules('hsn_code', 'HSN Code', 'trim|required');
             $this->form_validation->set_rules('bound_start_range', 'Bound Range', 'trim|required');
             $this->form_validation->set_rules('bound_end_range', 'Bound Range', 'trim|required');
 
             
             if ($this->form_validation->run() == TRUE) {
-                
-                 $data = array(
-                    'name' => $this->input->post('material_name'),
-                    'category_id' => $this->input->post('category_id'),
-                    'unit_measurement' => $this->input->post('unit_measurement'),
-                    'hsn_code' => $this->input->post('hsn_code'),
-                    'bound_start_range' => $this->input->post('bound_start_range'),
-                    'bound_end_range' => $this->input->post('bound_end_range'),
-                    'status' => $this->input->post('status'),
-                );
-                
 
+                $bound_start_range = $this->input->post('bound_start_range');
+                $bound_end_range = $this->input->post('bound_end_range');
 
-                $material_id = $this->Material->update('materials', array('id' => $id), $data);
-                // if ($material_id) {
+                if($bound_start_range > $bound_end_range){
+                    $this->session->set_flashdata('error', 'Please enter Bond start range is greater than or equal to the Bond end range.');
+                } else{
                     
+                    $data = array(
+                        'name' => $this->input->post('material_name'),
+                        'category_id' => $this->input->post('category_id'),
+                        'unit_measurement' => $this->input->post('unit_measurement'),
+                        'hsn_code' => $this->input->post('hsn_code'),
+                        'bound_start_range' => $this->input->post('bound_start_range'),
+                        'bound_end_range' => $this->input->post('bound_end_range'),
+                        'status' => $this->input->post('status'),
+                    );
+                    
+                    $material_id = $this->Material->update('materials', array('id' => $id), $data);
                     $material_project_id = $this->Material->update('material_projects',array('material_id' => $id), array('project_id' => $this->input->post('project_id')));
-
-
                     $this->session->set_flashdata('success', 'Material Updated Successfully. ');
                     redirect(base_url('admin/material'));
-               // } else {
-               //      $this->session->set_flashdata('error', 'Failed To Update Material');
-               //      redirect(base_url('admin/material/editMaterial/' . $id));
-               //  }
+                }
             }
         }
 
@@ -171,7 +192,9 @@ class Material extends CI_Controller {
     }
     
     public function ajax_delete($id) {
-        $this->Material->delete('materials', 'id', $id);
+        
+        $worker_id = $this->MaterialCategory->update('materials', array('id' => $id), array('is_deleted' => '1'));
+        // $this->Material->delete('materials', 'id', $id);
         $this->session->set_flashdata('success', 'Material Deleted Successfully');
     }
 }

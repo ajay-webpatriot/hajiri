@@ -18,7 +18,7 @@ class Material_model extends CI_Model {
         $this->db->from($this->table1);
         $this->db->join($this->table2, $this->table2.'.id = '.$this->table1.'.category_id');
         // $this->db->where($this->table1.".status", 1);
-        // $this->db->where($this->table2.".status", 1);
+        $this->db->where($this->table1.".is_deleted", '0');
         $this->db->order_by($this->table1 . '.id', "ASC");
         $query = $this->db->get();
         return $query->result();
@@ -67,10 +67,30 @@ class Material_model extends CI_Model {
         $query = $this->db->get();
         return $query->row();
     }
-    public function caheckIsExistMaterial($id){
+    // public function caheckIsExistMaterial($id){
+    //     $this->db->select('name');
+    //     $this->db->from($this->table1);
+    //     $this->db->where($this->table1 . '.id', $id);
+    //     $query = $this->db->get();
+    //     return $query->row();
+    // }
+
+    public function caheckIsExistMaterial($id, $project_id, $material_name){
         $this->db->select('name');
         $this->db->from($this->table1);
-        $this->db->where($this->table1 . '.id', $id);
+        // $project_id = selected project id
+        if(!empty($project_id)){
+            $this->db->join($this->table3, $this->table3.'.material_id = '.$this->table1.'.id');
+            $this->db->where($this->table3 . '.project_id', $project_id);
+            if(!empty($material_name)){
+                $this->db->where($this->table1 . '.name', $material_name);
+            }
+        }
+        // id = record id
+        if(!empty($id)){
+            $this->db->where($this->table1 . '.id !=', $id);
+        }
+        $this->db->where($this->table1 . '.is_deleted', '0');
         $query = $this->db->get();
         return $query->row();
     }

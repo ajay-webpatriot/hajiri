@@ -59,14 +59,14 @@
                             <div class="form-group">
                                 <label for="title" class="col-sm-3 control-label">Contact Number <font color="red">*</font></label>
                                 <div class="col-sm-9">
-                                    <input name="contact_number" placeholder="Contact Number" class="form-control" type="text" value="<?php echo (isset($_POST['contact_number'])) ? $_POST['contact_number'] : ''; ?>" required="required">
+                                    <input name="contact_number" placeholder="Contact Number" class="form-control" type="text" value="<?php echo (isset($_POST['contact_number'])) ? $_POST['contact_number'] : ''; ?>" required="required" onkeypress="return isNumber(event)" minlength ="10" maxlength="12">
                                     <span class="error"><?php echo (form_error('contact_number')) ? form_error('contact_number') : ''; ?></span>
                                 </div>
                             </div>
                             <div class="form-group">
-                                <label for="title" class="col-sm-3 control-label">GST No <font color="red">*</font></label>
+                                <label for="title" class="col-sm-3 control-label">GST No</label>
                                 <div class="col-sm-9">
-                                    <input name="gst_number" placeholder="GST No" class="form-control" type="text" value="<?php echo (isset($_POST['gst_number'])) ? $_POST['gst_number'] : ''; ?>" required="required">
+                                    <input name="gst_number" placeholder="GST No" class="form-control" type="text" value="<?php echo (isset($_POST['gst_number'])) ? $_POST['gst_number'] : ''; ?>">
                                     <span class="error"><?php echo (form_error('gst_number')) ? form_error('gst_number') : ''; ?></span>
                                 </div>
                             </div>
@@ -82,7 +82,7 @@
                             <div class="form-group">
                                 <label for="title" class="col-sm-3 control-label">Email Id <font color="red">*</font></label>
                                 <div class="col-sm-9">
-                                    <input name="email_id" placeholder="Email Id" class="form-control" type="text" value="<?php echo (isset($_POST['email_id'])) ? $_POST['email_id'] : ''; ?>" required="required">
+                                    <input name="email_id" placeholder="Email Id" class="form-control" type="email" value="<?php echo (isset($_POST['email_id'])) ? $_POST['email_id'] : ''; ?>" required="required">
                                     <span class="error"><?php echo (form_error('email_id')) ? form_error('email_id') : ''; ?></span>
                                 </div>
                             </div>
@@ -153,4 +153,13 @@
             allowClear: true
         });
     });
+    //only number keypress
+    function isNumber(evt) {
+        evt = (evt) ? evt : window.event;
+        var charCode = (evt.which) ? evt.which : evt.keyCode;
+        if (charCode > 31 && (charCode < 48 || charCode > 57)) {
+            return false;
+        }
+        return true;
+    }
 </script>

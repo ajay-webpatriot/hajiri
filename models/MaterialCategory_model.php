@@ -16,6 +16,7 @@ class MaterialCategory_model extends CI_Model {
         $this->db->select('name AS category, id,approximate_estimate_ratio,status');
         $this->db->from($default);
         // $this->db->where($default.".status", 1);
+        $this->db->where($default.".is_deleted", '0');
         $this->db->order_by($default . '.'.$order_by, "ASC");
         $query = $this->db->get();
         return $query->result();
@@ -26,19 +27,19 @@ class MaterialCategory_model extends CI_Model {
         $this->db->select('name AS category, id,approximate_estimate_ratio,status');
         $this->db->from($default);
         $this->db->where($default.".status", 1);
+        $this->db->where($default.".is_deleted", '0');
         $this->db->order_by($default . '.name', "ASC");
         $query = $this->db->get();
         return $query->result();
     }
     
-    public function get_active_material_category_byProject($project_id) {
+    public function get_active_material_category_byProject($supplier_id) {
         
-        $sql = "select name AS category, id,approximate_estimate_ratio,status FROM categories where id IN ( SELECT DISTINCT category_id FROM `materials` INNER JOIN material_projects on materials.id = material_projects.material_id WHERE material_projects.project_id = '".$project_id."') AND status = 1";
+        // $sql = "select name AS category, id,approximate_estimate_ratio,status FROM categories where id IN ( SELECT DISTINCT category_id FROM `materials` INNER JOIN material_projects on materials.id = material_projects.material_id WHERE material_projects.project_id = '".$project_id."') AND status = 1 AND is_deleted = '0'";
+        $sql = "select c.name AS category, c.id, c.approximate_estimate_ratio, c.status  from categories as C inner join supplier_categories sc on c.id = sc.category_id where sc.supplier_id = '".$supplier_id."' AND c.is_deleted = '0'";
 
        return $this->db->query( $sql, '' )->result_array();
     }
-
-    // select * FROM categories where id IN ( SELECT DISTINCT category_id FROM `materials` INNER JOIN material_projects on materials.id = material_projects.material_id WHERE material_projects.project_id = 90) AND status = 1
 
     public function checkCategory($id) {
         $w = 'materials';

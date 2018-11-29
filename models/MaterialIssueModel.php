@@ -53,7 +53,8 @@ class MaterialIssueModel extends CI_Model {
         $this->db->from($this->table1);
         $this->db->where($this->table1 . '.project_id', $project_id);
         $this->db->where($this->table1 . '.material_id', $material_id);
-        $this->db->where($this->table1 . '.status !=', 'Deleted' );
+        $this->db->where($this->table1 . '.status !=', 'Deleted');
+        $this->db->where($this->table1 . '.is_deleted', 0);
         $query = $this->db->get();
         return $result = $query->row();
     }
