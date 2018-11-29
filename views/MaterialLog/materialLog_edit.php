@@ -1,3 +1,8 @@
+<style type="text/css">
+    .unit{
+        vertical-align: -webkit-baseline-middle !important;
+    }
+</style>
 <!-- Content Wrapper. Contains page content -->
 <div class="content-wrapper">
     <!-- Content Header (Page header) -->
@@ -11,7 +16,6 @@
         <li><a href="<?php echo base_url('admin/materialLog'); ?>">Material Log</a></li>
         <li class="active"><?php echo (isset($title) ? $title : ''); ?></li>
     </ol>
-
     <!-- Main content -->
     <section class="content">
         <div class="row">
@@ -36,13 +40,13 @@
                     }
                     ?>
                     <!-- form start -->
-                    <form action="" id="add-labour" class="form-horizontal" method="POST" enctype="multipart/form-data">
+                    <form action="" id="add-labour" class="form-horizontal" method="POST" enctype="multipart/form-data" autocomplete="off">
                         <div class="box-body">
                             <h4 class="box-title">General Details :</h4>
                             <div class="form-group">
                                 <label for="title" class="col-sm-3 control-label">Challan Date:</label>
                                 <div class="col-sm-9">
-                                    <input name="challan_date" id="date" placeholder="Challan Date" class="form-control datepicker" type="text" value="<?php echo (isset($result->challan_date)) ? $result->challan_date : ''; ?>" required>
+                                    <input name="challan_date" id="date" placeholder="Challan Date" class="form-control datepicker-material" type="text" value="<?php echo (isset($result->challan_date)) ? $result->challan_date : ''; ?>" required>
                                     <span class="error"><?php echo (form_error('challan_date')) ? form_error('challan_date') : ''; ?></span>
                                 </div>
                             </div> 
@@ -190,7 +194,7 @@
                                     <span class="error"><?php echo (form_error('quantity')) ? form_error('quantity') : ''; ?></span>
                                 </div>
                                 <div class="col-sm-2">
-                                    <span><b class="unit"><?=$selected_unit_measurement?></b></span>
+                                    <span><b class="unit" ><?=$selected_unit_measurement?></b></span>
                                 </div>
                             </div>
                             <?php
@@ -257,8 +261,9 @@
                         }
                         ?>
                         <a href="<?php echo base_url('admin/materialLog'); ?>" id="btnClose" name="close" class="btn btn-primary" >Close</a>
-
-                        <a id="btndelete" name="delete" href="<?php echo base_url('admin/materialLog/ajax_delete/'.$result->id); ?>" class="btn btn-danger" >Delete</a>
+                        <?php if($result->status !== "Approved"){ ?>
+                            <a id="btndelete" name="delete" href="<?php echo base_url('admin/materialLog/ajax_delete/'.$result->id); ?>" class="btn btn-danger" >Delete</a>
+                        <?php } ?>
                     </div>
                     <!-- /.box-footer -->
                 </form>
@@ -290,16 +295,12 @@
             $("#btnSave").hide();
             $("#btnverify").hide();
             $("#btnClose").show();
-            
-
             $('input[type=file]').hide();
-        
-       }
+        }
        else
        {
             $("#btnClose").hide();
-            
-       } 
+        } 
        $("#add_more").click(function(){
 
         var $clone = $('.addMaterialDetail:last').clone();

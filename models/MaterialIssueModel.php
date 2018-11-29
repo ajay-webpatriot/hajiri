@@ -58,4 +58,20 @@ class MaterialIssueModel extends CI_Model {
         $query = $this->db->get();
         return $result = $query->row();
     }
+    public function getMaterialAjax($project_id, $category_id){
+
+         // Sub Query
+        $this->db->select('material_id')->from('material_entry_log')->join('material_entry_logdetail', 'material_entry_log.id = material_entry_logdetail.material_entry_log_id')->where('material_entry_log.project_id', $project_id);
+        $subQuery =  $this->db->get_compiled_select();
+ 
+        // Main Query
+        $query = $this->db->select('id,name')
+                 ->from($this->table3)
+                 ->where("id IN ($subQuery)", NULL, FALSE)
+                 ->where($this->table3.'.category_id', $category_id)
+                 ->get();
+        return $result = $query->result();
+
+        // select * from materials as m where m.id IN ( SELECT DISTINCT meld.material_id FROM material_entry_log as mel inner JOIN material_entry_logdetail as meld on mel.id = meld.material_entry_log_id where mel.project_id = 90) and m.category_id = 2
+    }
 }

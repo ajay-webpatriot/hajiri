@@ -71,10 +71,12 @@
                                     <td> 
 
                                         <a class="btn btn-sm btn-primary" href="<?php echo base_url('admin/MaterialLog/editEntry/') . $value->id; ?>" title="Edit material entry">
-                                            <i class="glyphicon glyphicon-pencil"></i> </a>  
-                                            <button class="btn btn-sm btn-danger" title="Delete material entry" onclick="material_entry_log_delete('<?php echo $value->id; ?>')">
-                                                <i class="glyphicon glyphicon-trash"></i> 
-                                            </button>
+                                            <i class="glyphicon glyphicon-pencil"></i> </a> 
+                                            <?php if(isset($value->status) && $value->status !== 'Approved') { ?> 
+                                                <button class="btn btn-sm btn-danger" title="Delete material entry" onclick="material_entry_log_delete('<?php echo $value->id; ?>')">
+                                                    <i class="glyphicon glyphicon-trash"></i> 
+                                                </button>
+                                            <?php } ?>
                                         </td>
                                     </tr>
                                 <?php  } ?>

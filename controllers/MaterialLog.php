@@ -79,7 +79,6 @@ class materialLog extends CI_Controller {
                             $file = "./uploads/materialLog/material_image/".$newfilename;  
 
                             move_uploaded_file($_FILES['material_file']['tmp_name'][$cntFile],$file);     
-                            
                         }
                         array_push($material_image_arr, $newfilename);
                         //File Loading Successfully
@@ -125,8 +124,6 @@ class materialLog extends CI_Controller {
                             'material_id'   => $material_name[$cntDetail],
                             'quantity' => $material_quantity[$cntDetail],
                             'material_image'  => empty($material_image_arr[$cntDetail])?"":$material_image_arr[$cntDetail],
-                            // 'rate'   => '1',
-                            // 'total_rate'   => '1',
                             );
 
                             $insertId = $this->MaterialLog_model->materialLogDetailsave($materialLogDetailArr);
@@ -162,6 +159,7 @@ class materialLog extends CI_Controller {
 
         $materialLogStatus = array(
                     'status'   => "Deleted",
+                    'is_deleted'   => "1",
                 );
         
         $materialLogId = $this->MaterialLog_model->update('material_entry_log', array('id' => $id), $materialLogStatus);
@@ -215,162 +213,192 @@ class materialLog extends CI_Controller {
             $this->form_validation->set_rules('material_category[]', 'material category', 'required');
             $this->form_validation->set_rules('material_name[]', 'material name', 'required');
             $this->form_validation->set_rules('quantity[]', 'quantity', 'required');
+            if (isset($_POST['verify'])) {
+                $this->form_validation->set_rules('rate[]', 'rate', 'required');
+            }
 
             if ( $this->form_validation->run() == false ) {
                 $this->session->set_flashdata( 'error', 'Sorry,  Error while adding Material details.' );
                 redirect( base_url( 'admin/materialLog/editEntry/') );
             }else{
-               
-                
-                // resolved image issue s
-                // $associatedFileNames = array('challan_file');
-                $challan_image=$_FILES['challan_file']['name'];
-                if (!empty($challan_image)) {
-                    $result = uploadStaffFile('uploads/materialLog/challan/', 'challan_file');
-                    if ($result['flag'] == 1) {
-                        $challan_image = $result['filePath'];
-                    } else {
-                        $fileError[$fileName] = $result['error'];
+
+                $material_quantity = $this->input->post('quantity');
+                $material_quantity_rate = $this->input->post('rate');
+
+                $valid_quantity = true;
+                $valid_quantity_rate = true;
+                if(!empty($material_quantity)){
+                    foreach ($material_quantity as  $value) {
+                        if($value <= 0){
+                          $valid_quantity = false;
+                        }
                     }
+                }else{
+                    $valid_quantity = false;
                 }
-                // resolved image issue e
-                // material image upload work
-                $cntFile=0;
-                $material_image_arr=array();
-                foreach ($_FILES['material_file']['name'] as $file)
-                {
-                    $newfilename ="";    
-                    if($file != "")
+
+                if(!empty($material_quantity_rate)){
+                    foreach ($material_quantity_rate as $value) {
+                       if($value <= 0){
+                          $valid_quantity_rate = false;
+                        }
+                    }
+                }else{
+                    $valid_quantity_rate = false;
+                }
+
+                if($valid_quantity == true && $valid_quantity_rate == true){
+
+                    $challan_image=$_FILES['challan_file']['name'];
+                    if (!empty($challan_image)) {
+                        $result = uploadStaffFile('uploads/materialLog/challan/', 'challan_file');
+                        if ($result['flag'] == 1) {
+                            $challan_image = $result['filePath'];
+                        } else {
+                            $fileError[$fileName] = $result['error'];
+                        }
+                    }
+                    // material image upload work
+                    $cntFile=0;
+                    $material_image_arr=array();
+                    foreach ($_FILES['material_file']['name'] as $file)
                     {
-                        $file_name = $_FILES['material_file']['name'][$cntFile];
-                        $file_size =$_FILES['material_file']['size'][$cntFile];
-                        $file_tmp =$_FILES['material_file']['tmp_name'][$cntFile];
-                        $file_type=$_FILES['material_file']['type'][$cntFile]; 
+                        $newfilename ="";    
+                        if($file != "")
+                        {
+                            $file_name = $_FILES['material_file']['name'][$cntFile];
+                            $file_size =$_FILES['material_file']['size'][$cntFile];
+                            $file_tmp =$_FILES['material_file']['tmp_name'][$cntFile];
+                            $file_type=$_FILES['material_file']['type'][$cntFile]; 
 
-                        $file_basename = substr($file_name, 0, strripos($file_name, '.')); // get file name
-                        $file_ext = substr($file_name, strripos($file_name, '.'));  // get file extention
+                            $file_basename = substr($file_name, 0, strripos($file_name, '.')); // get file name
+                            $file_ext = substr($file_name, strripos($file_name, '.'));  // get file extention
 
-                        $newfilename = $file_basename."_".time(). $file_ext;
-                        $file = "./uploads/materialLog/material_image/".$newfilename;   
-                        move_uploaded_file($_FILES['material_file']['tmp_name'][$cntFile],$file);     
-                           
-                    }    
-                    array_push($material_image_arr, $newfilename); 
+                            $newfilename = $file_basename."_".time(). $file_ext;
+                            $file = "./uploads/materialLog/material_image/".$newfilename;   
+                            move_uploaded_file($_FILES['material_file']['tmp_name'][$cntFile],$file);     
+                               
+                        }    
+                        array_push($material_image_arr, $newfilename); 
                         //File Loading Successfully
-                   $cntFile++;
-                }
-               
-                $challan_date = $this->input->post('challan_date');
-                $challan_no = $this->input->post('challan_no');
-                $supplier_name = $this->input->post('supplier_name');
-                $project_name = $this->input->post('project_name');
-                $supervisor_name = $this->input->post('supervisor_name');
-                $material_category = $this->input->post('material_category');
-                $material_name = $this->input->post('material_name');
-                $quantity = $this->input->post('quantity');
-                // resolved image issue s
-                // $challan_image = $_FILES['challan_file']['name'];
-                // resolved image issue e 
-
-                $createdate = date_create($challan_date);
-                $date = date_format($createdate,'Y-m-d');
-                if (isset($_POST['verify'])) {
-                    $log_status = "Approved";
-                    $comment = $this->input->post('comment');
-                }
-                else 
-                {
-                    $comment = '';
-                    $log_status = "Pending";
-                }
-
-                // delete existing challan image work
-                $uploaded_challan_img="";
-                if($_FILES['challan_file']['name'] != "")
-                {
-                    // resolved image issue s
-                    $uploaded_challan_img=$challan_image;
-                    // resolved image issue e
-                    if (file_exists('./uploads/materialLog/challan/'.$data['result']->challan_image))
-                    {
-                        unlink('./uploads/materialLog/challan/'.$data['result']->challan_image);
-                        
-                    }    
-                }
-                else if(!empty($data['result']))
-                {
-                    $uploaded_challan_img=$data['result']->challan_image;
-                }
-
-                // insert material log 
-                $materialLogArr = array(
-                    'challan_date' => $date,
-                    'challan_no'   => $challan_no,
-                    'challan_image' => $uploaded_challan_img,
-                    'supplier_id'   => $supplier_name,
-                    'receiver_id'   => $supervisor_name,
-                    'project_id'   => $project_name,
-                    'comment' => $comment,
-                    'status'   => $log_status,
-                );
-                
-                $materialLogId = $this->MaterialLog_model->update('material_entry_log', array('id' => $id), $materialLogArr);
-
-                // insert material log detail
-                if($id){
-                    $material_name=$this->input->post('material_name');
-                    $material_quantity=$this->input->post('quantity');
-                    $material_rate = $this->input->post('rate');
-                    $material_amount=$this->input->post('amount');
-
-                    $cntDetail=0;
-
-                    $this->MaterialLog_model->delete('material_entry_logdetail','material_entry_log_id', $id);
-                    
-                    foreach ($material_category as $key => $value) {
-                      if (isset($_POST['verify'])) {
-                        $rate = $material_rate[$cntDetail];
-                        $total_rate = $material_amount[$cntDetail];
-                      }
-                      else{
-                        $rate = 0;
-                        $total_rate = 0;
-                      }
-                        // delete material image work
-                        $uploaded_material_img="";
-                        if($_FILES['material_file']['name'][$cntDetail] != "")
-                        {
-                            $uploaded_material_img=$material_image_arr[$cntDetail];
-
-                            if(!empty($data['result_detail'][$cntDetail])){
-                                if (file_exists('./uploads/materialLog/material_image/'.$data['result_detail'][$cntDetail]->material_image))
-                                {
-                                    unlink('./uploads/materialLog/material_image/'.$data['result_detail'][$cntDetail]->material_image);
-                                    
-                                } 
-                            }
-                        }
-                        else if(!empty($data['result_detail'][$cntDetail]))
-                        {
-                            $uploaded_material_img=$data['result_detail'][$cntDetail]->material_image;
-                        }
-            
-                       $materialLogDetailArr = array(
-                        'material_entry_log_id' => $id,
-                        'material_id'   => $material_name[$cntDetail],
-                        'quantity' => $material_quantity[$cntDetail],
-                        'material_image'  => $uploaded_material_img,
-                        'rate'   => $rate,
-                        'total_rate'   => $total_rate,
-                        );
-
-                        $insertId = $this->MaterialLog_model->materialLogDetailsave($materialLogDetailArr);
-                        $cntDetail++;
+                       $cntFile++;
                     }
-                }
-                if($insertId){
-                     $this->session->set_flashdata('success', 'Material Log Updated Successfully!');
-                    redirect(base_url('admin/materialLog/index'));
+               
+                    $challan_date = $this->input->post('challan_date');
+                    $challan_no = $this->input->post('challan_no');
+                    $supplier_name = $this->input->post('supplier_name');
+                    $project_name = $this->input->post('project_name');
+                    $supervisor_name = $this->input->post('supervisor_name');
+                    $material_category = $this->input->post('material_category');
+                    $material_name = $this->input->post('material_name');
+                    $quantity = $this->input->post('quantity');
+                    $createdate = date_create($challan_date);
+                    $date = date_format($createdate,'Y-m-d');
+
+                    if (isset($_POST['verify'])) {
+                        $log_status = "Approved";
+                        $comment = $this->input->post('comment');
+                    }
+                    else 
+                    {
+                        $comment = '';
+                        $log_status = "Pending";
+                    }
+
+                    // delete existing challan image work
+                    $uploaded_challan_img="";
+                    if($_FILES['challan_file']['name'] != "")
+                    {
+                        // resolved image issue s
+                        $uploaded_challan_img=$challan_image;
+                        // resolved image issue e
+                        if (file_exists('./uploads/materialLog/challan/'.$data['result']->challan_image))
+                        {
+                            unlink('./uploads/materialLog/challan/'.$data['result']->challan_image);
+                        }    
+                    }
+                    else if(!empty($data['result']))
+                    {
+                        $uploaded_challan_img=$data['result']->challan_image;
+                    }
+
+                    // insert material log 
+                    $materialLogArr = array(
+                        'challan_date' => $date,
+                        'challan_no'   => $challan_no,
+                        'challan_image' => $uploaded_challan_img,
+                        'supplier_id'   => $supplier_name,
+                        'receiver_id'   => $supervisor_name,
+                        'project_id'   => $project_name,
+                        'comment' => $comment,
+                        'status'   => $log_status,
+                    );
+                
+                    $materialLogId = $this->MaterialLog_model->update('material_entry_log', array('id' => $id), $materialLogArr);
+
+                    // insert material log detail
+                    if($id){
+                        $material_name=$this->input->post('material_name');
+                        $material_quantity=$this->input->post('quantity');
+                        $material_rate = $this->input->post('rate');
+                        $material_amount=$this->input->post('amount');
+
+                        $cntDetail=0;
+
+                        $this->MaterialLog_model->delete('material_entry_logdetail','material_entry_log_id', $id);
+                        
+                        foreach ($material_category as $key => $value) {
+                          if (isset($_POST['verify'])) {
+                            $rate = $material_rate[$cntDetail];
+                            $total_rate = $material_amount[$cntDetail];
+                          }
+                          else{
+                            $rate = 0;
+                            $total_rate = 0;
+                          }
+                            // delete material image work
+                            $uploaded_material_img="";
+                            if($_FILES['material_file']['name'][$cntDetail] != "")
+                            {
+                                $uploaded_material_img=$material_image_arr[$cntDetail];
+
+                                if(!empty($data['result_detail'][$cntDetail])){
+                                    if (file_exists('./uploads/materialLog/material_image/'.$data['result_detail'][$cntDetail]->material_image))
+                                    {
+                                        unlink('./uploads/materialLog/material_image/'.$data['result_detail'][$cntDetail]->material_image);
+                                        
+                                    } 
+                                }
+                            }
+                            else if(!empty($data['result_detail'][$cntDetail]))
+                            {
+                                $uploaded_material_img=$data['result_detail'][$cntDetail]->material_image;
+                            }
+                
+                           $materialLogDetailArr = array(
+                            'material_entry_log_id' => $id,
+                            'material_id'   => $material_name[$cntDetail],
+                            'quantity' => $material_quantity[$cntDetail],
+                            'material_image'  => $uploaded_material_img,
+                            'rate'   => $rate,
+                            'total_rate'   => $total_rate,
+                            );
+
+                            $insertId = $this->MaterialLog_model->materialLogDetailsave($materialLogDetailArr);
+                            $cntDetail++;
+                        }
+                    }
+                    if($insertId){
+                         $this->session->set_flashdata('success', 'Material Log Updated Successfully!');
+                        redirect(base_url('admin/materialLog/index'));
+                    }
+                }else{
+                    if($valid_quantity == false){
+                        $this->session->set_flashdata('error', 'Please enter quantity more than zero');
+                    }
+                    if($valid_quantity_rate == false){
+                        $this->session->set_flashdata('error', 'Please enter quantity rate more than zero');
+                    }
                 }
             }
         }

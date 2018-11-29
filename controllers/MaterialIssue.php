@@ -77,6 +77,7 @@ class MaterialIssue extends CI_Controller {
         // $data['materialCategory'] = $this->MaterialCategory_model->get_active_material_category();
         
         $data['ActiveProjects'] = $this->Project_model->get_active_projects();
+        $data['materialCategory'] = $this->MaterialCategory_model->get_all_material_category();
         $data['title'] = 'Add Material Issue';
         $data['menu_title'] = 'Issue Log';
         $data['page'] = 'matirealIssue/insertMaterialIssue';
@@ -200,5 +201,20 @@ class MaterialIssue extends CI_Controller {
         
         $quantity = $entryQuantity - $issueQuantity; 
         echo json_encode($quantity);
+    }
+    public function getProjectMaterialAjax(){
+        $material = array();
+        if(isset($_GET['project_id']) && isset($_GET['category_id'])){
+            if(!empty($_GET['project_id']) && !empty($_GET['category_id'])){
+                $project_id = $_GET['project_id'];
+                $category_id = $_GET['category_id'];
+                $material = $this->MaterialIssueModel->getMaterialAjax($project_id, $category_id);
+                echo json_encode([
+                    'success'=> true, 
+                    'material' => $material
+                ]);  
+                exit();
+            }
+        }
     }
 }

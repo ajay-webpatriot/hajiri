@@ -27,14 +27,13 @@
                             <h4 class="box-title" style="padding-left: 10px;">General Details :</h4>
                         </div>
                     </div>
-                    <form action="<?php echo base_url('admin/MaterialIssue/addIssueLog');?>" id="addIssueLog" class="form-horizontal validateDontSubmit" method="POST" enctype="multipart/form-data">
+                    <form action="<?php echo base_url('admin/MaterialIssue/addIssueLog');?>" id="addIssueLog" class="form-horizontal validateDontSubmit" method="POST" enctype="multipart/form-data" autocomplete="off">
                         <div class="box-body">
                            <!-- Issue Date start -->
                             <div class="form-group">
                                 <label for="date" class="col-sm-3 control-label">Issue Date <font color="red">*</font></label>
-
                                 <div class="col-sm-9">
-                                    <input name="issueDate" id="date" placeholder="Issue Date" class="form-control datepicker" type="text" value="<?php echo (isset($_POST['issueDate'])) ? $_POST['issueDate'] : ''; ?>" required>
+                                    <input name="issueDate" id="date" placeholder="Issue Date" class="form-control datepicker-material" type="text" value="<?php echo (isset($_POST['issueDate'])) ? $_POST['issueDate'] : ''; ?>" required>
                                     <span class="error"><?php echo (form_error('issueDate')) ? form_error('issueDate') : ''; ?></span>
                                 </div>
                             </div>
@@ -65,7 +64,7 @@
                                     <div class="col-sm-9">
                                         <select class="form-control material_category" id="MaterialCategory" name="materialCategory" required>
                                             <option value="">Material Category</option>
-                                            <?php  /*
+                                            <?php  
                                             if($materialCategory != ''){
                                             foreach ($materialCategory as $Category) {
 
@@ -76,7 +75,7 @@
                                                 <option value="<?php echo $Category->id; ?>"><?php echo $Category->category; ?></option>
                                             <?php 
                                                 }
-                                            } */
+                                            } 
                                             ?>
                                         </select>
                                         <span class="error"><?php echo form_error('materialCategory') ?></span>
@@ -187,24 +186,26 @@
             $("#OutsideSiteMenuHide").attr("style", "display: none;"); 
         }
     });
+
+    //29/11/2018
        
-    $("#MaterialCategory").change(function(){
-        var selectCatId = $("#MaterialCategory option:selected").val();
-        var ele=this;
-        var optionHTML="<option value=''>Material Name</option>";
-        $.ajax({
-            type:"GET",
-            url: "<?php echo base_url('admin/MaterialIssue/materialIssueNames/'); ?>"+selectCatId,
-            dataType: "json",
-            success: function(data) {
-                $.each(data, function(key, value) {
-                   optionHTML+='<option  data-unit="'+value.unit_measurement+'"  value="'+ value.id +'">'+ value.name +'</option>';
-                });
-                $(ele).parents(".form-group").next().find("select").html(optionHTML);
-            }
-        });
-        $('#MaterialNames').html();
-    });
+    // $("#MaterialCategory").change(function(){
+    //     var selectCatId = $("#MaterialCategory option:selected").val();
+    //     var ele=this;
+    //     var optionHTML="<option value=''>Material Name</option>";
+    //     $.ajax({
+    //         type:"GET",
+    //         url: "<?php //echo base_url('admin/MaterialIssue/materialIssueNames/'); ?>"+selectCatId,
+    //         dataType: "json",
+    //         success: function(data) {
+    //             $.each(data, function(key, value) {
+    //                optionHTML+='<option  data-unit="'+value.unit_measurement+'"  value="'+ value.id +'">'+ value.name +'</option>';
+    //             });
+    //             $(ele).parents(".form-group").next().find("select").html(optionHTML);
+    //         }
+    //     });
+    //     $('#MaterialNames').html();
+    // });
 
     $(document).on("change",".materialName",function(){
         
@@ -245,58 +246,53 @@
             return status;
         })
 
-    
-        
-        // load material name using ajax
-        // $(document).on("change",".material_category",function(){
-
-        //     var optionHTML="<option value=''>Material Name</option>";
-        //     var category_id = $(this).val();
+         // load supervisor name using ajax
+        // $(document).on("change",".project_name",function(){
+            
+        //     var projectCategoryOption ="<option value=''>Material Category</option>";
+        //     var project_id = $(this).val();
         //     var ele=this;
-        //     if(category_id) {   
+        //     if(project_id) {   
         //         $.ajax({
-        //             url: "<?php //echo base_url().'admin/MaterialLog/getmaterialAjax/'?>"+category_id,
+        //             url: "<?php //echo base_url().'admin/MaterialIssue/getProjectCategoryAjax/'?>"+project_id,
         //             type: "GET",
         //             dataType: "json",
         //             success:function(data) {
-        //                 // $('select[name="city"]').empty();
-        //                 $.each(data, function(key, value) {
-        //                     optionHTML+='<option  data-unit="'+value.unit_measurement+'"  value="'+ value.id +'">'+ value.name +'</option>';
+        //                 $.each(data.getProjectCategory, function(key, value) {
+        //                     projectCategoryOption+='<option  value="'+ value.id +'">'+ value.category +'</option>';
         //                 });
-        //                 $(ele).parents(".form-group").next().find("select").html(optionHTML);
+        //                 $('.material_category').html(projectCategoryOption);
         //             }
         //         });
         //     }else{
-        //         $(ele).parents(".form-group").next().find("select").html(optionHTML);
+        //         $('.material_category').html(projectCategoryOption);
         //     }
         // }); 
-        
-    //     $(document).on("change",".material_name",function(){
-    //         var unit_measurement = $(this).find('option:selected', this).attr('data-unit');
-    //         $(this).parents(".form-group").next().find(".unit").html(unit_measurement);
-    //     });
-    // });
-     // load supervisor name using ajax
-        $(document).on("change",".project_name",function(){
+
+         // load supervisor name using ajax
+        $(document).on("change",".material_category",function(){
             
-            var projectCategoryOption ="<option value=''>Material Category</option>";
-            var project_id = $(this).val();
-            var ele=this;
-            if(project_id) {   
+            var project_id = $('.project_name').val();
+            var material_category = $('.material_category').val();
+
+            var projectMaterialOption ="<option value=''>Material Name</option>";
+
+            if(project_id && material_category) {   
                 $.ajax({
-                    url: "<?php echo base_url().'admin/MaterialLog/getSupervisorAjax/'?>"+project_id,
+                    url: "<?php echo base_url().'admin/MaterialIssue/getProjectMaterialAjax/'?>?project_id="+project_id+'&category_id='+material_category,
                     type: "GET",
                     dataType: "json",
                     success:function(data) {
-                        $.each(data.getProjectCategory, function(key, value) {
-                            projectCategoryOption+='<option  value="'+ value.id +'">'+ value.category +'</option>';
+                        $.each(data.material, function(key, value) {
+                            projectMaterialOption+='<option  value="'+ value.id +'">'+ value.name +'</option>';
                         });
-                        $('.material_category').html(projectCategoryOption);
+                        $('.materialName').html(projectMaterialOption);
                     }
                 });
-            }else{
-                $('.material_category').html(projectCategoryOption);
             }
-        }); 
+            else{
+                $('.materialName').html(projectMaterialOption);
+            }
+        });
 
 </script>

@@ -1,3 +1,8 @@
+<style type="text/css">
+    .unit{
+        vertical-align: -webkit-baseline-middle !important;
+    }
+</style>
 <!-- Content Wrapper. Contains page content -->
 <div class="content-wrapper">
     <!-- Content Header (Page header) -->
@@ -36,13 +41,13 @@
                     }
                     ?>
                     <!-- form start -->
-                    <form action="" id="add-labour" class="form-horizontal" method="POST" enctype="multipart/form-data">
+                    <form action="" id="add-labour" class="form-horizontal" method="POST" enctype="multipart/form-data" autocomplete="off">
                         <div class="box-body">
                             <h4 class="box-title">General Details :</h4>
                             <div class="form-group">
                                 <label for="title" class="col-sm-3 control-label">Challan Date <font color="red">*</font></label>
                                 <div class="col-sm-9">
-                                    <input name="challan_date" id="date" placeholder="Challan Date" class="form-control datepicker" type="text" value="<?php echo (isset($_POST['date'])) ? $_POST['date'] : ''; ?>" required>
+                                    <input name="challan_date" id="date" placeholder="Challan Date" class="form-control datepicker-material" type="text" value="<?php echo (isset($_POST['date'])) ? $_POST['date'] : ''; ?>" required>
                                     <span class="error"><?php echo (form_error('challan_date')) ? form_error('challan_date') : ''; ?></span>
                                 </div>
                             </div> 
@@ -61,7 +66,6 @@
                                     <span class="error"><?php echo (form_error('challan_image')) ? form_error('challan_image') : ''; ?></span>
                                 </div>
                             </div>
-
                             <div class="form-group">
                                 <label for="project_name" class="col-sm-3 control-label">Project Name <font color="red">*</font></label>
                                 <div class="col-sm-9">
@@ -241,6 +245,7 @@
         }); 
         $(document).on("change",".supplier_name",function(){
             var CategoryOption ="<option value=''>Material Category</option>";
+            $('.material_name').html("<option value=''>Material Name</option>");
             var supplier_id = $(this).val();
             var projectCategoryOption ="<option value=''>Material Category</option>";
             var ele=this;

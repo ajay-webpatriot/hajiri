@@ -27,6 +27,10 @@
             startDate:new Date(),
             format: "mm/dd/yyyy"
         });
+
+        $('.datepicker-material').datepicker({
+            format: "mm/dd/yyyy"
+        });
     });
 </script>
 <script src="<?php echo base_url('assets/admin/dist/js/croppie.js'); ?>"></script>

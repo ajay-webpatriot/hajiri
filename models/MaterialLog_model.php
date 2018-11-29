@@ -38,6 +38,7 @@ class MaterialLog_model extends CI_Model {
         $this->db->join($this->table4, $this->table4.'.id = '.$this->table1.'.supplier_id');
         $this->db->join($this->table6, $this->table1.'.receiver_id = '.$this->table6.'.user_id');
         $this->db->where($this->table1.".status != ", "Deleted");
+        $this->db->where($this->table1.".is_deleted ", "0");
         $this->db->order_by($this->table1 . '.id', "ASC");
         $query = $this->db->get();
         return $query->result();
