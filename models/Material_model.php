@@ -172,6 +172,18 @@ class Material_model extends CI_Model {
         $query = $this->db->get();
         return $query->row();
     }
+    public function getProjectMaterial($id)
+    {
+        $this->db->select($this->table1.".*");
+        $this->db->from($this->table1);
+        $this->db->join($this->table3,$this->table3.'.material_id = '.$this->table1.'.id');
+        $this->db->where($this->table3.'.project_id', $id);
+        
+        $this->db->where($this->table1.".status", 1);
+        $this->db->order_by($this->table1.'.name', "ASC");
+        $query = $this->db->get();
+        return $query->result();
+    }
 }
 
 ?>

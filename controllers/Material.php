@@ -29,91 +29,91 @@ class Material extends CI_Controller {
 
     }
     public function materialDatatable()
-        {
-            $columns = array( 
-                                0 =>'materials.name',
-                                1 =>'categories.name',
-                                2 => 'unit_measurement',
-                                3 => 'project_name',
-                                4 => 'status'
-                            );
-            // print_r($this->input->post('order'));exit;
-            $limit = $this->input->post('length');
-            $start = $this->input->post('start');
-            $order = $columns[$this->input->post('order')[0]['column']];
-            $dir = $this->input->post('order')[0]['dir'];
-      
-            $totalData = $this->Material->allMaterial_count();
-                
-            $totalFiltered = $totalData; 
-            $where = null;
-            if(!empty($this->input->post('search')['value']))
-            {            
-                $where .= '(materials.name LIKE "'.$this->input->post('search')['value'].'%" or ';
-                $where .= 'categories.name LIKE "'.$this->input->post('search')['value'].'%" or ';
-                $where .= 'materials.unit_measurement LIKE "'.$this->input->post('search')['value'].'%" or ';
-                $where .= 'project.project_name LIKE "'.$this->input->post('search')['value'].'%")';
-            }
-            if(!empty($this->input->post('project')))
-            {   
-                if($where == null)
-                $where .= 'material_projects.project_id = "'.$this->input->post('project').'"';
-                else
-                $where .= ' AND material_projects.project_id = "'.$this->input->post('project').'"';
-            }
-        
-            if($where == null)
-            {            
-                $posts = $this->Material->allMaterial($limit,$start,$order,$dir);
-            }
-            else {                
-
-                $posts =  $this->Material->material_custom_search($limit,$start,$where,$order,$dir);
-
-                $totalFiltered = $this->Material->material_custom_search_count($where);
-            }
-
-            $data = array();
-            if(!empty($posts))
-            {   
-                $debitImg = base_url('assets/admin/images/debit.png');
-                $creditImg = base_url('assets/admin/images/credit.png');
-                foreach ($posts as $post)
-                {   
-                    
-                    $nestedData['name'] = $post->name;
-                    $nestedData['category_name'] = $post->category_name;
-                    $nestedData['unit_measurement'] = $post->unit_measurement;
-                    $nestedData['project_name'] = $post->project_name;
-                    
-                    if($post->status == 0)
-                        $nestedData['status'] = '<a class="btn btn-sm btn-danger btn-xs" href="#" title="Status" data-status="' . $post->status . '" onclick="change_status(' . "'" . $post->id . "'" . ')">Inactive</a>';
-                    else if($post->status == 1)
-                        $nestedData['status'] = '<a class="btn btn-sm btn-success btn-xs" href="#" title="Status" data-status="' . $post->status . '" onclick="change_status(' . "'" . $post->id . "'" . ')">Active</a>';
-                    //Edit Action                   
-                   
-                    $nestedData['action'] = '<a class="btn btn-sm btn-primary" href="'.base_url('admin/material/editMaterial/') . $post->id.'" title="Edit material">
-                                        <i class="glyphicon glyphicon-pencil"></i> </a>
-
-                                        <button class="btn btn-sm btn-danger" title="Delete material" onclick="material_delete('. $post->id.')">
-                                        <i class="glyphicon glyphicon-trash"></i> 
-                                    </button>';
-                        
-    
-
-                    $data[] = $nestedData;
-
-                }
-            }
-              
-            $json_data = array(
-                        "draw"            => intval($this->input->post('draw')),  
-                        "recordsTotal"    => intval($totalData),  
-                        "recordsFiltered" => intval($totalFiltered), 
-                        "data"            => $data   
+    {
+        $columns = array( 
+                            0 =>'materials.name',
+                            1 =>'categories.name',
+                            2 => 'unit_measurement',
+                            3 => 'project_name',
+                            4 => 'status'
                         );
+        // print_r($this->input->post('order'));exit;
+        $limit = $this->input->post('length');
+        $start = $this->input->post('start');
+        $order = $columns[$this->input->post('order')[0]['column']];
+        $dir = $this->input->post('order')[0]['dir'];
+  
+        $totalData = $this->Material->allMaterial_count();
+            
+        $totalFiltered = $totalData; 
+        $where = null;
+        if(!empty($this->input->post('search')['value']))
+        {            
+            $where .= '(materials.name LIKE "'.$this->input->post('search')['value'].'%" or ';
+            $where .= 'categories.name LIKE "'.$this->input->post('search')['value'].'%" or ';
+            $where .= 'materials.unit_measurement LIKE "'.$this->input->post('search')['value'].'%" or ';
+            $where .= 'project.project_name LIKE "'.$this->input->post('search')['value'].'%")';
+        }
+        if(!empty($this->input->post('project')))
+        {   
+            if($where == null)
+            $where .= 'material_projects.project_id = "'.$this->input->post('project').'"';
+            else
+            $where .= ' AND material_projects.project_id = "'.$this->input->post('project').'"';
+        }
+    
+        if($where == null)
+        {            
+            $materialData = $this->Material->allMaterial($limit,$start,$order,$dir);
+        }
+        else {                
+
+            $materialData =  $this->Material->material_custom_search($limit,$start,$where,$order,$dir);
+
+            $totalFiltered = $this->Material->material_custom_search_count($where);
+        }
+
+        $data = array();
+        if(!empty($materialData))
+        {   
+            $debitImg = base_url('assets/admin/images/debit.png');
+            $creditImg = base_url('assets/admin/images/credit.png');
+            foreach ($materialData as $material)
+            {   
                 
-            echo json_encode($json_data); 
+                $nestedData['name'] = $material->name;
+                $nestedData['category_name'] = $material->category_name;
+                $nestedData['unit_measurement'] = $material->unit_measurement;
+                $nestedData['project_name'] = $material->project_name;
+                
+                if($material->status == 0)
+                    $nestedData['status'] = '<a class="btn btn-sm btn-danger btn-xs" href="#" title="Status" data-status="' . $material->status . '" onclick="change_status(' . "'" . $material->id . "'" . ')">Inactive</a>';
+                else if($material->status == 1)
+                    $nestedData['status'] = '<a class="btn btn-sm btn-success btn-xs" href="#" title="Status" data-status="' . $material->status . '" onclick="change_status(' . "'" . $material->id . "'" . ')">Active</a>';
+                //Edit Action                   
+               
+                $nestedData['action'] = '<a class="btn btn-sm btn-primary" href="'.base_url('admin/material/editMaterial/') . $material->id.'" title="Edit material">
+                                    <i class="glyphicon glyphicon-pencil"></i> </a>
+
+                                    <button class="btn btn-sm btn-danger" title="Delete material" onclick="material_delete('. $material->id.')">
+                                    <i class="glyphicon glyphicon-trash"></i> 
+                                </button>';
+                    
+
+
+                $data[] = $nestedData;
+
+            }
+        }
+          
+        $json_data = array(
+                    "draw"            => intval($this->input->post('draw')),  
+                    "recordsTotal"    => intval($totalData),  
+                    "recordsFiltered" => intval($totalFiltered), 
+                    "data"            => $data   
+                    );
+            
+        echo json_encode($json_data); 
     }
     public function addMaterial() {
         

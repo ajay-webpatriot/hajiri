@@ -31,8 +31,8 @@ class MaterialLog_model extends CI_Model {
         $this->db->select($this->table1 . '.*,'
             .$this->table4.'.name as supplier_name,concat('.$this->table6.'.user_name," ",'.$this->table6.'.user_last_name) as supervisor_name');
 
-        $this->db->select('(select group_concat('.$this->table3.'.name separator ",") from '.$this->table3.' join '.$this->table2.' where '.$this->table3.'.id='.$this->table2.'.material_id and '.$this->table1.'.id='.$this->table2.'.material_entry_log_id) as material_name');
-        $this->db->select('(select group_concat('.$this->table5.'.name separator ",") from '.$this->table3.' join '.$this->table2.'  join '.$this->table5.' where '.$this->table3.'.id='.$this->table2.'.material_id and '.$this->table5.'.id='.$this->table3.'.category_id and '.$this->table1.'.id='.$this->table2.'.material_entry_log_id) as category_name');
+        // $this->db->select('(select group_concat('.$this->table3.'.name separator ",") from '.$this->table3.' join '.$this->table2.' where '.$this->table3.'.id='.$this->table2.'.material_id and '.$this->table1.'.id='.$this->table2.'.material_entry_log_id) as material_name');
+        // $this->db->select('(select group_concat('.$this->table5.'.name separator ",") from '.$this->table3.' join '.$this->table2.'  join '.$this->table5.' where '.$this->table3.'.id='.$this->table2.'.material_id and '.$this->table5.'.id='.$this->table3.'.category_id and '.$this->table1.'.id='.$this->table2.'.material_entry_log_id) as category_name');
         
         $this->db->from($this->table1);
         $this->db->join($this->table4, $this->table4.'.id = '.$this->table1.'.supplier_id');
@@ -101,6 +101,93 @@ class MaterialLog_model extends CI_Model {
         $query = $this->db->get();
        return  $result = $query->row();
     }
+    // data table query start
+    function allMaterialLog_count()
+    {   
+        $this->db->select($this->table1 . '.*,'
+            .$this->table4.'.name as supplier_name,concat('.$this->table6.'.user_name," ",'.$this->table6.'.user_last_name) as supervisor_name');
+
+        $this->db->from($this->table1);
+        $this->db->join($this->table4, $this->table4.'.id = '.$this->table1.'.supplier_id');
+        $this->db->join($this->table6, $this->table1.'.receiver_id = '.$this->table6.'.user_id');
+        $this->db->where($this->table1.".status != ", "Deleted");
+        $this->db->where($this->table1.".is_deleted", '0');
+        $query = $this->db->get();
+    
+        return $query->num_rows();  
+
+    }
+    public function allMaterialLog($limit,$start,$col,$dir){
+
+        $this->db->select($this->table1 . '.*,'
+            .$this->table4.'.name as supplier_name,concat('.$this->table6.'.user_name," ",'.$this->table6.'.user_last_name) as supervisor_name');
+        $this->db->from($this->table1);
+        $this->db->join($this->table4, $this->table4.'.id = '.$this->table1.'.supplier_id');
+        $this->db->join($this->table6, $this->table1.'.receiver_id = '.$this->table6.'.user_id');
+        $this->db->where($this->table1.".status != ", "Deleted");
+        $this->db->where($this->table1.".is_deleted ", "0");
+        $this->db->limit($limit,$start);
+        $this->db->order_by($col,$dir);
+        $query = $this->db->get();
+        
+        if($query->num_rows()>0)
+        {
+            return $query->result(); 
+        }
+        else
+        {
+            return null;
+        }
+    }
+    public function materialLog_custom_search($limit,$start,$search,$col,$dir)
+    {
+        $this->db->select($this->table1 . '.*,'
+            .$this->table4.'.name as supplier_name,concat('.$this->table6.'.user_name," ",'.$this->table6.'.user_last_name) as supervisor_name');
+
+        
+        $this->db->from($this->table1);
+        $this->db->join($this->table2, $this->table1.'.id = '.$this->table2.'.material_entry_log_id');
+        $this->db->join($this->table4, $this->table4.'.id = '.$this->table1.'.supplier_id');
+        $this->db->join($this->table6, $this->table1.'.receiver_id = '.$this->table6.'.user_id');
+        $this->db->where($this->table1.".status != ", "Deleted");
+        $this->db->where($this->table1.".is_deleted", "0");
+        $this->db->where($search);
+        
+        $this->db->limit($limit,$start);
+        $this->db->order_by($col,$dir);
+        $this->db->group_by($this->table1.'.id');
+        $query = $this->db->get();
+        // echo $this->db->last_query();exit;
+        if($query->num_rows()>0)
+        {
+            return $query->result(); 
+        }
+        else
+        {
+            return null;
+        }
+    }
+    public function materialLog_custom_search_count($search)
+    {
+        $this->db->distinct($this->table1 .'id');
+        $this->db->select($this->table1 . '.*,'
+            .$this->table4.'.name as supplier_name,concat('.$this->table6.'.user_name," ",'.$this->table6.'.user_last_name) as supervisor_name');
+
+        $this->db->from($this->table1);
+        $this->db->join($this->table2, $this->table1.'.id = '.$this->table2.'.material_entry_log_id');
+        $this->db->join($this->table4, $this->table4.'.id = '.$this->table1.'.supplier_id');
+        $this->db->join($this->table6, $this->table1.'.receiver_id = '.$this->table6.'.user_id');
+        $this->db->where($this->table1.".status != ", "Deleted");
+        $this->db->where($this->table1.".is_deleted ", "0");
+        $this->db->where($search);
+        $this->db->group_by($this->table1.'.id');
+
+        $query = $this->db->get();
+
+
+        return $query->num_rows();
+    }
+    // data table query end
 }
 
 ?>

@@ -75,7 +75,7 @@ class Supplier extends CI_Controller {
                         );
                         $this->Supplier->save('supplier_categories', $data);
                     }
-                    $this->session->set_flashdata("success", "Supervisor added successfully.");
+                    $this->session->set_flashdata("success", "Supplier added successfully.");
                     redirect(base_url('admin/supplier'));
                 } else {
                     $this->session->set_flashdata('error', 'Failed To Add Supplier');
@@ -157,7 +157,7 @@ class Supplier extends CI_Controller {
         $result = $this->Supplier->get_by_id($id);
         $data['result'] = $result;
         $data['title'] = 'Edit Supplier';
-        $data['description'] = 'Edit Supervisor Description';
+        $data['description'] = 'Edit Supplier Description';
         $data['page'] = 'supplier/edit_supplier';
         $this->load->view('includes/template', $data);
     }
