@@ -156,6 +156,7 @@
         var tableEntry="";
         var dateStartRange="";
         var dateEndRange="";
+
         $(function () {
 
             // $("#table").DataTable({
@@ -171,10 +172,14 @@
                 dateEndRange=end.format('YYYY-MM-DD');
                 tableEntry.draw();
             });
+
+            // set date during initialization
+
             dateStartRange=moment($('input[name="daterange"]').val().split(" - ")[0]).format('YYYY-MM-DD');
             dateEndRange=moment($('input[name="daterange"]').val().split(" - ")[1]).format('YYYY-MM-DD');
+            
             // DataTable
-        tableEntry = $('#table').DataTable({
+            tableEntry = $('#table').DataTable({
                 "processing": true,
                 "serverSide": true,
                 "responsive": true,
@@ -310,12 +315,7 @@
         $(document).ready(function () {
         $('.alert-success').fadeOut(3000); //remove suucess message
         //datatables
-    });
-    function callTable()
-    {
-        alert("asd");
-        tableEntry.draw();
-    }    
+    });   
     // Delete material entry log
     function material_entry_log_delete(id) {
 

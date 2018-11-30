@@ -74,4 +74,41 @@ class MaterialIssueModel extends CI_Model {
 
         // select * from materials as m where m.id IN ( SELECT DISTINCT meld.material_id FROM material_entry_log as mel inner JOIN material_entry_logdetail as meld on mel.id = meld.material_entry_log_id where mel.project_id = 90) and m.category_id = 2
     }
+    // data table query start
+    public function allMaterialIssue_count()
+    {   
+        $this->db->select($this->table1 . '.*,concat('.$this->table4.'.user_name," ",'.$this->table4.'.user_last_name) as issue_by_name,'.$this->table2.'.name as category_name,'.$this->table3.'.name as material_name');
+        $this->db->from($this->table1);
+        $this->db->join($this->table3, $this->table1.'.material_id = '.$this->table3.'.id');
+        $this->db->join($this->table2, $this->table2.'.id = '.$this->table3.'.category_id');
+        $this->db->join($this->table4, $this->table4.'.user_id = '.$this->table1.'.issue_by');
+        $this->db->where($this->table1 . '.status != ', 'Deleted');
+        
+        $query = $this->db->get();
+    
+        return $query->num_rows();
+    }
+
+    public function allMaterialIssue($limit,$start,$col,$dir)
+    {   
+        $this->db->select($this->table1 . '.*,concat('.$this->table4.'.user_name," ",'.$this->table4.'.user_last_name) as issue_by_name,'.$this->table2.'.name as category_name,'.$this->table3.'.name as material_name');
+        $this->db->from($this->table1);
+        $this->db->join($this->table3, $this->table1.'.material_id = '.$this->table3.'.id');
+        $this->db->join($this->table2, $this->table2.'.id = '.$this->table3.'.category_id');
+        $this->db->join($this->table4, $this->table4.'.user_id = '.$this->table1.'.issue_by');
+        $this->db->where($this->table1 . '.status != ', 'Deleted');
+        $this->db->limit($limit,$start);
+        $this->db->order_by($col,$dir);
+        $query = $this->db->get();
+        
+        if($query->num_rows()>0)
+        {
+            return $query->result(); 
+        }
+        else
+        {
+            return null;
+        }
+    }
+    // data table query end
 }
