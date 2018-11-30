@@ -236,11 +236,11 @@ class MaterialIssue extends CI_Controller {
        
         $entry = $this->MaterialLog_model->getMaterialEntryQuantitybyProjectId($project_id, $material_id);
         
-        $entryQuantity = '';
-        $issueQuantity = '';
+        $entryQuantity = 0;
+        $issueQuantity = 0;
         
-        $entryQuantity = isset($entry->entryQuantity)? $entry->entryQuantity : '';
-        $issueQuantity = isset($issue->issueQuantity)? $issue->issueQuantity : '';
+        $entryQuantity = isset($entry->entryQuantity)? $entry->entryQuantity : 0;
+        $issueQuantity = isset($issue->issueQuantity)? $issue->issueQuantity : 0;
         
         $quantity = $entryQuantity - $issueQuantity; 
         if($quantity > 0){
@@ -388,7 +388,7 @@ class MaterialIssue extends CI_Controller {
                 
                 //Edit Action                   
                
-                $nestedData['action'] = '<a class="btn btn-sm btn-primary" href="'.base_url('admin/MaterialIssue/editIssueLog/') . $issue->id.' title="Edit material issue">
+                $nestedData['action'] = '<a class="btn btn-sm btn-primary" href="'.base_url('admin/MaterialIssue/editIssueLog/') . $issue->id.'" title="Edit material issue">
                                         <i class="glyphicon glyphicon-pencil"></i> </a>  
                                         <button class="btn btn-sm btn-danger" title="Delete material issue" onclick="material_issue_log_delete('.$issue->id.')">
                                             <i class="glyphicon glyphicon-trash"></i> 
