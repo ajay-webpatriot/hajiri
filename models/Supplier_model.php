@@ -15,11 +15,9 @@ class Supplier_model extends CI_Model {
     }
 
     public function get_all_supplier() {
-        // $this->db->select($this->table1 . '.*,'. $this->table2.'.name as category_name');
         $this->db->select($this->table1 . '.*');
         $this->db->from($this->table1);
-        // $this->db->join($this->table2, $this->table2.'.id = '.$this->table1.'.category_id');
-        // $this->db->where($this->table1.".status", 1);
+        $this->db->where($this->table1.".company_id", $this->session->userdata('company_id'));
         $this->db->where($this->table1.".is_deleted", '0');
         $this->db->order_by($this->table1 . '.id', "ASC");
         $query = $this->db->get();
@@ -28,6 +26,7 @@ class Supplier_model extends CI_Model {
     public function get_active_supplier() {
         $this->db->select($this->table1 . '.*');
         $this->db->from($this->table1);
+        $this->db->where($this->table1.".company_id", $this->session->userdata('company_id'));
         $this->db->where($this->table1.".status", 1);
         $this->db->order_by($this->table1 . '.id', "ASC");
         $query = $this->db->get();
@@ -70,6 +69,7 @@ class Supplier_model extends CI_Model {
         $this->db->select($this->table1.'.id,'.$this->table1.'.name');
         $this->db->from($this->table1);
         $this->db->join($this->table4,$this->table1.'.id = '.$this->table4.'.supplier_id');
+        $this->db->where($this->table1.".company_id", $this->session->userdata('company_id'));
         $this->db->where($this->table4.'.project_id', $id);
         $this->db->where($this->table1.'.status', 1);
         $this->db->where($this->table1.'.is_deleted', '0');

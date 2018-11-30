@@ -21,6 +21,7 @@ class Material_model extends CI_Model {
         $this->db->join($this->table3, $this->table3.'.material_id = '.$this->table1.'.id');
         $this->db->join($this->table4, $this->table3.'.project_id = '.$this->table4.'.project_id');
         // $this->db->where($this->table1.".status", 1);
+        $this->db->where($this->table1.".company_id", $this->session->userdata('company_id'));
         $this->db->where($this->table1.".is_deleted", '0');
         $query = $this->db->get();
     
@@ -36,6 +37,7 @@ class Material_model extends CI_Model {
         $this->db->join($this->table3, $this->table3.'.material_id = '.$this->table1.'.id');
         $this->db->join($this->table4, $this->table3.'.project_id = '.$this->table4.'.project_id');
         $this->db->where($this->table1.".is_deleted", '0');
+        $this->db->where($this->table1.".company_id", $this->session->userdata('company_id'));
         $this->db->limit($limit,$start);
         $this->db->order_by($col,$dir);
         $query = $this->db->get();
@@ -58,6 +60,7 @@ class Material_model extends CI_Model {
         $this->db->join($this->table3, $this->table3.'.material_id = '.$this->table1.'.id');
         $this->db->join($this->table4, $this->table3.'.project_id = '.$this->table4.'.project_id');
         $this->db->where($this->table1.".is_deleted", '0');
+        $this->db->where($this->table1.".company_id", $this->session->userdata('company_id'));
         $this->db->where($search);
         $this->db->limit($limit,$start);
         $this->db->order_by($col,$dir);
@@ -81,6 +84,7 @@ class Material_model extends CI_Model {
         $this->db->join($this->table3, $this->table3.'.material_id = '.$this->table1.'.id');
         $this->db->join($this->table4, $this->table3.'.project_id = '.$this->table4.'.project_id');
         $this->db->where($this->table1.".is_deleted", '0');
+        $this->db->where($this->table1.".company_id", $this->session->userdata('company_id'));
         $this->db->where($search);
         $this->db->order_by($this->table1 . '.id', "ASC"); 
         
@@ -107,6 +111,7 @@ class Material_model extends CI_Model {
         $this->db->join($this->table2, $this->table2.'.id = '.$this->table1.'.category_id');
         $this->db->where($this->table1.".status", 1);
         $this->db->where($this->table2.".status", 1);
+        $this->db->where($this->table1.".company_id", $this->session->userdata('company_id'));
         $this->db->order_by($this->table1 . '.id', "ASC");
         $query = $this->db->get();
         return $query->result();
@@ -178,7 +183,7 @@ class Material_model extends CI_Model {
         $this->db->from($this->table1);
         $this->db->join($this->table3,$this->table3.'.material_id = '.$this->table1.'.id');
         $this->db->where($this->table3.'.project_id', $id);
-        
+        $this->db->where($this->table1.".company_id", $this->session->userdata('company_id'));
         $this->db->where($this->table1.".status", 1);
         $this->db->order_by($this->table1.'.name', "ASC");
         $query = $this->db->get();

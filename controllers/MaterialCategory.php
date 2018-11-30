@@ -33,6 +33,7 @@ class MaterialCategory extends CI_Controller {
                 $data = array(
                     'name' => $this->input->post('categoryName'),
                     'approximate_estimate_ratio'=> $this->input->post('approximate_estimate_ratio'),
+                    'company_id' => $this->session->userdata('company_id'),
                     'status' => 1,
                 );
                 $cat_id = $this->MaterialCategory->save('categories', $data);
@@ -69,7 +70,8 @@ class MaterialCategory extends CI_Controller {
             if ($this->form_validation->run() === TRUE) {
                 $data = array(
                     'name' => $this->input->post('categoryName'),
-                    'approximate_estimate_ratio'=> $this->input->post('approximate_estimate_ratio')
+                    'approximate_estimate_ratio'=> $this->input->post('approximate_estimate_ratio'),
+                    'company_id' => $this->session->userdata('company_id')
                 );
                 $where = "id = ".$id;
                 $cat_id = $this->MaterialCategory->update('categories',$where ,$data);

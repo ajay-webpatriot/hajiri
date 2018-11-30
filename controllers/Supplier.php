@@ -46,6 +46,7 @@ class Supplier extends CI_Controller {
                 $data = array(
                     'name' => $this->input->post('supplier_name'),
                     'company_name' => $this->input->post('company_name'),
+                    'company_id' => $this->session->userdata('company_id'),
                     'contact_number' => $this->input->post('contact_number'),
                     'gst_number' => $this->input->post('gst_number'),
                     'address' => $this->input->post('address'),
@@ -114,6 +115,7 @@ class Supplier extends CI_Controller {
                 $data = array(
                     'name' => $this->input->post('supplier_name'),
                     'company_name' => $this->input->post('company_name'),
+                    'company_id' => $this->session->userdata('company_id'),
                     'contact_number' => $this->input->post('contact_number'),
                     'gst_number' => $this->input->post('gst_number'),
                     'address' => $this->input->post('address'),

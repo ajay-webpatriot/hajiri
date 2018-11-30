@@ -20,10 +20,7 @@
                     </div>
                     
                     <div class="col-md-12" style="padding-bottom: 2%;">
-                        <label class="col-md-1 control-label">Date:</label>
-                        <div class="col-md-3">
-                            <input type="text" class="form-control" name="daterange" value="01/01/2018 - 01/15/2018" />
-                        </div>
+                        
 
                         <label class="col-md-1 control-label">Project:</label>
                         <div class="col-md-3">
@@ -43,6 +40,10 @@
                                 
                             </select>
                         </div>
+                        <label class="col-md-1 control-label">Date:</label>
+                        <div class="col-md-3">
+                            <input type="text" class="form-control" name="daterange"  />
+                        </div>
                         
                     </div>
                     <div class="col-md-12">
@@ -53,19 +54,12 @@
                                 
                             </select>
                         </div>
-                        <label class="col-md-1 control-label">Supplier Name:</label>
-                        <div class="col-md-3">
-                            <select class="form-control supplierIssue" name="supplierIssue">
-                                <option value="">All Supplier </option>
-                                
-                            </select>
-                        </div>
                         <label class="col-md-1 control-label">Status:</label>
                         <div class="col-md-3">
                             <select class="form-control statusIssue" name="statusIssue">
                                 <option value="">All Status </option>
                                 <option value="Verified">Verified</option>
-                                <option value="Pending">Pending</option>
+                                <option value="Issued">Issued</option>
                                 
                             </select>
                         </div>
@@ -106,7 +100,7 @@
                     </thead>
                     <tbody>
                         <?php 
-                        if($materialIssue != ''){
+                       /* if($materialIssue != ''){
 
                         
                             foreach ($materialIssue as $value) { 
@@ -124,22 +118,17 @@
 
                                     <a class="btn btn-sm btn-primary" href="<?php echo base_url('admin/MaterialIssue/editIssueLog/') . $value->id; ?>" title="Edit material issue">
                                         <i class="glyphicon glyphicon-pencil"></i> </a>  
-<<<<<<< HEAD
-                                        <button class="btn btn-sm btn-danger" title="Delete material issue" onclick="material_issue_log_delete('<?php echo $value->id; ?>')">
-                                            <i class="glyphicon glyphicon-trash"></i> 
-                                        </button>
-=======
+
                                         <?php if($value->status !== 'Verified' ) { ?>
                                             <button class="btn btn-sm btn-danger" title="Delete material entry" onclick="material_issue_log_delete('<?php echo $value->id; ?>')">
                                                 <i class="glyphicon glyphicon-trash"></i> 
                                             </button>
                                         <?php } ?>
->>>>>>> cb822bde0a86db6110c1026c2b05ce63bb220cf3
                                     </td>
                                 </tr>
                         <?php 
                             } 
-                                } 
+                                } */
                         ?>
                     </tbody>
                 </table>
@@ -240,6 +229,20 @@ $(function () {
             {
                 "targets": [5],
                 "visible": true,
+                "searchable": true,
+                "sortable":true,
+                "type": "string"
+            },
+            {
+                "targets": [6],
+                "visible": true,
+                "searchable": true,
+                "sortable":true,
+                "type": "string"
+            },
+            {
+                "targets": [7],
+                "visible": true,
                 "searchable": false,
                 "sortable":false,
                 "type": "string"
@@ -249,14 +252,13 @@ $(function () {
 
     $('.projectIssue').change(function () {
         var optionHTML="<option value=''>All Supervisor</option>";
-        var projectSupplierOption ="<option value=''>All Supplier</option>";
         var projectMaterialOption ="<option value=''>All Material</option>";
 
         var project_id = $(this).val();
         var ele=this;
         if(project_id) {   
             $.ajax({
-                url: "<?php echo base_url().'admin/MaterialLog/getFilterDetailAjax/'?>"+project_id,
+                url: "<?php echo base_url().'admin/MaterialIssue/getFilterDetailAjax/'?>"+project_id,
                 type: "GET",
                 dataType: "json",
                 success:function(data) {
@@ -265,21 +267,15 @@ $(function () {
                         optionHTML+='<option  value="'+ value.user_id +'">'+ value.supervisor_name +'</option>';
                     });
 
-                    $.each(data.getProjectSupplier, function(key, value) {
-                        projectSupplierOption+='<option  value="'+ value.id +'">'+ value.name +'</option>';
-                    });
-
                     $.each(data.getProjectMaterial, function(key, value) {
                         projectMaterialOption+='<option  value="'+ value.id +'">'+ value.name +'</option>';
                     });
 
                     $('.supervisorIssue').html(optionHTML);
-                    $('.supplierIssue').html(projectSupplierOption);
                     $('.materialIssue').html(projectMaterialOption);
                 }
             });
         }else{
-            $('.supplierIssue').html(projectSupplierOption);
             $('.supervisorIssue').html(optionHTML);
             $('.materialIssue').html(projectMaterialOption);
         }
@@ -288,10 +284,6 @@ $(function () {
     });
 
     $('.supervisorIssue').change(function () {
-        tableIssue.draw();
-    });
-
-    $('.supplierIssue').change(function () {
         tableIssue.draw();
     });
 

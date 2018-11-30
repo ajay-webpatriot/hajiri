@@ -20,6 +20,7 @@ class MaterialIssueModel extends CI_Model {
         $this->db->join($this->table2, $this->table2.'.id = '.$this->table3.'.category_id');
         $this->db->join($this->table4, $this->table4.'.user_id = '.$this->table1.'.issue_by');
         $this->db->where($this->table1 . '.status != ', 'Deleted');
+        $this->db->where($this->table1.".company_id", $this->session->userdata('company_id'));
         $this->db->where($this->table1 . '.is_deleted = ', '0');
         $query = $this->db->get();
         $result= $query->result();
@@ -57,6 +58,7 @@ class MaterialIssueModel extends CI_Model {
         $this->db->where($this->table1 . '.material_id', $material_id);
         $this->db->where($this->table1 . '.status =', 'Verified');
         $this->db->where($this->table1 . '.is_deleted', '0');
+        $this->db->where($this->table1.".company_id", $this->session->userdata('company_id'));
         $query = $this->db->get();
         return $result = $query->row();
     }
@@ -85,6 +87,7 @@ class MaterialIssueModel extends CI_Model {
         $this->db->join($this->table3, $this->table1.'.material_id = '.$this->table3.'.id');
         $this->db->join($this->table2, $this->table2.'.id = '.$this->table3.'.category_id');
         $this->db->join($this->table4, $this->table4.'.user_id = '.$this->table1.'.issue_by');
+        $this->db->where($this->table1.".company_id", $this->session->userdata('company_id'));
         $this->db->where($this->table1 . '.status != ', 'Deleted');
         
         $query = $this->db->get();
@@ -99,6 +102,7 @@ class MaterialIssueModel extends CI_Model {
         $this->db->join($this->table3, $this->table1.'.material_id = '.$this->table3.'.id');
         $this->db->join($this->table2, $this->table2.'.id = '.$this->table3.'.category_id');
         $this->db->join($this->table4, $this->table4.'.user_id = '.$this->table1.'.issue_by');
+        $this->db->where($this->table1.".company_id", $this->session->userdata('company_id'));
         $this->db->where($this->table1 . '.status != ', 'Deleted');
         $this->db->limit($limit,$start);
         $this->db->order_by($col,$dir);
@@ -112,6 +116,58 @@ class MaterialIssueModel extends CI_Model {
         {
             return null;
         }
+    }
+    public function materialIssue_custom_search($limit,$start,$search,$col,$dir)
+    {   
+        $this->db->select($this->table1 . '.*,concat('.$this->table4.'.user_name," ",'.$this->table4.'.user_last_name) as issue_by_name,'.$this->table2.'.name as category_name,'.$this->table3.'.name as material_name');
+        $this->db->from($this->table1);
+        $this->db->join($this->table3, $this->table1.'.material_id = '.$this->table3.'.id');
+        $this->db->join($this->table2, $this->table2.'.id = '.$this->table3.'.category_id');
+        $this->db->join($this->table4, $this->table4.'.user_id = '.$this->table1.'.issue_by');
+        $this->db->where($this->table1.".company_id", $this->session->userdata('company_id'));
+        $this->db->where($this->table1 . '.status != ', 'Deleted');
+        $this->db->where($search);
+        
+        $this->db->limit($limit,$start);
+        $this->db->order_by($col,$dir);
+        $query = $this->db->get();
+        // echo $this->db->last_query();exit;
+        if($query->num_rows()>0)
+        {
+            return $query->result(); 
+        }
+        else
+        {
+            return null;
+        }
+    }
+    public function materialIssue_custom_search_count($search)
+    {   
+        $this->db->select($this->table1 . '.*,concat('.$this->table4.'.user_name," ",'.$this->table4.'.user_last_name) as issue_by_name,'.$this->table2.'.name as category_name,'.$this->table3.'.name as material_name');
+        $this->db->from($this->table1);
+        $this->db->join($this->table3, $this->table1.'.material_id = '.$this->table3.'.id');
+        $this->db->join($this->table2, $this->table2.'.id = '.$this->table3.'.category_id');
+        $this->db->join($this->table4, $this->table4.'.user_id = '.$this->table1.'.issue_by');
+        $this->db->where($this->table1.".company_id", $this->session->userdata('company_id'));
+        $this->db->where($this->table1 . '.status != ', 'Deleted');
+        $this->db->where($search);
+        $query = $this->db->get();
+
+        return $query->num_rows();
+    }
+    public function companyAdminSupervisor()
+    {
+        $this->db->select($this->table4.".user_id,CONCAT(".$this->table4.".user_name,' ',".$this->table4.".user_last_name) as supervisor_name");
+        $this->db->from($this->table4);
+        
+        $company_id = $this->session->userdata('company_id');
+        $this->db->where($this->table4 .".company_id", $company_id);
+        $this->db->where_in($this->table4 .'.user_designation', array("Supervisor","Admin"));    
+        $this->db->where($this->table4 .".status = 1");
+        $this->db->join('company c','c.compnay_id = '.$this->table4.'.company_id');
+        $this->db->order_by($this->table4 . '.user_id',"desc");        
+        $query = $this->db->get();
+        return $query->result();
     }
     // data table query end
 }

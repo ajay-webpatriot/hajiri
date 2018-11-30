@@ -108,6 +108,7 @@ class materialLog extends CI_Controller {
                         'supplier_id'   => $supplier_name,
                         'receiver_id'   => $supervisor_name,
                         'project_id'   => $project_name,
+                        'company_id' => $this->session->userdata('company_id'),
                         'status'   => 'Pending',
                     );
                     $materialLogId = $this->MaterialLog_model->materialLogsave($materialLogArr);
@@ -347,6 +348,7 @@ class materialLog extends CI_Controller {
                         'supplier_id'   => $supplier_name,
                         'receiver_id'   => $supervisor_name,
                         'project_id'   => $project_name,
+                        'company_id' => $this->session->userdata('company_id'),
                         'comment' => $comment,
                         'status'   => $log_status,
                     );
@@ -470,6 +472,7 @@ class materialLog extends CI_Controller {
     }
     public function materialLogDatatable()
     {
+        // sorting column array
         $columns = array( 
                             0 =>'material_entry_log.challan_no',
                             1 =>'material_entry_log.challan_date',
@@ -479,7 +482,6 @@ class materialLog extends CI_Controller {
                             5 => 'supplier_name',
                             6 => 'status'
                         );
-        // print_r($this->input->post('dateStartRange'));exit;
         $limit = $this->input->post('length');
         $start = $this->input->post('start');
         $order = $columns[$this->input->post('order')[0]['column']];
@@ -489,7 +491,6 @@ class materialLog extends CI_Controller {
             
         $totalFiltered = $totalData; 
         // $where=null;
-        // echo $this->input->post('dateStartRange').'"  and  "'.$this->input->post('dateEndRange');exit;
         $where = '(material_entry_log.challan_date between "'.$this->input->post('dateStartRange').'"  and  "'.$this->input->post('dateEndRange').'")';
         if(!empty($this->input->post('search')['value']))
         {            
@@ -500,12 +501,7 @@ class materialLog extends CI_Controller {
             $where .= 'material_entry_log.challan_no LIKE "'.$this->input->post('search')['value'].'%" or ';
             
             $where .= 'material_entry_log.status LIKE "'.$this->input->post('search')['value'].'%" or ';
-            $where .= 'concat(user.user_name," ",user.user_last_name) LIKE "'.$this->input->post('search')['value'].'%" or ';// supervisor_name
-
-            
-
-            $where .= 'suppliers.name LIKE "'.$this->input->post('search')['value'].'%" ) ';
-
+            $where .= 'concat(user.user_name," ",user.user_last_name) LIKE "'.$this->input->post('search')['value'].'%" )';// supervisor_name
             
         }
 
@@ -548,39 +544,39 @@ class materialLog extends CI_Controller {
     
         if($where == null)
         {            
-            $posts = $this->MaterialLog_model->allMaterialLog($limit,$start,$order,$dir);
+            $materialLogs = $this->MaterialLog_model->allMaterialLog($limit,$start,$order,$dir);
         }
         else {                
 
-            $posts =  $this->MaterialLog_model->materialLog_custom_search($limit,$start,$where,$order,$dir);
+            $materialLogs =  $this->MaterialLog_model->materialLog_custom_search($limit,$start,$where,$order,$dir);
 
             $totalFiltered = $this->MaterialLog_model->materialLog_custom_search_count($where);
         }
 
         $data = array();
-        if(!empty($posts))
+        if(!empty($materialLogs))
         {   
             $debitImg = base_url('assets/admin/images/debit.png');
             $creditImg = base_url('assets/admin/images/credit.png');
-            foreach ($posts as $post)
+            foreach ($materialLogs as $materialLog)
             {   
                 
-                $nestedData['challan_no'] = $post->challan_no;
-                $nestedData['challan_date'] = $post->challan_date;
-                $nestedData['supervisor_name'] = $post->supervisor_name;
+                $nestedData['challan_no'] = $materialLog->challan_no;
+                $nestedData['challan_date'] = $materialLog->challan_date;
+                $nestedData['supervisor_name'] = $materialLog->supervisor_name;
                 
-                $nestedData['supplier_name'] = $post->supplier_name;
-                $nestedData['status'] = $post->status;
+                $nestedData['supplier_name'] = $materialLog->supplier_name;
+                $nestedData['status'] = $materialLog->status;
 
                 
                 //Edit Action                   
                
-                $nestedData['action'] = '<a class="btn btn-sm btn-primary" href="'.base_url('admin/MaterialLog/editEntry/') . $post->id.'" title="Edit material entry">
+                $nestedData['action'] = '<a class="btn btn-sm btn-primary" href="'.base_url('admin/MaterialLog/editEntry/') . $materialLog->id.'" title="Edit material entry">
                                             <i class="glyphicon glyphicon-pencil"></i> </a>  ';
 
 
-                if(isset($post->status) && $post->status !== 'Approved') { 
-                     $nestedData['action'] .= '<button class="btn btn-sm btn-danger" title="Delete material entry" onclick="material_entry_log_delete('.$post->id.')">
+                if(isset($materialLog->status) && $materialLog->status !== 'Approved') { 
+                     $nestedData['action'] .= '<button class="btn btn-sm btn-danger" title="Delete material entry" onclick="material_entry_log_delete('.$materialLog->id.')">
                         <i class="glyphicon glyphicon-trash"></i> 
                     </button>';
                 } 

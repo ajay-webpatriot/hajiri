@@ -155,6 +155,7 @@ class Material extends CI_Controller {
                     $data = array(
                         'name' => $this->input->post('material_name'),
                         'category_id' => $this->input->post('category_id'),
+                        'company_id' => $this->session->userdata('company_id'),
                         'unit_measurement' => $this->input->post('unit_measurement'),
                         'hsn_code' => $this->input->post('hsn_code'),
                         'bound_start_range' => $this->input->post('bound_start_range'),
@@ -240,6 +241,7 @@ class Material extends CI_Controller {
                     $data = array(
                         'name' => $this->input->post('material_name'),
                         'category_id' => $this->input->post('category_id'),
+                        'company_id' => $this->session->userdata('company_id'),
                         'unit_measurement' => $this->input->post('unit_measurement'),
                         'hsn_code' => $this->input->post('hsn_code'),
                         'bound_start_range' => $this->input->post('bound_start_range'),

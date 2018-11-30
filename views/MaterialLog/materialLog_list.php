@@ -24,11 +24,6 @@
                         </div>
                         
                         <div class="col-md-12" style="padding-bottom: 2%;">
-                            <label class="col-md-1 control-label">Date:</label>
-                            <div class="col-md-3">
-                                <input type="text" class="form-control" name="daterange" value="01/01/2018 - 01/15/2018" />
-                            </div>
-
                             <label class="col-md-1 control-label">Project:</label>
                             <div class="col-md-3">
                                 <select class="form-control projectEntry" name="projectEntry">
@@ -46,6 +41,10 @@
                                     <option value="">All Material </option>
                                     
                                 </select>
+                            </div>
+                            <label class="col-md-1 control-label">Date:</label>
+                            <div class="col-md-3">
+                                <input type="text" class="form-control" name="daterange" />
                             </div>
                             
                         </div>

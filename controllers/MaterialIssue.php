@@ -11,10 +11,12 @@ class MaterialIssue extends CI_Controller {
         $this->load->model('MaterialIssueModel');
         $this->load->model('Project_model');
         $this->load->model('MaterialLog_model');
+        $this->load->model('Material_model');
         $this->load->model('Admin_model', 'admin');        
         checkAdmin();
     }
     public function index() {
+        $data['projects'] = $this->Project_model->get_active_projects();
         $data['title'] = 'Material Issue';
         $data['menu_title'] = 'Issue Log';
         $data['materialIssue'] = $this->MaterialIssueModel->getIssueLog();
@@ -67,6 +69,7 @@ class MaterialIssue extends CI_Controller {
                         'issue_by'=>$this->session->userdata('id'),
                         'material_id'   => $this->input->post('MaterialName'),
                         'project_id'   => $this->input->post('project_name'),
+                        'company_id' => $this->session->userdata('company_id'),
                         'quantity' => $this->input->post('IssueQuantity'),
                         'material_image'   =>  $issue_image,
                         'consumption_place'   => $this->input->post('sites'),
@@ -187,6 +190,7 @@ class MaterialIssue extends CI_Controller {
                         'date' => $date,
                         'issue_by'=>$this->session->userdata('id'),
                         'material_id'   => $this->input->post('MaterialName'),
+                        'company_id' => $this->session->userdata('company_id'),
                         'quantity' => $this->input->post('IssueQuantity'),
                         'material_image'   =>  $uploaded_material_img,
                         'consumption_place'   => $this->input->post('sites'),
@@ -282,8 +286,25 @@ class MaterialIssue extends CI_Controller {
             }
         }
     }
+
+    public function getFilterDetailAjax($id) {
+        
+        $getMaterialByProjectId = array();
+        $getCompanyAdmin= array();
+
+        $getMaterialByProjectId = $this->Material_model->getProjectMaterial($id);
+        $getCompanyAdmin= $this->MaterialIssueModel->companyAdminSupervisor();
+
+
+        echo json_encode([
+            'success'=> true, 
+            'getProjectSupervisor' => $getCompanyAdmin,
+            'getProjectMaterial' => $getMaterialByProjectId
+        ]);  exit();
+    }
     public function materialIssueDatatable()
     {
+        // sorting column array
         $columns = array( 
                             0 =>'material_issue_log.issue_no',
                             1 =>'material_issue_log.date',
@@ -293,7 +314,6 @@ class MaterialIssue extends CI_Controller {
                             5 => 'quantity',
                             6 => 'status'
                         );
-        // print_r($this->input->post('dateStartRange'));exit;
         $limit = $this->input->post('length');
         $start = $this->input->post('start');
         $order = $columns[$this->input->post('order')[0]['column']];
@@ -303,61 +323,51 @@ class MaterialIssue extends CI_Controller {
             
         $totalFiltered = $totalData; 
         $where=null;
-        // echo $this->input->post('dateStartRange').'"  and  "'.$this->input->post('dateEndRange');exit;
-        // $where = '(material_entry_log.challan_date between "'.$this->input->post('dateStartRange').'"  and  "'.$this->input->post('dateEndRange').'")';
+       
+        $where = '(material_issue_log.date between "'.$this->input->post('dateStartRange').'"  and  "'.$this->input->post('dateEndRange').'")';
         if(!empty($this->input->post('search')['value']))
         {            
-            // if($where != null){
-            //     $where.= ' AND ';
-            // }
-            // $where .= '(suppliers.name LIKE "'.$this->input->post('search')['value'].'%" or ';
-            // $where .= 'material_entry_log.challan_no LIKE "'.$this->input->post('search')['value'].'%" or ';
+            if($where != null){
+                $where.= ' AND ';
+            }
+            $where .= '(material_issue_log.issue_no LIKE "'.$this->input->post('search')['value'].'%" or ';
             
-            // $where .= 'material_entry_log.status LIKE "'.$this->input->post('search')['value'].'%" or ';
-            // $where .= 'concat(user.user_name," ",user.user_last_name) LIKE "'.$this->input->post('search')['value'].'%" or ';// supervisor_name
-
-            
-
-            // $where .= 'suppliers.name LIKE "'.$this->input->post('search')['value'].'%" ) ';
-
-            
+            $where .= 'material_issue_log.status LIKE "'.$this->input->post('search')['value'].'%" or ';
+            $where .= 'categories.name LIKE "'.$this->input->post('search')['value'].'%" or ';
+            $where .= 'materials.name LIKE "'.$this->input->post('search')['value'].'%" or ';
+            $where .= 'material_issue_log.quantity LIKE "'.$this->input->post('search')['value'].'%" or ';
+             $where .= 'material_issue_log.status LIKE "'.$this->input->post('search')['value'].'%" or ';
+            $where .= 'concat(user.user_name," ",user.user_last_name) LIKE "'.$this->input->post('search')['value'].'%" )';// supervisor_name            
         }
 
         
         if(!empty($this->input->post('project')))
         {   
             if($where == null)
-            $where .= 'material_entry_log.project_id = "'.$this->input->post('project').'"';
+            $where .= 'material_issue_log.project_id = "'.$this->input->post('project').'"';
             else
-            $where .= ' AND material_entry_log.project_id = "'.$this->input->post('project').'"';
+            $where .= ' AND material_issue_log.project_id = "'.$this->input->post('project').'"';
         }
         if(!empty($this->input->post('material')))
         {   
             if($where == null)
-            $where .= 'material_entry_logdetail.material_id = "'.$this->input->post('material').'"';
+            $where .= 'material_issue_log.material_id = "'.$this->input->post('material').'"';
             else
-            $where .= ' AND material_entry_logdetail.material_id = "'.$this->input->post('material').'"';
-        }
-        if(!empty($this->input->post('supplier')))
-        {   
-            if($where == null)
-            $where .= 'material_entry_log.supplier_id = "'.$this->input->post('supplier').'"';
-            else
-            $where .= ' AND material_entry_log.supplier_id = "'.$this->input->post('supplier').'"';
+            $where .= ' AND material_issue_log.material_id = "'.$this->input->post('material').'"';
         }
         if(!empty($this->input->post('supervisor')))
         {   
             if($where == null)
-            $where .= 'material_entry_log.receiver_id = "'.$this->input->post('supervisor').'"';
+            $where .= 'material_issue_log.issue_by = "'.$this->input->post('supervisor').'"';
             else
-            $where .= ' AND material_entry_log.receiver_id = "'.$this->input->post('supervisor').'"';
+            $where .= ' AND material_issue_log.issue_by = "'.$this->input->post('supervisor').'"';
         }
         if(!empty($this->input->post('status')))
         {   
             if($where == null)
-            $where .= 'material_entry_log.status = "'.$this->input->post('status').'"';
+            $where .= 'material_issue_log.status = "'.$this->input->post('status').'"';
             else
-            $where .= ' AND material_entry_log.status = "'.$this->input->post('status').'"';
+            $where .= ' AND material_issue_log.status = "'.$this->input->post('status').'"';
         }
     
         if($where == null)
@@ -366,9 +376,9 @@ class MaterialIssue extends CI_Controller {
         }
         else {                
 
-            $issues =  $this->MaterialIssueModel->materialLog_custom_search($limit,$start,$where,$order,$dir);
+            $issues =  $this->MaterialIssueModel->materialIssue_custom_search($limit,$start,$where,$order,$dir);
 
-            $totalFiltered = $this->MaterialIssueModel->materialLog_custom_search_count($where);
+            $totalFiltered = $this->MaterialIssueModel->materialIssue_custom_search_count($where);
         }
 
         $data = array();
