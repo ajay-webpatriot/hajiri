@@ -191,29 +191,9 @@
             $("#OutsideSiteMenuHide").attr("style", "display: none;"); 
         }
     });
-
-    //29/11/2018
-       
-    // $("#MaterialCategory").change(function(){
-    //     var selectCatId = $("#MaterialCategory option:selected").val();
-    //     var ele=this;
-    //     var optionHTML="<option value=''>Material Name</option>";
-    //     $.ajax({
-    //         type:"GET",
-    //         url: "<?php //echo base_url('admin/MaterialIssue/materialIssueNames/'); ?>"+selectCatId,
-    //         dataType: "json",
-    //         success: function(data) {
-    //             $.each(data, function(key, value) {
-    //                optionHTML+='<option  data-unit="'+value.unit_measurement+'"  value="'+ value.id +'">'+ value.name +'</option>';
-    //             });
-    //             $(ele).parents(".form-group").next().find("select").html(optionHTML);
-    //         }
-    //     });
-    //     $('#MaterialNames').html();
-    // });
-
     $(document).on("change",".materialName",function(){
         
+        $('.QuantityError').html('');
         var material_id = $(".materialName").val();
         var project_id = $(".project_name").val();
         $('.totalQuantity').attr('id', 0);
@@ -228,7 +208,7 @@
                         // var id = data;
                         $('.totalQuantity').removeClass('totalQuantityClassError');
                         $('.totalQuantity').addClass('totalQuantityClass');
-                        $('.totalQuantity').html('Available Quantity '+data.quantity+' bags');
+                        $('.totalQuantity').html('Available quantity '+data.quantity+' bags');
                         $('.totalQuantity').attr('id', data.quantity);
                     }else{
                          // var id = data;
@@ -240,7 +220,6 @@
             });
         }
             var unit_measurement = $(this).find('option:selected', this).attr('data-unit');
-            // $(this).parents(".form-group").next().find(".unit").html(unit_measurement);
             $(".unit").html(unit_measurement);
     });
          
@@ -256,9 +235,9 @@
                 $('.QuantityError').show();
 
                 if(totalQuantity == 0){
-                    $('.QuantityError').html('Quantity not Available in selected category and project.');
+                    $('.QuantityError').html('Quantity not available in selected category and project.');
                 }else{
-                    $('.QuantityError').html('Please not allow quantity more than '+totalQuantity);
+                    $('.QuantityError').html('Quantity not available more than '+totalQuantity);
                 }
                 status =  false;
             }
@@ -284,6 +263,7 @@
         function getMaterial(project_id, material_category){
 
             var projectMaterialOption ="<option value=''>Material Name</option>";
+            $('.totalQuantity').html('');
 
             if(project_id && material_category) {   
                 $.ajax({

@@ -98,6 +98,28 @@ class MaterialIssue extends CI_Controller {
     {
         $data = $this->data;
         $data['result'] = $this->MaterialIssueModel->get_materialIssue_by_id($id);
+
+        $issue = 0;
+        $entry = 0;
+        $totalQuantity = 0;
+
+        if(isset($data['result']->material_id) && isset($data['result']->project_id)){
+            $project_id = $data['result']->project_id;
+            $material_id = $data['result']->material_id;
+            $result = $this->MaterialIssueModel->getMaterialIssueQuantitybyProjectId($project_id, $material_id);
+            $entryResult = $this->MaterialLog_model->getMaterialEntryQuantitybyProjectId($project_id, $material_id);
+            
+            if(count($issue) > 0){
+                $issue = $result->issueQuantity;
+            }
+            if(count($entryResult) > 0){
+                $entry = $entryResult->entryQuantity;
+            }
+        }
+
+        $totalQuantity =  $entry - $issue;
+         
+        $data['totalQuantity'] = $totalQuantity;
          
         if (isset( $_POST['submit']) || isset($_POST['verify'])){
 
@@ -111,22 +133,22 @@ class MaterialIssue extends CI_Controller {
             $this->form_validation->set_rules('sites', 'Consumption Place', 'required');
             // $this->form_validation->set_rules('issueComment', 'Issue Comment', 'required');  
             
-            if ($this->form_validation->run() == false ) {
+            if($this->form_validation->run() == false ){
                 $this->session->set_flashdata( 'error', 'Sorry,  Error while adding Material Issue details.' );
                 redirect( base_url( 'admin/MaterialIssue/addIssueLog/') );
             }else{
 
                 $material_quantity = $this->input->post('IssueQuantity');
-
                 $valid_quantity = true;
+                $quantity_invalid = true; 
 
-                foreach ($material_quantity as  $value) {
-                    if($value <= 0){
-                      $valid_quantity = false;
-                    }
+                if($material_quantity <= 0){
+                    $valid_quantity = false;
+                }else if( $material_quantity > $totalQuantity){
+                    $quantity_invalid = false;
                 }
-                if($valid_quantity == true){
-
+                 
+                if($valid_quantity == true && $quantity_invalid == true){
 
                     if (!empty($Issuefile['name'])) {
                         $Issuefile = $_FILES["Issuefile"]['name'];
@@ -151,7 +173,6 @@ class MaterialIssue extends CI_Controller {
                         if (file_exists('./uploads/MaterialIssue/'.$data['result']->material_image))
                         {
                             unlink('./uploads/MaterialIssue/'.$data['result']->material_image);
-                            
                         }    
                     }
                     else if(!empty($data['result']))
@@ -180,33 +201,15 @@ class MaterialIssue extends CI_Controller {
                         redirect(base_url('admin/MaterialIssue'));
                     // }
                 }else{
-                    $this->session->set_flashdata('error', 'Please enter quantity more than zero');
+                    if($valid_quantity == false){
+                        $this->session->set_flashdata('error', 'Please enter quantity more than zero.');
+                    } else{
+                        $this->session->set_flashdata('error', 'Invalid your entered quantity.');
+                    }
                 }
             }
         }
         $data['materialCategory'] = $this->MaterialCategory_model->get_active_material_category();
-
-       $issue = 0;
-       $entry = 0;
-
-        if(isset($data['result']->material_id) && isset($data['result']->project_id)){
-            $project_id = $data['result']->project_id;
-            $material_id = $data['result']->material_id;
-            $result = $this->MaterialIssueModel->getMaterialIssueQuantitybyProjectId($project_id, $material_id);
-            $entryResult = $this->MaterialLog_model->getMaterialEntryQuantitybyProjectId($project_id, $material_id);
-            
-            if(count($issue) > 0){
-                $issue = $result->issueQuantity;
-            }
-            if(count($entryResult) > 0){
-                $entry = $entryResult->entryQuantity;
-            }
-        }
-
-        $totalQuantity =  $entry - $issue;
-         
-        $data['totalQuantity'] = $totalQuantity;
-         
         $data['ActiveProjects'] = $this->Project_model->get_active_projects();
         $data['title'] = 'Material Issue edit Data';
         $data['menu_title'] = 'Issue Log';
