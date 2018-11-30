@@ -12,17 +12,95 @@ class Material_model extends CI_Model {
         parent::__construct();
         $this->load->database();
     }
-
-    public function get_all_material() {
-        $this->db->select($this->table1 . '.*,'. $this->table2.'.name as category_name');
+    // data table query start
+    function allMaterial_count()
+    {   
+        $this->db->select($this->table1 . '.*,'. $this->table2.'.name as category_name,'. $this->table4.'.project_name');
         $this->db->from($this->table1);
         $this->db->join($this->table2, $this->table2.'.id = '.$this->table1.'.category_id');
+        $this->db->join($this->table3, $this->table3.'.material_id = '.$this->table1.'.id');
+        $this->db->join($this->table4, $this->table3.'.project_id = '.$this->table4.'.project_id');
         // $this->db->where($this->table1.".status", 1);
         $this->db->where($this->table1.".is_deleted", '0');
-        $this->db->order_by($this->table1 . '.id', "ASC");
         $query = $this->db->get();
-        return $query->result();
+    
+        return $query->num_rows();  
+
     }
+    function allMaterial($limit,$start,$col,$dir)
+    {   
+        
+        $this->db->select($this->table1 . '.*,'. $this->table2.'.name as category_name,'. $this->table4.'.project_name');
+        $this->db->from($this->table1);
+        $this->db->join($this->table2, $this->table2.'.id = '.$this->table1.'.category_id');
+        $this->db->join($this->table3, $this->table3.'.material_id = '.$this->table1.'.id');
+        $this->db->join($this->table4, $this->table3.'.project_id = '.$this->table4.'.project_id');
+        $this->db->where($this->table1.".is_deleted", '0');
+        $this->db->limit($limit,$start);
+        $this->db->order_by($col,$dir);
+        $query = $this->db->get();
+        
+        if($query->num_rows()>0)
+        {
+            return $query->result(); 
+        }
+        else
+        {
+            return null;
+        }
+        
+    }
+    function material_custom_search($limit,$start,$search,$col,$dir)
+    {
+        $this->db->select($this->table1 . '.*,'. $this->table2.'.name as category_name,'. $this->table4.'.project_name');
+        $this->db->from($this->table1);
+        $this->db->join($this->table2, $this->table2.'.id = '.$this->table1.'.category_id');
+        $this->db->join($this->table3, $this->table3.'.material_id = '.$this->table1.'.id');
+        $this->db->join($this->table4, $this->table3.'.project_id = '.$this->table4.'.project_id');
+        $this->db->where($this->table1.".is_deleted", '0');
+        $this->db->where($search);
+        $this->db->limit($limit,$start);
+        $this->db->order_by($col,$dir);
+        $query = $this->db->get();
+        
+       
+        if($query->num_rows()>0)
+        {
+            return $query->result();  
+        }
+        else
+        {
+            return null;
+        }
+    }
+    function material_custom_search_count($search)
+    {
+        $this->db->select($this->table1 . '.*,'. $this->table2.'.name as category_name,'. $this->table4.'.project_name');
+        $this->db->from($this->table1);
+        $this->db->join($this->table2, $this->table2.'.id = '.$this->table1.'.category_id');
+        $this->db->join($this->table3, $this->table3.'.material_id = '.$this->table1.'.id');
+        $this->db->join($this->table4, $this->table3.'.project_id = '.$this->table4.'.project_id');
+        $this->db->where($this->table1.".is_deleted", '0');
+        $this->db->where($search);
+        $this->db->order_by($this->table1 . '.id', "ASC"); 
+        
+        $query = $this->db->get();
+        return $query->num_rows();
+    }
+    // data table query end
+    // public function get_all_material() {
+    //     $this->db->select($this->table1 . '.*,'. $this->table2.'.name as category_name,'. $this->table4.'.project_name');
+    //     // $this->db->select('(select '.$this->table4.'.project_name  from '.$this->table4.' join '.$this->table3.' on '.$this->table4.'.project_id='.$this->table3.'.project_id where '.$this->table1.'.id='.$this->table3.'.material_id) as project_name');
+    //     $this->db->from($this->table1);
+    //     $this->db->join($this->table2, $this->table2.'.id = '.$this->table1.'.category_id');
+    //     $this->db->join($this->table3, $this->table3.'.material_id = '.$this->table1.'.id');
+    //     $this->db->join($this->table4, $this->table3.'.project_id = '.$this->table4.'.project_id');
+    //     // $this->db->where($this->table1.".status", 1);
+    //     $this->db->where($this->table1.".is_deleted", '0');
+    //     $this->db->order_by($this->table1 . '.id', "ASC");
+    //     $query = $this->db->get();
+    //     return $query->result();
+    // }
     public function get_active_material() {
         $this->db->select($this->table1 . '.*,'. $this->table2.'.name as category_name');
         $this->db->from($this->table1);
@@ -93,6 +171,18 @@ class Material_model extends CI_Model {
         $this->db->where($this->table1 . '.is_deleted', '0');
         $query = $this->db->get();
         return $query->row();
+    }
+    public function getProjectMaterial($id)
+    {
+        $this->db->select($this->table1.".*");
+        $this->db->from($this->table1);
+        $this->db->join($this->table3,$this->table3.'.material_id = '.$this->table1.'.id');
+        $this->db->where($this->table3.'.project_id', $id);
+        
+        $this->db->where($this->table1.".status", 1);
+        $this->db->order_by($this->table1.'.name', "ASC");
+        $query = $this->db->get();
+        return $query->result();
     }
 }
 

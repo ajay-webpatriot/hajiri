@@ -19,6 +19,7 @@ class materialLog extends CI_Controller {
 
     public function index(){
         $data = $this->data;
+        $data['projects'] = $this->project->get_active_projects();
         $data['materialLog'] = $this->MaterialLog_model->getMaterialLog();
         $data['title'] = 'Material Entry';
         $data['page'] = 'MaterialLog/materialLog_list';
@@ -449,5 +450,155 @@ class materialLog extends CI_Controller {
         $data['description'] = 'Edit Material Entry';
         $data['page'] = 'materialLog/materialLog_edit';
         $this->load->view('includes/template', $data);
+    }
+
+    public function getFilterDetailAjax($id) {
+        
+        $getProjectSupervisor = array();
+        $getSupplierByProjectId = array();
+        
+        $getProjectSupervisor = $this->MaterialLog_model->getProjectSupervisor($id);
+        $getSupplierByProjectId = $this->Supplier_model->getProjectSupplier($id);
+        $getMaterialByProjectId = $this->Material_model->getProjectMaterial($id);
+        
+        echo json_encode([
+            'success'=> true, 
+            'getProjectSupervisor' => $getProjectSupervisor,
+            'getProjectSupplier' => $getSupplierByProjectId,
+            'getProjectMaterial' => $getMaterialByProjectId
+        ]);  exit();
+    }
+    public function materialLogDatatable()
+    {
+        $columns = array( 
+                            0 =>'material_entry_log.challan_no',
+                            1 =>'material_entry_log.challan_date',
+                            2 => 'supervisor_name',
+                            3 => 'category_name',
+                            4 => 'material_name',
+                            5 => 'supplier_name',
+                            6 => 'status'
+                        );
+        // print_r($this->input->post('dateStartRange'));exit;
+        $limit = $this->input->post('length');
+        $start = $this->input->post('start');
+        $order = $columns[$this->input->post('order')[0]['column']];
+        $dir = $this->input->post('order')[0]['dir'];
+  
+        $totalData = $this->MaterialLog_model->allMaterialLog_count();
+            
+        $totalFiltered = $totalData; 
+        // $where=null;
+        // echo $this->input->post('dateStartRange').'"  and  "'.$this->input->post('dateEndRange');exit;
+        $where = '(material_entry_log.challan_date between "'.$this->input->post('dateStartRange').'"  and  "'.$this->input->post('dateEndRange').'")';
+        if(!empty($this->input->post('search')['value']))
+        {            
+            if($where != null){
+                $where.= ' AND ';
+            }
+            $where .= '(suppliers.name LIKE "'.$this->input->post('search')['value'].'%" or ';
+            $where .= 'material_entry_log.challan_no LIKE "'.$this->input->post('search')['value'].'%" or ';
+            
+            $where .= 'material_entry_log.status LIKE "'.$this->input->post('search')['value'].'%" or ';
+            $where .= 'concat(user.user_name," ",user.user_last_name) LIKE "'.$this->input->post('search')['value'].'%" or ';// supervisor_name
+
+            
+
+            $where .= 'suppliers.name LIKE "'.$this->input->post('search')['value'].'%" ) ';
+
+            
+        }
+
+        
+        if(!empty($this->input->post('project')))
+        {   
+            if($where == null)
+            $where .= 'material_entry_log.project_id = "'.$this->input->post('project').'"';
+            else
+            $where .= ' AND material_entry_log.project_id = "'.$this->input->post('project').'"';
+        }
+        if(!empty($this->input->post('material')))
+        {   
+            if($where == null)
+            $where .= 'material_entry_logdetail.material_id = "'.$this->input->post('material').'"';
+            else
+            $where .= ' AND material_entry_logdetail.material_id = "'.$this->input->post('material').'"';
+        }
+        if(!empty($this->input->post('supplier')))
+        {   
+            if($where == null)
+            $where .= 'material_entry_log.supplier_id = "'.$this->input->post('supplier').'"';
+            else
+            $where .= ' AND material_entry_log.supplier_id = "'.$this->input->post('supplier').'"';
+        }
+        if(!empty($this->input->post('supervisor')))
+        {   
+            if($where == null)
+            $where .= 'material_entry_log.receiver_id = "'.$this->input->post('supervisor').'"';
+            else
+            $where .= ' AND material_entry_log.receiver_id = "'.$this->input->post('supervisor').'"';
+        }
+        if(!empty($this->input->post('status')))
+        {   
+            if($where == null)
+            $where .= 'material_entry_log.status = "'.$this->input->post('status').'"';
+            else
+            $where .= ' AND material_entry_log.status = "'.$this->input->post('status').'"';
+        }
+    
+        if($where == null)
+        {            
+            $posts = $this->MaterialLog_model->allMaterialLog($limit,$start,$order,$dir);
+        }
+        else {                
+
+            $posts =  $this->MaterialLog_model->materialLog_custom_search($limit,$start,$where,$order,$dir);
+
+            $totalFiltered = $this->MaterialLog_model->materialLog_custom_search_count($where);
+        }
+
+        $data = array();
+        if(!empty($posts))
+        {   
+            $debitImg = base_url('assets/admin/images/debit.png');
+            $creditImg = base_url('assets/admin/images/credit.png');
+            foreach ($posts as $post)
+            {   
+                
+                $nestedData['challan_no'] = $post->challan_no;
+                $nestedData['challan_date'] = $post->challan_date;
+                $nestedData['supervisor_name'] = $post->supervisor_name;
+                
+                $nestedData['supplier_name'] = $post->supplier_name;
+                $nestedData['status'] = $post->status;
+
+                
+                //Edit Action                   
+               
+                $nestedData['action'] = '<a class="btn btn-sm btn-primary" href="'.base_url('admin/MaterialLog/editEntry/') . $post->id.'" title="Edit material entry">
+                                            <i class="glyphicon glyphicon-pencil"></i> </a>  ';
+
+
+                if(isset($post->status) && $post->status !== 'Approved') { 
+                     $nestedData['action'] .= '<button class="btn btn-sm btn-danger" title="Delete material entry" onclick="material_entry_log_delete('.$post->id.')">
+                        <i class="glyphicon glyphicon-trash"></i> 
+                    </button>';
+                } 
+                    
+
+
+                $data[] = $nestedData;
+
+            }
+        }
+          
+        $json_data = array(
+                    "draw"            => intval($this->input->post('draw')),  
+                    "recordsTotal"    => intval($totalData),  
+                    "recordsFiltered" => intval($totalFiltered), 
+                    "data"            => $data   
+                    );
+            
+        echo json_encode($json_data); 
     }
 }

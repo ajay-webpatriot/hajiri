@@ -12,6 +12,9 @@
   <link rel="stylesheet" href="<?php echo base_url('assets/admin/dist/css/skins/skin-blue.min.css');?>">
   <!-- select 2 css -->
   <link rel="stylesheet" href="<?php echo base_url('assets/admin/plugins/select2/select2.css');?>">
+
+  <!-- Daterange picker -->
+  <link rel="stylesheet" href="<?php echo base_url('assets/admin/plugins/daterangepicker/daterangepicker.css'); ?>">
 <!-- END PAGE LEVEL PLUGINS -->
 </head>
 

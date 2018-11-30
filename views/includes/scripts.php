@@ -32,6 +32,12 @@
 <script src="<?php echo base_url('assets/admin/plugins/select2/select2.js'); ?>"></script>
 <!-- Latest compiled and minified JavaScript -->
 
+
+<!-- daterangepicker -->
+<script src="https://cdnjs.cloudflare.com/ajax/libs/moment.js/2.11.2/moment.min.js"></script>
+<script src="<?php echo base_url('assets/admin/plugins/daterangepicker/daterangepicker.js'); ?>"></script>
+
+
 <!-- BEGIN PAGE LEVEL PLUGINS -->
 <script>
   $(function () {
