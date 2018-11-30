@@ -124,9 +124,17 @@
 
                                     <a class="btn btn-sm btn-primary" href="<?php echo base_url('admin/MaterialIssue/editIssueLog/') . $value->id; ?>" title="Edit material issue">
                                         <i class="glyphicon glyphicon-pencil"></i> </a>  
+<<<<<<< HEAD
                                         <button class="btn btn-sm btn-danger" title="Delete material issue" onclick="material_issue_log_delete('<?php echo $value->id; ?>')">
                                             <i class="glyphicon glyphicon-trash"></i> 
                                         </button>
+=======
+                                        <?php if($value->status !== 'Verified' ) { ?>
+                                            <button class="btn btn-sm btn-danger" title="Delete material entry" onclick="material_issue_log_delete('<?php echo $value->id; ?>')">
+                                                <i class="glyphicon glyphicon-trash"></i> 
+                                            </button>
+                                        <?php } ?>
+>>>>>>> cb822bde0a86db6110c1026c2b05ce63bb220cf3
                                     </td>
                                 </tr>
                         <?php 

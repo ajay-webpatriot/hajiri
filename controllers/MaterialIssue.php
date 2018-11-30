@@ -22,10 +22,6 @@ class MaterialIssue extends CI_Controller {
 
         $this->load->view('includes/template', $data);
     }
-    public function materialIssueNames($id){
-        $result = $this->MaterialLog_model->getMaterialByCategory($id);
-        echo json_encode($result); 
-    }
     public function addIssueLog(){
         if($this->input->post()){
             $Issuefile = $_FILES["Issuefile"];
@@ -43,34 +39,49 @@ class MaterialIssue extends CI_Controller {
                 $this->session->set_flashdata( 'error', 'Sorry,  Error while adding Material Issue details.' );
                 // redirect( base_url( 'admin/MaterialIssue/addIssueLog/') );
             }else{
-                
-                $issue_image=$Issuefile['name'];
-                if (!empty($issue_image)) {
-                    $Issuefile = $_FILES["Issuefile"]['name'];
-                    $fileResult = uploadStaffFile('uploads/MaterialIssue/', 'Issuefile');
-                    $issue_image=$fileResult['filePath'];
+
+                $material_quantity = $this->input->post('IssueQuantity');
+
+                $valid_quantity = true;
+
+                foreach ($material_quantity as  $value) {
+                    if($value <= 0){
+                      $valid_quantity = false;
+                    }
                 }
-                
-                $createdate = date_create($this->input->post('issueDate'));
-                $date = date_format($createdate,'Y-m-d');
-                $materialIssueArr = array(
-                    'issue_no' => $this->input->post('issueNo'),
-                    'date' => $date,
-                    'issue_by'=>$this->session->userdata('id'),
-                    'material_id'   => $this->input->post('MaterialName'),
-                    'project_id'   => $this->input->post('project_name'),
-                    'quantity' => $this->input->post('IssueQuantity'),
-                    'material_image'   =>  $issue_image,
-                    'consumption_place'   => $this->input->post('sites'),
-                    'consumption_outsite_project_id'   => ($this->input->post('sites') == "outsite")?$this->input->post('Projects'):'',
-                    'issue_comment'   => $this->input->post('issueComment')
-                );
-                
-                $materialIssueId = $this->MaterialIssueModel->save($materialIssueArr);
-                
-                if($materialIssueId){
-                     $this->session->set_flashdata('success', 'Material Issue Added Successfully!');
-                    redirect(base_url('admin/MaterialIssue'));
+                if($valid_quantity == true){
+
+
+                    $issue_image=$Issuefile['name'];
+                    if (!empty($issue_image)) {
+                        $Issuefile = $_FILES["Issuefile"]['name'];
+                        $fileResult = uploadStaffFile('uploads/MaterialIssue/', 'Issuefile');
+                        $issue_image=$fileResult['filePath'];
+                    }
+                    
+                    $createdate = date_create($this->input->post('issueDate'));
+                    $date = date_format($createdate,'Y-m-d');
+                    $materialIssueArr = array(
+                        'issue_no' => $this->input->post('issueNo'),
+                        'date' => $date,
+                        'issue_by'=>$this->session->userdata('id'),
+                        'material_id'   => $this->input->post('MaterialName'),
+                        'project_id'   => $this->input->post('project_name'),
+                        'quantity' => $this->input->post('IssueQuantity'),
+                        'material_image'   =>  $issue_image,
+                        'consumption_place'   => $this->input->post('sites'),
+                        'consumption_outsite_project_id'   => ($this->input->post('sites') == "outsite")?$this->input->post('Projects'):'',
+                        'issue_comment'   => $this->input->post('issueComment')
+                    );
+                    
+                    $materialIssueId = $this->MaterialIssueModel->save($materialIssueArr);
+                    
+                    if($materialIssueId){
+                         $this->session->set_flashdata('success', 'Material Issue Added Successfully!');
+                        redirect(base_url('admin/MaterialIssue'));
+                    }
+                }else{
+                    $this->session->set_flashdata('error', 'Please enter quantity more than zero');
                 }
             }
         }
@@ -82,13 +93,12 @@ class MaterialIssue extends CI_Controller {
         $data['menu_title'] = 'Issue Log';
         $data['page'] = 'matirealIssue/insertMaterialIssue';
         $this->load->view('includes/template', $data);
-        
     }
     public function editIssueLog($id)
     {
         $data = $this->data;
         $data['result'] = $this->MaterialIssueModel->get_materialIssue_by_id($id);
-
+         
         if (isset( $_POST['submit']) || isset($_POST['verify'])){
 
             $Issuefile = $_FILES["Issuefile"];
@@ -106,66 +116,98 @@ class MaterialIssue extends CI_Controller {
                 redirect( base_url( 'admin/MaterialIssue/addIssueLog/') );
             }else{
 
+                $material_quantity = $this->input->post('IssueQuantity');
 
-                if (!empty($Issuefile['name'])) {
-                    $Issuefile = $_FILES["Issuefile"]['name'];
-                    $fileResult = uploadStaffFile('uploads/MaterialIssue/', 'Issuefile');
-                    $issue_image=$fileResult['filePath'];
-                }
-                if (isset($_POST['verify'])) {
-                    $log_status = "Verified";
-                    $verify_comment = $this->input->post('verifyComment');
-                }
-                else 
-                {
-                    $verify_comment = '';
-                    $log_status = "Issued";
-                }
+                $valid_quantity = true;
 
-                // delete existing challan image work
-                $uploaded_material_img="";
-                if($_FILES['Issuefile']['name'] != "")
-                {
-                    $uploaded_material_img=$issue_image;
-                    if (file_exists('./uploads/MaterialIssue/'.$data['result']->material_image))
+                foreach ($material_quantity as  $value) {
+                    if($value <= 0){
+                      $valid_quantity = false;
+                    }
+                }
+                if($valid_quantity == true){
+
+
+                    if (!empty($Issuefile['name'])) {
+                        $Issuefile = $_FILES["Issuefile"]['name'];
+                        $fileResult = uploadStaffFile('uploads/MaterialIssue/', 'Issuefile');
+                        $issue_image=$fileResult['filePath'];
+                    }
+                    if (isset($_POST['verify'])) {
+                        $log_status = "Verified";
+                        $verify_comment = $this->input->post('verifyComment');
+                    }
+                    else 
                     {
-                        unlink('./uploads/MaterialIssue/'.$data['result']->material_image);
-                        
-                    }    
-                }
-                else if(!empty($data['result']))
-                {
-                    $uploaded_material_img=$data['result']->material_image;
-                }
+                        $verify_comment = '';
+                        $log_status = "Issued";
+                    }
 
-                $createdate = date_create($this->input->post('issueDate'));
-                $date = date_format($createdate,'Y-m-d');
-                $materialIssueArr = array(
-                    'issue_no' => $this->input->post('issueNo'),
-                    'date' => $date,
-                    'issue_by'=>$this->session->userdata('id'),
-                    'material_id'   => $this->input->post('MaterialName'),
-                    'quantity' => $this->input->post('IssueQuantity'),
-                    'material_image'   =>  $uploaded_material_img,
-                    'consumption_place'   => $this->input->post('sites'),
-                    'consumption_outsite_project_id'   => ($this->input->post('sites') == "outsite")?$this->input->post('Projects'):'',
-                    'issue_comment'   => $this->input->post('issueComment'),
-                    'status'=>$log_status,
-                    'verify_comment' => $verify_comment
-                );
-                $materialIssueId = $this->MaterialIssueModel->update('material_issue_log', array('id' => $id), $materialIssueArr);
-                // if($materialIssueId){
-                     $this->session->set_flashdata('success', 'Material Issue updated Successfully!');
-                    redirect(base_url('admin/MaterialIssue'));
-                // }
+                    // delete existing challan image work
+                    $uploaded_material_img="";
+                    if($_FILES['Issuefile']['name'] != "")
+                    {
+                        $uploaded_material_img=$issue_image;
+                        if (file_exists('./uploads/MaterialIssue/'.$data['result']->material_image))
+                        {
+                            unlink('./uploads/MaterialIssue/'.$data['result']->material_image);
+                            
+                        }    
+                    }
+                    else if(!empty($data['result']))
+                    {
+                        $uploaded_material_img=$data['result']->material_image;
+                    }
+
+                    $createdate = date_create($this->input->post('issueDate'));
+                    $date = date_format($createdate,'Y-m-d');
+                    $materialIssueArr = array(
+                        'issue_no' => $this->input->post('issueNo'),
+                        'date' => $date,
+                        'issue_by'=>$this->session->userdata('id'),
+                        'material_id'   => $this->input->post('MaterialName'),
+                        'quantity' => $this->input->post('IssueQuantity'),
+                        'material_image'   =>  $uploaded_material_img,
+                        'consumption_place'   => $this->input->post('sites'),
+                        'consumption_outsite_project_id'   => ($this->input->post('sites') == "outsite")?$this->input->post('Projects'):'',
+                        'issue_comment'   => $this->input->post('issueComment'),
+                        'status'=>$log_status,
+                        'verify_comment' => $verify_comment
+                    );
+                    $materialIssueId = $this->MaterialIssueModel->update('material_issue_log', array('id' => $id), $materialIssueArr);
+                    // if($materialIssueId){
+                        $this->session->set_flashdata('success', 'Material Issue updated Successfully!');
+                        redirect(base_url('admin/MaterialIssue'));
+                    // }
+                }else{
+                    $this->session->set_flashdata('error', 'Please enter quantity more than zero');
+                }
             }
         }
         $data['materialCategory'] = $this->MaterialCategory_model->get_active_material_category();
-        
+
+       $issue = 0;
+       $entry = 0;
+
+        if(isset($data['result']->material_id) && isset($data['result']->project_id)){
+            $project_id = $data['result']->project_id;
+            $material_id = $data['result']->material_id;
+            $result = $this->MaterialIssueModel->getMaterialIssueQuantitybyProjectId($project_id, $material_id);
+            $entryResult = $this->MaterialLog_model->getMaterialEntryQuantitybyProjectId($project_id, $material_id);
+            
+            if(count($issue) > 0){
+                $issue = $result->issueQuantity;
+            }
+            if(count($entryResult) > 0){
+                $entry = $entryResult->entryQuantity;
+            }
+        }
+
+        $totalQuantity =  $entry - $issue;
+         
+        $data['totalQuantity'] = $totalQuantity;
+         
         $data['ActiveProjects'] = $this->Project_model->get_active_projects();
-        // echo '<pre>';
-        // print_r($data);
-        // exit();
         $data['title'] = 'Material Issue edit Data';
         $data['menu_title'] = 'Issue Log';
         $data['page'] = 'matirealIssue/editMaterialIssue';
@@ -175,8 +217,9 @@ class MaterialIssue extends CI_Controller {
 
         $materialIssueStatus = array(
                     'status'   => "Deleted",
+                    'is_deleted' => "1"
                 );
-                
+        
         $materialLogId = $this->MaterialIssueModel->update('material_issue_log', array('id' => $id), $materialIssueStatus);
         
         redirect(base_url('admin/materialIssue/index'));
@@ -200,7 +243,18 @@ class MaterialIssue extends CI_Controller {
         $issueQuantity = isset($issue->issueQuantity)? $issue->issueQuantity : '';
         
         $quantity = $entryQuantity - $issueQuantity; 
-        echo json_encode($quantity);
+        if($quantity > 0){
+            echo json_encode([
+                        'status'=> true, 
+                        'quantity' => $quantity
+                    ]);
+        }else{
+            echo json_encode([
+                        'status'=> false, 
+                        'quantity' => $quantity
+                    ]);
+        }
+        exit();
     }
     public function getProjectMaterialAjax(){
         $material = array();
@@ -208,11 +262,19 @@ class MaterialIssue extends CI_Controller {
             if(!empty($_GET['project_id']) && !empty($_GET['category_id'])){
                 $project_id = $_GET['project_id'];
                 $category_id = $_GET['category_id'];
-                $material = $this->MaterialIssueModel->getMaterialAjax($project_id, $category_id);
-                echo json_encode([
-                    'success'=> true, 
-                    'material' => $material
-                ]);  
+                // $material = $this->MaterialIssueModel->getMaterialAjax($project_id, $category_id);
+                $material = $this->MaterialLog_model->getMaterialByCategory($category_id, $project_id);
+                if(count($material) > 0 && !empty($material)){
+                    echo json_encode([
+                        'status'=> true, 
+                        'material' => $material
+                    ]); 
+                } else{
+                    echo json_encode([
+                        'status'=> false, 
+                        'material' => $material
+                    ]); 
+                }
                 exit();
             }
         }

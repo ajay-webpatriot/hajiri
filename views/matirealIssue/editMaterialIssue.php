@@ -1,3 +1,13 @@
+<style type="text/css">
+    .totalQuantityClass{
+        padding-bottom: 10px;
+        color: green;
+    }
+    .totalQuantityClassError{
+        padding-bottom: 10px;
+        color: red;
+    }
+</style>
 <!-- Content Wrapper. Contains page content -->
 <div class="content-wrapper">
     <!-- Content Header (Page header) -->
@@ -40,13 +50,20 @@
                         </div>
                     </div>
                     
-                    <form action="" id="addIssueLog" class="form-horizontal" method="POST" enctype="multipart/form-data">
+                    <form action="" id="addIssueLog" class="form-horizontal validateDontSubmit" method="POST" enctype="multipart/form-data" autocomplete="off">
                         <div class="box-body">
+
+                            <?php
+                                $date = '';
+                                if(isset($result->date) && !empty($result->date)){
+                                    $date = date("m/d/Y", strtotime($result->date));
+                                }
+                            ?>
                             
                             <div class="form-group">
                                 <label for="date" class="col-sm-3 control-label">Issue Date:</label>
                                 <div class="col-sm-9">
-                                    <input name="issueDate" id="date" placeholder="Issue Date" class="form-control datepicker" type="text" value="<?php echo (isset($result->date)) ? $result->date : ''; ?>" required>
+                                    <input name="issueDate" id="date" placeholder="Issue Date" class="form-control datepicker-material" type="text" value="<?php echo (isset($date)) ? $date : ''; ?>" required>
                                     <span class="error"><?php echo (form_error('issueDate')) ? form_error('issueDate') : ''; ?></span>
                                 </div>
                             </div>
@@ -58,12 +75,11 @@
                                     <span class="error"><?php echo (form_error('issueNo')) ? form_error('issueNo') : ''; ?></span>
                                 </div>
                             </div>
-                            
-
+                                
                             <div class="form-group">
                                     <label for="materialCategory" class="col-sm-3 control-label">Material Category:</label>
                                     <div class="col-sm-9">
-                                        <select class="form-control" id="MaterialCategory" name="materialCategory" required>
+                                        <select class="form-control material_category" id="MaterialCategory" name="materialCategory" required>
                                             <option value="">Material Category</option>
                                             <?php 
                                             if($materialCategory != ''){
@@ -87,11 +103,12 @@
                                 <label for="MaterialName" class="col-sm-3 control-label">Material Name:</label>
                                 <div class="col-sm-9" id="MaterialNames">
                                     <select class="form-control materialName" name="MaterialName" required>
-                                        <option value="">Material Name </option>
+                                        <option value="">Material Name</option>
                                         <?php 
+                                        $materials = array();
+                                        $materials = $this->MaterialLog_model->getMaterialByCategory($result->category_id, $result->project_id);
 
-                                        $materials = $this->MaterialLog_model->getMaterialByCategory($result->category_id);
-                                        foreach ($materials as $key => $mat) {
+                                        foreach ($materials as $key => $mat){
                                             $selected = '';
                                             $selected_unit_measurement = '';
                                             if( isset( $result->material_id ) && $mat->id == $result->material_id ){
@@ -102,15 +119,17 @@
                                         }
                                         ?>
                                     </select>
-                                    <span class="error"><?php echo form_error('supervisor_name') ?></span>
+                                    <span class="error empty_material_error"><?php echo form_error('MaterialName') ?></span>
                                 </div>
                             </div>
+
+                            <span class="totalQuantity col-md-12 col-md-offset-3" id="<?php echo $totalQuantity; ?>" ></span>
                                
                             <div class="form-group">
                                 <label for="IssueQuantity" class="col-sm-3 control-label">Quantity:</label>
                                 <div class="col-sm-6">
-                                    <input name="IssueQuantity" placeholder="Quantity" class="form-control" type="number" min="1" value="<?php echo (isset($result->quantity)) ? $result->quantity : ''; ?>" required>
-                                    <span class="error"><?php echo (form_error('IssueQuantity')) ? form_error('IssueQuantity') : ''; ?></span>
+                                    <input name="IssueQuantity" placeholder="Quantity" class="form-control issueQuantity" type="number" min="1" value="<?php echo (isset($result->quantity)) ? $result->quantity : ''; ?>" required>
+                                    <span class="error QuantityError"><?php echo (form_error('IssueQuantity')) ? form_error('IssueQuantity') : ''; ?></span>
                                 </div>
                                 <div class="col-sm-3">
                                     <span><b class="unit"></b></span>
@@ -182,9 +201,16 @@
 
                             <div class="form-group">
                                 <label for="quantity" class="col-sm-3 control-label">Issue Comment:</label>
+                                <?php if($this->session->userdata('user_designation') == 'admin'){
+                                ?> 
                                 <div class="col-sm-6">
-                                   <textarea name="issueComment" id="" cols="30" rows="5"><?=$result->issue_comment?></textarea>
+                                   <textarea name="issueComment" id="" cols="30" rows="5" disabled="disabled"><?=$result->issue_comment?></textarea>
                                 </div>
+                            <?php } else{ ?>
+                                    <div class="col-sm-6">
+                                   <textarea name="issueComment" id="" cols="30" rows="5" disabled="disabled"><?=$result->issue_comment?></textarea>
+                                </div>
+                            <?php } ?>
                             </div> 
                             <?php
                             if($this->session->userdata('user_designation') == 'Superadmin' || $this->session->userdata('user_designation') == 'admin'){
@@ -216,11 +242,13 @@
                             }
                             ?>
                             <a href="<?php echo base_url('admin/MaterialIssue'); ?>" id="btnClose" name="close" class="btn btn-primary" >Close</a>
-
-                            <a id="btndelete" name="delete" href="<?php echo base_url('admin/MaterialIssue/ajax_delete/'.$result->id); ?>" class="btn btn-danger" >Delete</a>
+                            <?php if($result->status !== 'Verified' ) { ?>
+                                <a id="btndelete" name="delete" href="<?php echo base_url('admin/MaterialIssue/ajax_delete/'.$result->id); ?>" class="btn btn-danger" >Delete</a>
+                            <?php } ?>
                         </div>
                         <!-- /.box-footer -->
                     </form>
+                    <input type="hidden" class="project_name" value="<?php echo $result->project_id; ?>">
                 </div>
                 <!-- /.box -->
             </div>
@@ -249,8 +277,7 @@
             $("#btndelete").show();
 
             $('input[type=file]').hide();
-        
-       }
+        }
        else
        {
             $("#btnClose").hide();
@@ -267,31 +294,125 @@
             $("#OutsideSiteMenuHide").attr("style", "display: none;"); 
         }
     });
-       
-    $("#MaterialCategory").change(function(){
-        var selectCatId = $("#MaterialCategory option:selected").val();
-        var ele=this;
-        var optionHTML="<option value=''>Material Name</option>";
-        console.log(selectCatId);
-        $.ajax({
-            type:"GET",
-            url: "<?php echo base_url('admin/Materialissue/materialIssueNames/'); ?>"+selectCatId,
-            dataType: "json",
-            success: function(data) {
-                console.log('============');
-                $.each(data, function(key, value) {
-                    console.log(value);
-                   
-                    optionHTML+='<option  data-unit="'+value.unit_measurement+'"  value="'+ value.id +'">'+ value.name +'</option>';
-                });
-                $(ele).parents(".form-group").next().find("select").html(optionHTML);
-            }
-        });
 
-        $('#MaterialNames').html();
+    $(document).on("change",".material_category",function(){
+        var project_id = $('.project_name').val();
+        var material_category = $('.material_category').val();
+        $('.empty_material_error').html("");
+        getMaterial(project_id, material_category);
     });
 
+    // get material by project and category
+    function getMaterial(project_id, material_category){
+
+        var projectMaterialOption ="<option value=''>Material Name</option>";
+
+        if(project_id && material_category) {   
+            $.ajax({
+                url: "<?php echo base_url().'admin/MaterialIssue/getProjectMaterialAjax/'?>?project_id="+project_id+'&category_id='+material_category,
+                type: "GET",
+                dataType: "json",
+                success:function(data) {
+                    if(data.status == true){
+                        $.each(data.material, function(key, value) {
+                            projectMaterialOption+='<option  value="'+ value.id +'">'+ value.name +'</option>';
+                        });
+                    }else{
+                       $('.empty_material_error').html("Material not found in selected category and project.");
+                    }
+                    $('.materialName').html(projectMaterialOption);
+                }
+            });
+        }
+        else{
+            $('.materialName').html(projectMaterialOption);
+        }
+    }
+
     $(document).on("change",".materialName",function(){
+        
+        var material_id = $(".materialName").val();
+        var project_id = $(".project_name").val();
+        $('.totalQuantity').attr('id', 0);
+
+        var alreadyEnteredQuantity =  <?php echo $result->quantity; ?>;
+        
+        if(material_id != '' && project_id != ''){
+            $.ajax({
+                type:"GET",
+                url: "<?php echo base_url('admin/MaterialIssue/getMaterialIssueQuantity/'); ?>?material_id="+material_id+"&project_id="+project_id,
+                dataType: "json",
+                success: function(data) {
+                    if(data.status == true){
+                        // var id = data;
+                        $('.totalQuantity').removeClass('totalQuantityClassError');
+                        $('.totalQuantity').addClass('totalQuantityClass');
+                        $('.totalQuantity').html('Available Quantity '+data.quantity+' bags');
+                        $('.totalQuantity').attr('id', data.quantity);
+                    }else{
+                         // var id = data;
+                        $('.totalQuantity').removeClass('totalQuantityClass');
+                        $('.totalQuantity').addClass('totalQuantityClassError');
+                        $('.totalQuantity').html('No issue quantity available');
+                    }
+                }
+            });
+        }
+            var unit_measurement = $(this).find('option:selected', this).attr('data-unit');
+            // $(this).parents(".form-group").next().find(".unit").html(unit_measurement);
+            $(".unit").html(unit_measurement);
+    });
+
+    $(document).on('submit','.validateDontSubmit',function (){
+        
+        var totalQuantity = $('.totalQuantity').attr('id');
+        var issueQuantity = $('.issueQuantity').val();
+
+        var alreadyEnteredQuantity =  <?php echo $result->quantity; ?>;
+        
+        var count = parseInt(totalQuantity) + parseInt(alreadyEnteredQuantity);
+
+        var status = false;
+
+        if(Number(count) >= Number(issueQuantity)){
+          status =  true;
+        }else{
+            $('.QuantityError').show();
+              var total = alreadyEnteredQuantity + totalQuantity;
+            if(totalQuantity == 0){
+                $('.QuantityError').html('Quantity not Available in selected category and project.');
+            }else{
+                $('.QuantityError').html('Please not allow quantity more than '+count);
+            }
+            status =  false;
+        }
+        $('.totalQuantity').attr('id', 0);
+        return status;
+    });
+
+       
+    // $("#MaterialCategory").change(function(){ 
+    //     var selectCatId = $("#MaterialCategory option:selected").val();
+    //     var ele=this;
+    //     var optionHTML="<option value=''>Material Name</option>";
+    //     $.ajax({
+    //         type:"GET",
+    //         url: "<?php //echo base_url('admin/Materialissue/materialIssueNames/'); ?>"+selectCatId,
+    //         dataType: "json",
+    //         success: function(data) {
+    //             $.each(data, function(key, value) {
+    //                 console.log(value);
+                   
+    //                 optionHTML+='<option  data-unit="'+value.unit_measurement+'"  value="'+ value.id +'">'+ value.name +'</option>';
+    //             });
+    //             $(ele).parents(".form-group").next().find("select").html(optionHTML);
+    //         }
+    //     });
+
+    //     $('#MaterialNames').html();
+    // });
+
+        $(document).on("change",".materialName",function(){
             var unit_measurement = $(this).find('option:selected', this).attr('data-unit');
             $(this).parents(".form-group").next().find(".unit").html(unit_measurement);
         });

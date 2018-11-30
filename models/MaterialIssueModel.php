@@ -20,6 +20,7 @@ class MaterialIssueModel extends CI_Model {
         $this->db->join($this->table2, $this->table2.'.id = '.$this->table3.'.category_id');
         $this->db->join($this->table4, $this->table4.'.user_id = '.$this->table1.'.issue_by');
         $this->db->where($this->table1 . '.status != ', 'Deleted');
+        $this->db->where($this->table1 . '.is_deleted = ', '0');
         $query = $this->db->get();
         $result= $query->result();
         
@@ -35,6 +36,7 @@ class MaterialIssueModel extends CI_Model {
         $this->db->join($this->table4, $this->table4.'.user_id = '.$this->table1.'.issue_by');
         $this->db->where($this->table1 . '.id', $id);
         $this->db->where($this->table1 . '.status != ', 'Deleted');
+        $this->db->where($this->table1 . '.is_deleted = ', '0');
         
         $query = $this->db->get();
         return $query->row();
@@ -54,7 +56,7 @@ class MaterialIssueModel extends CI_Model {
         $this->db->where($this->table1 . '.project_id', $project_id);
         $this->db->where($this->table1 . '.material_id', $material_id);
         $this->db->where($this->table1 . '.status !=', 'Deleted');
-        $this->db->where($this->table1 . '.is_deleted', 0);
+        $this->db->where($this->table1 . '.is_deleted', '0');
         $query = $this->db->get();
         return $result = $query->row();
     }
@@ -69,6 +71,7 @@ class MaterialIssueModel extends CI_Model {
                  ->from($this->table3)
                  ->where("id IN ($subQuery)", NULL, FALSE)
                  ->where($this->table3.'.category_id', $category_id)
+                 ->where($this->table3.'.is_deleted', '0')
                  ->get();
         return $result = $query->result();
 

@@ -169,22 +169,24 @@
 
                                         <option value="">Material Name</option>
                                         <?php
-                                        $materials = $this->MaterialLog_model->getMaterialByCategory($value->category_id);
 
-                                        foreach ($materials as $key => $mat) {
-                                            $selected = '';
-                                            $selected_unit_measurement = '';
-                                            if( isset( $value->material_id ) && $mat->id == $value->material_id ){
-                                                $selected = 'selected="selected"';
-                                                $selected_unit_measurement = $mat->unit_measurement;
+                                            if(isset($result->project_id) && isset($value->category_id)){
+
+                                                $materials = $this->MaterialLog_model->getMaterialByCategory($value->category_id, $result->project_id);
+
+                                                foreach ($materials as $key => $mat) {
+                                                    $selected = '';
+                                                    $selected_unit_measurement = '';
+                                                    if( isset( $value->material_id ) && $mat->id == $value->material_id ){
+                                                        $selected = 'selected="selected"';
+                                                        $selected_unit_measurement = $mat->unit_measurement;
+                                                    }
+                                                    echo '<option data-unit="'.$mat->unit_measurement.'" value="'.$mat->id.'" '.$selected.' >'.$mat->name.'</option>';
+                                                } 
                                             }
-                                            echo '<option data-unit="'.$mat->unit_measurement.'" value="'.$mat->id.'" '.$selected.' >'.$mat->name.'</option>';
-                                        }
                                         ?>
-
-
                                     </select>
-                                    <span class="error"><?php echo form_error('material_name') ?></span>
+                                    <span class="error material-error"><?php echo form_error('material_name') ?></span>
                                 </div>
                             </div>
                             <div class="form-group">
@@ -314,19 +316,24 @@
         // load material name using ajax
         $(document).on("change",".material_category",function(){
 
+            $('.material-error').html('');
             var optionHTML="<option value=''>Material Name</option>";
+            var project_id = $('.project_name').val();
             var category_id = $(this).val();
             var ele=this;
-            if(category_id) {   
+            if(category_id && project_id !== '') {   
                 $.ajax({
-                    url: "<?php echo base_url().'admin/MaterialLog/getmaterialAjax/'?>"+category_id,
+                    url: "<?php echo base_url().'admin/MaterialLog/getmaterialAjax/'?>?category_id="+category_id+"&project_id="+project_id,
                     type: "GET",
                     dataType: "json",
                     success:function(data) {
-                        // $('select[name="city"]').empty();
-                        $.each(data, function(key, value) {
-                            optionHTML+='<option data-unit="'+value.unit_measurement+'" value="'+ value.id +'">'+ value.name +'</option>';
-                        });
+                        if(data.status == true){
+                            $.each(data.material, function(key, value) {
+                                optionHTML+='<option data-unit="'+value.unit_measurement+'" value="'+ value.id +'">'+ value.name +'</option>';
+                            });
+                        }else{
+                            $('.material-error').html("Material not found in selected category");
+                        }
                         $(ele).parents(".form-group").next().find("select").html(optionHTML);
                     }
                 });
@@ -376,6 +383,8 @@
     function projectByOption(project_id){
         var optionHTML="<option value=''>Supervisor Name</option>";
         var projectSupplierOption ="<option value=''>Supplier Name</option>";
+        $('.material_category').html("<option value=''>Material Category</option>");
+        $('.material_name').html("<option value=''>Material Name</option>");
          
         if(project_id != '' && project_id != undefined){
             $.ajax({

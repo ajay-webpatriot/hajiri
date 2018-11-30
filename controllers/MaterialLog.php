@@ -170,9 +170,25 @@ class materialLog extends CI_Controller {
         // $this->MaterialLog_model->delete('material_entry_logdetail', 'material_entry_log_id', $id);
         $this->session->set_flashdata('success', 'Material Entry Log Deleted Successfully');
     }
-    public function getmaterialAjax($id) { 
-       $result = $this->MaterialLog_model->getMaterialByCategory($id);
-       echo json_encode($result);
+    public function getmaterialAjax() { 
+        
+        $result = array();
+        if(isset($_GET['category_id']) && isset($_GET['project_id'])){
+            $category_id = $_GET['category_id'];
+            $project_id = $_GET['project_id'];
+            $result = $this->MaterialLog_model->getMaterialByCategory($category_id, $project_id);
+        }
+        if(count($result) > 0) {
+            echo json_encode([
+                'status'=> true, 
+                'material' => $result,
+            ]);
+        }else{
+            echo json_encode([
+                'status'=> false, 
+                'material' => $result,
+            ]);
+        }
        exit;
     }
     public function getSupervisorAjax($id) {
