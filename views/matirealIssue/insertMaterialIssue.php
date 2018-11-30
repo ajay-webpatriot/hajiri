@@ -1,6 +1,11 @@
 <style type="text/css">
     .totalQuantityClass{
         padding-bottom: 10px;
+        color: green;
+    }
+    .totalQuantityClassError{
+        padding-bottom: 10px;
+        color: red;
     }
 </style>
 <!-- Content Wrapper. Contains page content -->
@@ -95,10 +100,10 @@
                                             //} 
                                         //} ?>
                                     </select>
-                                    <span class="error"><?php echo form_error('MaterialName') ?></span>
+                                    <span class="error empty_material_error"><?php echo form_error('MaterialName') ?></span>
                                 </div>
                             </div>
-                            <span class="totalQuantity col-md-12 col-md-offset-3" id="" style="color: green;"></span>
+                            <span class="totalQuantity col-md-12 col-md-offset-3" id="" ></span>
 
                             <div class="form-group">
                                 <label for="IssueQuantity" class="col-sm-3 control-label">Quantity <font color="red">*</font></label>
@@ -211,6 +216,7 @@
         
         var material_id = $(".materialName").val();
         var project_id = $(".project_name").val();
+        $('.totalQuantity').attr('id', 0);
         
         if(material_id != '' && project_id != ''){
             $.ajax({
@@ -218,62 +224,64 @@
                 url: "<?php echo base_url('admin/MaterialIssue/getMaterialIssueQuantity/'); ?>?material_id="+material_id+"&project_id="+project_id,
                 dataType: "json",
                 success: function(data) {
-                    // var id = data;
-                    $('.totalQuantity').addClass('totalQuantityClass');
-                    $('.totalQuantity').html('Available Quantity '+data+' bags');
-                    $('.totalQuantity').attr('id', data);
+                    if(data.status == true){
+                        // var id = data;
+                        $('.totalQuantity').removeClass('totalQuantityClassError');
+                        $('.totalQuantity').addClass('totalQuantityClass');
+                        $('.totalQuantity').html('Available Quantity '+data.quantity+' bags');
+                        $('.totalQuantity').attr('id', data.quantity);
+                    }else{
+                         // var id = data;
+                        $('.totalQuantity').removeClass('totalQuantityClass');
+                        $('.totalQuantity').addClass('totalQuantityClassError');
+                        $('.totalQuantity').html('No issue quantity available');
+                    }
                 }
             });
         }
             var unit_measurement = $(this).find('option:selected', this).attr('data-unit');
             // $(this).parents(".form-group").next().find(".unit").html(unit_measurement);
             $(".unit").html(unit_measurement);
-
-        });
+    });
          
         $(document).on('submit','.validateDontSubmit',function (){
             
             var totalQuantity = $('.totalQuantity').attr('id');
             var issueQuantity = $('.issueQuantity').val();
+            
             var status = false;
-            if(Number(issueQuantity) > Number(totalQuantity)){
-                $('.QuantityError').show();
-                $('.QuantityError').html('Please enter quantity more than '+totalQuantity);
-                status =  false;
-            }else{
+            if(Number(totalQuantity) >= Number(issueQuantity)){
                 status =  true;
+            }else{
+                $('.QuantityError').show();
+
+                if(totalQuantity == 0){
+                    $('.QuantityError').html('Quantity not Available in selected category and project.');
+                }else{
+                    $('.QuantityError').html('Please not allow quantity more than '+totalQuantity);
+                }
+                status =  false;
             }
+            $('.totalQuantity').attr('id', 0);
             return status;
-        })
+        });
 
-         // load supervisor name using ajax
-        // $(document).on("change",".project_name",function(){
-            
-        //     var projectCategoryOption ="<option value=''>Material Category</option>";
-        //     var project_id = $(this).val();
-        //     var ele=this;
-        //     if(project_id) {   
-        //         $.ajax({
-        //             url: "<?php //echo base_url().'admin/MaterialIssue/getProjectCategoryAjax/'?>"+project_id,
-        //             type: "GET",
-        //             dataType: "json",
-        //             success:function(data) {
-        //                 $.each(data.getProjectCategory, function(key, value) {
-        //                     projectCategoryOption+='<option  value="'+ value.id +'">'+ value.category +'</option>';
-        //                 });
-        //                 $('.material_category').html(projectCategoryOption);
-        //             }
-        //         });
-        //     }else{
-        //         $('.material_category').html(projectCategoryOption);
-        //     }
-        // }); 
-
-         // load supervisor name using ajax
-        $(document).on("change",".material_category",function(){
-            
+        $(document).on("change",".project_name",function(){
             var project_id = $('.project_name').val();
             var material_category = $('.material_category').val();
+            $('.empty_material_error').html("");
+            getMaterial(project_id, material_category);
+        });
+
+        $(document).on("change",".material_category",function(){
+            var project_id = $('.project_name').val();
+            var material_category = $('.material_category').val();
+            $('.empty_material_error').html("");
+            getMaterial(project_id, material_category);
+        });
+        
+        // get material by project and category
+        function getMaterial(project_id, material_category){
 
             var projectMaterialOption ="<option value=''>Material Name</option>";
 
@@ -283,9 +291,13 @@
                     type: "GET",
                     dataType: "json",
                     success:function(data) {
-                        $.each(data.material, function(key, value) {
-                            projectMaterialOption+='<option  value="'+ value.id +'">'+ value.name +'</option>';
-                        });
+                        if(data.status == true){
+                            $.each(data.material, function(key, value) {
+                                projectMaterialOption+='<option  value="'+ value.id +'">'+ value.name +'</option>';
+                            });
+                        }else{
+                           $('.empty_material_error').html("Material not found in selected category and project.");
+                        }
                         $('.materialName').html(projectMaterialOption);
                     }
                 });
@@ -293,6 +305,6 @@
             else{
                 $('.materialName').html(projectMaterialOption);
             }
-        });
+        }
 
 </script>

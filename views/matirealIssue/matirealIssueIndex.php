@@ -60,9 +60,11 @@
 
                                     <a class="btn btn-sm btn-primary" href="<?php echo base_url('admin/MaterialIssue/editIssueLog/') . $value->id; ?>" title="Edit material entry">
                                         <i class="glyphicon glyphicon-pencil"></i> </a>  
-                                        <button class="btn btn-sm btn-danger" title="Delete material entry" onclick="material_issue_log_delete('<?php echo $value->id; ?>')">
-                                            <i class="glyphicon glyphicon-trash"></i> 
-                                        </button>
+                                        <?php if($value->status !== 'Verified' ) { ?>
+                                            <button class="btn btn-sm btn-danger" title="Delete material entry" onclick="material_issue_log_delete('<?php echo $value->id; ?>')">
+                                                <i class="glyphicon glyphicon-trash"></i> 
+                                            </button>
+                                        <?php } ?>
                                     </td>
                                 </tr>
                         <?php 
