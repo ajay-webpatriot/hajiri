@@ -279,10 +279,9 @@
             $('input[type=file]').hide();
         }
        else
-       {
+        {
             $("#btnClose").hide();
-            
-       } 
+        } 
     });
     $("input[type='radio']").change(function(){
         if($(this).val()=="outsite")
@@ -330,7 +329,7 @@
     }
 
     $(document).on("change",".materialName",function(){
-        
+        $('.QuantityError').html('');
         var material_id = $(".materialName").val();
         var project_id = $(".project_name").val();
         $('.totalQuantity').attr('id', 0);
@@ -347,7 +346,7 @@
                         // var id = data;
                         $('.totalQuantity').removeClass('totalQuantityClassError');
                         $('.totalQuantity').addClass('totalQuantityClass');
-                        $('.totalQuantity').html('Available Quantity '+data.quantity+' bags');
+                        $('.totalQuantity').html('Available quantity '+data.quantity+' bags');
                         $('.totalQuantity').attr('id', data.quantity);
                     }else{
                          // var id = data;
@@ -359,92 +358,34 @@
             });
         }
             var unit_measurement = $(this).find('option:selected', this).attr('data-unit');
-            // $(this).parents(".form-group").next().find(".unit").html(unit_measurement);
             $(".unit").html(unit_measurement);
     });
 
     $(document).on('submit','.validateDontSubmit',function (){
-        
+
+        $('.QuantityError').html('');
         var totalQuantity = $('.totalQuantity').attr('id');
         var issueQuantity = $('.issueQuantity').val();
-
-        var alreadyEnteredQuantity =  <?php echo $result->quantity; ?>;
-        
-        var count = parseInt(totalQuantity) + parseInt(alreadyEnteredQuantity);
-
         var status = false;
 
-        if(Number(count) >= Number(issueQuantity)){
-          status =  true;
+        if(Number(totalQuantity) >= Number(issueQuantity)){
+             
+            status = true;
+            
         }else{
-            $('.QuantityError').show();
-              var total = alreadyEnteredQuantity + totalQuantity;
+            
             if(totalQuantity == 0){
-                $('.QuantityError').html('Quantity not Available in selected category and project.');
+                $('.QuantityError').html('Quantity not available in selected category and project.');
             }else{
-                $('.QuantityError').html('Please not allow quantity more than '+count);
+                $('.QuantityError').html('Quantity not available more than '+totalQuantity);
             }
-            status =  false;
+            status = false;
         }
-        $('.totalQuantity').attr('id', 0);
         return status;
     });
 
-       
-    // $("#MaterialCategory").change(function(){ 
-    //     var selectCatId = $("#MaterialCategory option:selected").val();
-    //     var ele=this;
-    //     var optionHTML="<option value=''>Material Name</option>";
-    //     $.ajax({
-    //         type:"GET",
-    //         url: "<?php //echo base_url('admin/Materialissue/materialIssueNames/'); ?>"+selectCatId,
-    //         dataType: "json",
-    //         success: function(data) {
-    //             $.each(data, function(key, value) {
-    //                 console.log(value);
-                   
-    //                 optionHTML+='<option  data-unit="'+value.unit_measurement+'"  value="'+ value.id +'">'+ value.name +'</option>';
-    //             });
-    //             $(ele).parents(".form-group").next().find("select").html(optionHTML);
-    //         }
-    //     });
-
-    //     $('#MaterialNames').html();
-    // });
-
-        $(document).on("change",".materialName",function(){
-            var unit_measurement = $(this).find('option:selected', this).attr('data-unit');
-            $(this).parents(".form-group").next().find(".unit").html(unit_measurement);
-        });
-        
-        // load material name using ajax
-        // $(document).on("change",".material_category",function(){
-
-        //     var optionHTML="<option value=''>Material Name</option>";
-        //     var category_id = $(this).val();
-        //     var ele=this;
-        //     if(category_id) {   
-        //         $.ajax({
-        //             url: "<?php //echo base_url().'admin/MaterialLog/getmaterialAjax/'?>"+category_id,
-        //             type: "GET",
-        //             dataType: "json",
-        //             success:function(data) {
-        //                 // $('select[name="city"]').empty();
-        //                 $.each(data, function(key, value) {
-        //                     optionHTML+='<option  data-unit="'+value.unit_measurement+'"  value="'+ value.id +'">'+ value.name +'</option>';
-        //                 });
-        //                 $(ele).parents(".form-group").next().find("select").html(optionHTML);
-        //             }
-        //         });
-        //     }else{
-        //         $(ele).parents(".form-group").next().find("select").html(optionHTML);
-        //     }
-        // }); 
-        
-    //     $(document).on("change",".material_name",function(){
-    //         var unit_measurement = $(this).find('option:selected', this).attr('data-unit');
-    //         $(this).parents(".form-group").next().find(".unit").html(unit_measurement);
-    //     });
-    // });
-
+    $(document).on("change",".materialName",function(){
+        var unit_measurement = $(this).find('option:selected', this).attr('data-unit');
+        $(this).parents(".form-group").next().find(".unit").html(unit_measurement);
+    });
 </script>

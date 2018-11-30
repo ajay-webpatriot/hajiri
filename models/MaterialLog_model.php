@@ -111,7 +111,7 @@ class MaterialLog_model extends CI_Model {
         $this->db->from($this->table1);
         $this->db->join($this->table2, $this->table1. '.id = '. $this->table2.'.material_entry_log_id');
         $this->db->where($this->table1 . '.project_id', $project_id);
-        $this->db->where($this->table1 . '.status !=', 'Deleted');
+        $this->db->where($this->table1 . '.status =', 'Approved');
         $this->db->where($this->table1 . '.is_deleted =', '0');
         $this->db->where($this->table2 . '.material_id =', $material_id);
         $query = $this->db->get();
