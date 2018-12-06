@@ -76,8 +76,6 @@ class Material extends CI_Controller {
         $data = array();
         if(!empty($materialData))
         {   
-            $debitImg = base_url('assets/admin/images/debit.png');
-            $creditImg = base_url('assets/admin/images/credit.png');
             foreach ($materialData as $material)
             {   
                 

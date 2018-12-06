@@ -1,6 +1,10 @@
 <style type="text/css">
-    .unit{
+    .unit,.amountLabel{
         vertical-align: -webkit-baseline-middle !important;
+    }
+    .amountLabel{
+        display: block;
+        padding: 6px 12px;
     }
 </style>
 <!-- Content Wrapper. Contains page content -->
@@ -55,7 +59,7 @@
                             <div class="form-group">
                                 <label for="title" class="col-sm-3 control-label">Challan No <font color="red">*</font></label>
                                 <div class="col-sm-9">
-                                    <input name="challan_no" placeholder="Challan No" class="form-control" type="text" value="<?php echo (isset($results->challan_date)) ? $results->challan_date : ''; ?>" required>
+                                    <input name="challan_no" placeholder="Challan No" class="form-control" type="text" value="<?php echo (isset($_POST['challan_date'])) ? $_POST['challan_date'] : ''; ?>" required>
                                     <span class="error"><?php echo (form_error('challan_date')) ? form_error('challan_date') : ''; ?></span>
                                 </div>
                             </div> 
@@ -137,13 +141,32 @@
                                 <div class="form-group">
                                     <label for="quantity" class="col-sm-3 control-label">Quantity <font color="red">*</font></label>
                                     <div class="col-sm-6">
-                                        <input name="quantity[]" min="1" placeholder="Quantity" class="form-control Quantity" type="number" value="<?php echo (isset($results->quantity)) ? $results->quantity : ''; ?>" required>
+                                        <input name="quantity[]" min="1" placeholder="Quantity" class="form-control quantity" type="number" value="<?php echo (isset($_POST['quantity'])) ? $_POST['quantity'] : ''; ?>" required>
                                         <span class="error"><?php echo (form_error('quantity')) ? form_error('quantity') : ''; ?></span>
                                     </div>
                                     <div class="col-sm-3">
                                         <span><b class="unit"></b></span>
                                     </div>
                                 </div> 
+                                <?php
+                                if($this->session->userdata('user_designation') == 'Superadmin' || $this->session->userdata('user_designation') == 'admin'){
+                                ?> 
+                                    <div class="form-group">
+                                        <label for="rate" class="col-sm-3 control-label">Rate <font color="red">*</font></label>
+                                        <div class="col-sm-9">
+                                            <input name="rate[]" min="1" onkeyup="rate_change_fun(this)" onchange="rate_change_fun(this)" placeholder="Rate" class="form-control rate" type="number" value="<?php echo (isset($value->rate)) ? $value->rate : ''; ?>" required>
+                                           
+                                        </div>
+                                    </div>
+                                    <div class="form-group">
+                                        <label for="amount" class="col-sm-3 control-label">Amount:</label>
+                                        <div class="col-sm-9">
+                                            <span class="amountLabel"><?php echo (isset($value->total_rate)) ? $value->total_rate : ''; ?></span>
+                                            <input name="amount[]" placeholder="Amount" class="form-control amount" type="hidden" value="<?php echo (isset($value->total_rate)) ? $value->total_rate : ''; ?>" required>
+                                        </div>
+                                    </div> 
+                                <?php
+                                }?> 
                                 <div class="form-group">
                                     <label for="title" class="col-sm-3 control-label">Material Image </label>
                                     <div class="col-sm-9">
@@ -154,6 +177,17 @@
 
                             </div>    
                         </div>
+                        <?php
+                        if($this->session->userdata('user_designation') == 'Superadmin' || $this->session->userdata('user_designation') == 'admin'){
+                            ?> 
+                        <div class="form-group">
+                            <label for="title" class="col-sm-3 control-label">Comment:</label>
+                            <div class="col-sm-9">
+                               <textarea rows="4" cols="50" name="comment"></textarea>
+                            </div>
+                        </div> 
+                        <?php
+                        }?>
                         <!-- /.box-body -->
                         <div class="box-footer">
                             <input type="button" id="add_more" class="btn btn-success" value="Add more">
@@ -273,4 +307,23 @@
             }
         });
     });
+    // Calculate total amount
+    function rate_change_fun(ele)
+    {
+        var quantity=$(ele).parents(".form-group").prev().find(".quantity").val();
+        var rate=$(ele).val();
+        var totalRate=quantity*rate;
+        
+        $(ele).parents(".form-group").next().find(".amountLabel").html(totalRate);
+        $(ele).parents(".form-group").next().find(".amount").val(totalRate);
+    }
+    function quantity_change_fun(ele)
+    {
+        var quantity=$(ele).val();
+        var rate=$(ele).parents(".form-group").next().find(".rate").val();
+        var totalRate=quantity*rate;
+        
+        $(ele).parents(".form-group").next().next().find(".amountLabel").html(totalRate);
+        $(ele).parents(".form-group").next().next().find(".amount").val(totalRate);
+    }
 </script>

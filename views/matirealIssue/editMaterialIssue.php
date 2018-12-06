@@ -61,7 +61,7 @@
                             ?>
                             
                             <div class="form-group">
-                                <label for="date" class="col-sm-3 control-label">Issue Date:</label>
+                                <label for="date" class="col-sm-3 control-label">Issue Date <font color="red">*</font></label>
                                 <div class="col-sm-9">
                                     <input name="issueDate" id="date" placeholder="Issue Date" class="form-control datepicker-material" type="text" value="<?php echo (isset($date)) ? $date : ''; ?>" required>
                                     <span class="error"><?php echo (form_error('issueDate')) ? form_error('issueDate') : ''; ?></span>
@@ -69,15 +69,32 @@
                             </div>
                             <!-- Issue Date end -->
                             <div class="form-group">
-                                <label for="date" class="col-sm-3 control-label">Issue No:</label>
+                                <label for="date" class="col-sm-3 control-label">Issue No <font color="red">*</font></label>
                                 <div class="col-sm-9">
                                     <input name="issueNo" id="issueNo" placeholder="Issue No" class="form-control" type="text" value="<?php echo (isset($result->issue_no)) ? $result->issue_no : ''; ?>" required>
                                     <span class="error"><?php echo (form_error('issueNo')) ? form_error('issueNo') : ''; ?></span>
                                 </div>
                             </div>
-                                
                             <div class="form-group">
-                                    <label for="materialCategory" class="col-sm-3 control-label">Material Category:</label>
+                                <label for="project_name" class="col-sm-3 control-label">Project Name <font color="red">*</font></label>
+                                <div class="col-sm-9">
+                                    <select class="form-control project_name" name="project_name" required>
+                                        <option value="">Project Name </option>
+                                        <?php 
+                                        foreach($ActiveProjects as $value){
+                                            $selected = '';
+                                                if( isset($result->project_id) && $value->project_id == $result->project_id ){
+                                                    $selected = 'selected="selected"';
+                                                }
+                                            ?>
+                                          <option <?=$selected?> value="<?php echo $value->project_id; ?>"><?php echo $value->project_name; ?></option>
+                                        <?php } ?>
+                                    </select>
+                                    <span class="error"><?php echo form_error('project_name') ?></span>
+                                </div>
+                            </div>     
+                            <div class="form-group">
+                                    <label for="materialCategory" class="col-sm-3 control-label">Material Category <font color="red">*</font></label>
                                     <div class="col-sm-9">
                                         <select class="form-control material_category" id="MaterialCategory" name="materialCategory" required>
                                             <option value="">Material Category</option>
@@ -100,7 +117,7 @@
                                     </div>
                                 </div>
                             <div class="form-group selectclass">
-                                <label for="MaterialName" class="col-sm-3 control-label">Material Name:</label>
+                                <label for="MaterialName" class="col-sm-3 control-label">Material Name <font color="red">*</font></label>
                                 <div class="col-sm-9" id="MaterialNames">
                                     <select class="form-control materialName" name="MaterialName" required>
                                         <option value="">Material Name</option>
@@ -126,7 +143,7 @@
                             <span class="totalQuantity col-md-12 col-md-offset-3" id="<?php echo $totalQuantity; ?>" ></span>
                                
                             <div class="form-group">
-                                <label for="IssueQuantity" class="col-sm-3 control-label">Quantity:</label>
+                                <label for="IssueQuantity" class="col-sm-3 control-label">Quantity <font color="red">*</font></label>
                                 <div class="col-sm-6">
                                     <input name="IssueQuantity" placeholder="Quantity" class="form-control issueQuantity" type="number" min="1" value="<?php echo (isset($result->quantity)) ? $result->quantity : ''; ?>" required>
                                     <span class="error QuantityError"><?php echo (form_error('IssueQuantity')) ? form_error('IssueQuantity') : ''; ?></span>
@@ -235,7 +252,7 @@
                             }?>
 
                             <?php
-                            if( $this->session->userdata('user_designation') != 'Superadmin' || $this->session->userdata('user_designation') != 'admin'){
+                            if( $this->session->userdata('user_designation') == 'Superadmin' || $this->session->userdata('user_designation') == 'admin'){
                             ?>
                             <input type="submit" id="btnverify" name="verify" class="btn btn-primary" value="Verify & Submit">
                             <?php
@@ -362,7 +379,7 @@
     });
 
     $(document).on('submit','.validateDontSubmit',function (){
-
+        // quantity validation
         $('.QuantityError').html('');
         var totalQuantity = $('.totalQuantity').attr('id');
         var issueQuantity = $('.issueQuantity').val();
@@ -385,6 +402,7 @@
     });
 
     $(document).on("change",".materialName",function(){
+        // displayed unit measurement beside quantity field
         var unit_measurement = $(this).find('option:selected', this).attr('data-unit');
         $(this).parents(".form-group").next().find(".unit").html(unit_measurement);
     });

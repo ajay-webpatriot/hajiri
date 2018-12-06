@@ -20,7 +20,7 @@
 		
 		
 
-		<li class="treeview <?php echo ( ( $menu_title == 'Register') || ($menu_title == 'Attendance register') || ($menu_title == 'Worker register') ? 'active' : ''); ?>">
+		<li class="treeview <?php echo ( ( $menu_title == 'Register') || ($menu_title == 'Attendance register') || ($menu_title == 'Worker register' || $menu_title == 'Entry Log' || $menu_title == 'Invoice Log' || $menu_title == 'Issue Log') ? 'active' : ''); ?>">
 			<a href="#">
 				<i class="fa fa-book"></i>
 				<span>Register</span>
@@ -28,7 +28,7 @@
 					<i class="fa fa-angle-left pull-right"></i>
 				</span>
 			</a>
-			<ul class="treeview-menu <?php echo ( ( $menu_title == 'Attendance register' || $menu_title == 'Worker register') ? 'menu open' : ''); ?>"
+			<ul class="treeview-menu <?php echo ( ( $menu_title == 'Attendance register' || $menu_title == 'Worker register' || $menu_title == 'Entry Log' || $menu_title == 'Invoice Log' || $menu_title == 'Issue Log') ? 'menu open' : ''); ?>"
 				<?php echo ( ( $menu_title == 'Attendance register' || $menu_title == 'Worker register' ) ? "style='display:block;'" : ""); ?>>
 				<li class="<?php echo ((($menu_title == 'Attendance register')) ? 'active' : ''); ?>"><a href="<?php echo base_url('/admin/attendanceRegister'); ?>"><i class="fa fa-check-square"></i>Attendance register</a></li>
 				<li class="<?php echo ((($menu_title == 'Worker register')) ? 'active' : ''); ?>"><a href="<?php echo base_url('/admin/workerRegister'); ?>"><i class="fa fa-address-book-o"></i>Worker register</a></li>

@@ -9,6 +9,7 @@
     </section>
     <ol class="breadcrumb margin-bottom0">
         <li><a href="<?php echo base_url('admin'); ?>"><i class="fa fa-dashboard"></i> Dashboard</a></li>
+        <li><a href="<?php echo base_url('admin/materialInvoice'); ?>">Material Invoice</a></li>
         <li class="active"><?php echo (isset($title) ? $title : ''); ?></li>
     </ol>
     <section class="content container-fluid">
@@ -20,7 +21,7 @@
 					
 					<div class="filters col-md-12">
 						<br/>
-						<div class="col-md-1">
+						<div class="col-md-12">
 	                        <h4>Filters:</h4>
 	                    </div>
                         <label class="col-md-1 control-label">Project:</label>
@@ -39,57 +40,64 @@
 						<label class="col-md-1 control-label">Supplier:</label>
 						<div class="col-md-3">
 							<select class="form-control supplier" name="supplier">
-								<option value="">Select Supplier</option>
+								<option value="">All Supplier</option>
 							</select>
 						</div>	
+                        <label class="col-md-1 control-label">Date:</label>
+                        <div class="col-md-3">
+                            <input type="text" class="form-control" name="daterange" />
+                        </div>
 					</div>
 				</div>
 			</div>
-            <div class="box">
-                <div class="box-body table-responsive">
-                    <?php if ($this->session->flashdata('success') != ''): ?>
-                        <div class="alert alert-success alert-dismissable">
-                            <i class="fa fa-check"></i>
-                            <button type="button" class="close" data-dismiss="alert" aria-hidden="true">×</button>
-                            <b>Success!</b> 
-                            <?php echo $this->session->flashdata('success'); ?>
+            <!-- form start -->
+            <form action="<?php echo base_url('admin/MaterialInvoice/addInvoiceDetail');?>" id="add-challan" class="form-horizontal" method="POST">
+                <div class="box">
+                    <div class="box-body table-responsive">
+                        <?php if ($this->session->flashdata('success') != ''): ?>
+                            <div class="alert alert-success alert-dismissable">
+                                <i class="fa fa-check"></i>
+                                <button type="button" class="close" data-dismiss="alert" aria-hidden="true">×</button>
+                                <b>Success!</b> 
+                                <?php echo $this->session->flashdata('success'); ?>
+                            </div>
+                        <?php endif; ?>
+                        <?php if ($this->session->flashdata('error') != ''): ?>
+                            <div class="alert alert-danger alert-dismissable">
+                                <i class="fa fa-check"></i>
+                                <button type="button" class="close" data-dismiss="alert" aria-hidden="true">×</button>
+                                <b>Error!</b> 
+                                <?php echo $this->session->flashdata('error'); ?>
+                            </div>
+                        <?php endif; ?>
+                        					
+                        <table id="invoiceTable" class="tableFilter table table-striped table-hover table-bordered display responsive nowrap" cellspacing="0" width="100%">
+                            <thead>
+                                <tr>
+                                    <th></th>
+                                    <th>Challan No</th>
+                                    <th>
+                                        Entry Date
+                                    </th> 
+                                    <th>
+                                        Amount
+                                    </th>
+                                </tr>
+                            </thead>
+                        </table>
+                        <div class="box-tools pull-left">
+                            <!-- Add button -->
+                              
+                                <a href="javascript:void(0);" id="addChallanEntry" class="btn btn-info">
+                                    <i class="glyphicon glyphicon-plus"></i> 
+                                    Add Challan
+                                </a>
+                            
                         </div>
-                    <?php endif; ?>
-                    <?php if ($this->session->flashdata('error') != ''): ?>
-                        <div class="alert alert-danger alert-dismissable">
-                            <i class="fa fa-check"></i>
-                            <button type="button" class="close" data-dismiss="alert" aria-hidden="true">×</button>
-                            <b>Error!</b> 
-                            <?php echo $this->session->flashdata('error'); ?>
-                        </div>
-                    <?php endif; ?>
-                    					
-                    <table id="invoiceTable" class="tableFilter table table-striped table-hover table-bordered display responsive nowrap" cellspacing="0" width="100%">
-                        <thead>
-                            <tr>
-                                <th>id</th>
-                                <th>Type</th>
-                                <th>
-                                    Reason
-                                </th> 
-                                <th>
-                                    Date
-                                </th>
-								<th>
-									Amount
-								</th>
-                                <th>
-                                    Status
-                                </th>
-                                <th>
-                                    Action
-                                </th>
-                            </tr>
-                        </thead>
-                    </table>
-
+                    </div>
                 </div>
-            </div>
+            </form>
+            <!-- form end-->
         </div>
 		
 		
@@ -102,32 +110,30 @@
     var rows_selected = null;
     var absentId = [];
     var fHajiriId = [];
+
+    var tableInvoice="";
+    var dateStartRange="";
+    var dateEndRange="";
     $(document).ready(function() {
-		
-		$( ".monthPicker" ).datepicker({
-            defaultDate: new Date(),
-            format:		"yyyy-mm",
-			viewMode:	"months", 
-			minViewMode: "months",
-            endDate:	'+0d',
-            autoclose: true
-        }).datepicker("setDate", "0");
-		$( ".datepicker" ).datepicker({
-			defaultDate: new Date(),
-			format: 'dd-mm-yyyy',
-			<?php 
-				if( date('d') > 10){
-					$current = (date('d') - 1);
-					echo "startDate: '-".$current."d',";
-				}else{
-					echo "startDate: '-".date('01-m-Y', strtotime('-1 MONTH'))."',";
-				}
-			?>
-			endDate: '+0d',
-			autoclose: true,
-		});   
+		$('input[name="daterange"]').daterangepicker({
+            opens: 'left',
+            startDate: moment().subtract(6, 'days'),
+            endDate: new Date()
+          }, function(start, end, label) {
+            console.log("A new date selection was made: " + start.format('YYYY-MM-DD') + ' to ' + end.format('YYYY-MM-DD'));
+            dateStartRange=start.format('YYYY-MM-DD');
+            dateEndRange=end.format('YYYY-MM-DD');
+            tableInvoice.draw();
+        });
+
+        // set date during initialization
+
+        dateStartRange=moment($('input[name="daterange"]').val().split(" - ")[0]).format('YYYY-MM-DD');
+        dateEndRange=moment($('input[name="daterange"]').val().split(" - ")[1]).format('YYYY-MM-DD');
+
         // DataTable
-        var table = $('#invoiceTable').DataTable({
+        tableInvoice = $('#invoiceTable').DataTable({
+            "order": [[ 1, "desc" ]],
             "processing": true,
             "serverSide": true,
             "responsive": true,
@@ -138,25 +144,23 @@
                 "dataType": "json",
                 "type": "POST",
                 "data":function(data) {
-                    data.date =  $('.monthPicker').val();
                     data.project = $('.project').val();
-                    data.supervisor = $('.supervisor').val();
+                    data.supplier = $('.supplier').val();
+                    data.dateStartRange=dateStartRange;
+                    data.dateEndRange=dateEndRange;
                     data.<?php echo $this->security->get_csrf_token_name(); ?> = "<?php echo $this->security->get_csrf_hash(); ?>";
                 },
             },
             "columns": [
                       { "data": "id" },
-                      { "data": "Kharchi_type" },
-                      { "data": "Kharchi_details" },
-                      { "data": "date" },
-                      { "data": "amount" },
-                      { "data": "status" },
-                      { "data": "action" },
+                      { "data": "challan_no" },
+                      { "data": "challan_date" },
+                      { "data": "amount" }
             ],
             columnDefs: [
                {
                     "targets": [0],
-                    "visible": false,
+                    "visible": true,
                     "searchable": false,
                     "sortable":false,
                     "type": "string"
@@ -164,65 +168,30 @@
 				{
                     "targets": [1],
                     "visible": true,
-                    "searchable": false,
-                    "sortable":false,
+                    "searchable": true,
+                    "sortable":true,
                     "type": "string"
                 },
                 {
                     "targets": [2],
                     "visible": true,
                     "searchable": true,
-                    "sortable":false,
+                    "sortable":true,
                     "type": "string"
                 },
                 {
                     "targets": [3],
                     "visible": true,
                     "searchable": true,
-                    "sortable":false,
-                    "type": "string"
-                },
-                {
-                    "targets": [4],
-                    "visible": true,
-                    "searchable": false,
-                    "sortable":false,
-                    "type": "string"
-                },
-                {
-                    "targets": [5],
-                    "visible": true,
-                    "searchable": false,
-                    "sortable":false,
-                    "type": "string"
-                },
-                {
-                    "targets": [6],
-                    "visible": true,
-                    "searchable": false,
-                    "sortable":false,
+                    "sortable":true,
                     "type": "string"
                 }
             ]
         });
-        
-        table
-        .on( 'select', function ( e, dt, type, indexes ) {
-            var rowData = table.column(0).checkboxes.selected();
-            $('#actionButton').removeClass('hidden');
-        } )
-        .on('user-select', function (e, dt, type, cell, originalEvent) {
-        //       alert( table.rows('.selected').data().length +' row(s) selected' );
-        })
-        .on( 'deselect', function ( e, dt, type, indexes ) {
-            var rowData = table.column(0).checkboxes.selected();
-            if(table.column(0).checkboxes.selected().length == 0){
-                $('#actionButton').addClass('hidden');
-            }
-        } );    
+           
 
         $('.project').change(function () {
-            var optionHTML="<option value=''>Supplier Name</option>";
+            var optionHTML="<option value=''>All Supplier</option>";
             var project_id = $(this).val();
             var ele=this;
             if(project_id) {   
@@ -241,15 +210,34 @@
             }else{
                $(".supplier").html(optionHTML);
             }
+            tableInvoice.draw();
         });
         $('.supplier').change(function () {
-            table.draw();
+            tableInvoice.draw();
         });
         
 		//Add money button positioning
 		
      
         $('.alert-success').fadeOut(5000); //remove suucess message 
+
+        $("#addChallanEntry").click(function(){
+            if($('[name="log_ids[]"]:checked').length > 0)
+            {
+                if(window.location.href.indexOf('?invoiceId') > -1)
+                {
+                    var url = window.location.search;
+                    
+                    url = url.replace("?invoiceId=", '');
+                    $("#add-challan").attr("action","<?=base_url('admin/MaterialInvoice/editInvoiceDetail/')?>"+url);
+                }
+                $("#add-challan").submit();
+            }
+            else
+            {
+                alert("select atleast one checkbox");
+            }
+        });
 
             
     });
@@ -274,7 +262,7 @@
             },
         });        
     }
-
+    
    
 </script>
 

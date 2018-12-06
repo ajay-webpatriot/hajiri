@@ -162,6 +162,17 @@
                                    <textarea name="issueComment" id="" cols="30" rows="5"></textarea>
                                 </div>
                             </div> 
+                            <?php
+                            if($this->session->userdata('user_designation') == 'Superadmin' || $this->session->userdata('user_designation') == 'admin'){
+                            ?> 
+                            <div class="form-group">
+                                <label for="quantity" class="col-sm-3 control-label">Verify Comment:</label>
+                                <div class="col-sm-6">
+                                   <textarea name="verifyComment" id="" cols="30" rows="5"></textarea>
+                                </div>
+                            </div> 
+                            <?php
+                            }?>
                         </div>
                         <!-- /.box-body -->
                         <div class="box-footer">
@@ -224,7 +235,7 @@
     });
          
         $(document).on('submit','.validateDontSubmit',function (){
-            
+            // quantity validation
             var totalQuantity = $('.totalQuantity').attr('id');
             var issueQuantity = $('.issueQuantity').val();
             

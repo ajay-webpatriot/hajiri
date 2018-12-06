@@ -36,7 +36,8 @@
 <!-- daterangepicker -->
 <script src="https://cdnjs.cloudflare.com/ajax/libs/moment.js/2.11.2/moment.min.js"></script>
 <script src="<?php echo base_url('assets/admin/plugins/daterangepicker/daterangepicker.js'); ?>"></script>
-
+<!-- custom js -->
+<script src="<?php echo base_url('assets/admin/dist/js/custom.js'); ?>"></script>
 
 <!-- BEGIN PAGE LEVEL PLUGINS -->
 <script>

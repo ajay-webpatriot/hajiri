@@ -36,7 +36,9 @@ class materialLog extends CI_Controller {
             $this->form_validation->set_rules('material_category[]', 'material category', 'required');
             $this->form_validation->set_rules('material_name[]', 'material name', 'required');
             $this->form_validation->set_rules('quantity[]', 'quantity', 'required');
-
+            if($this->session->userdata('user_designation') == 'Superadmin' || $this->session->userdata('user_designation') == 'admin'){
+                $this->form_validation->set_rules('rate[]', 'rate', 'required');
+            }
             if ( $this->form_validation->run() == TRUE) {
 
                 $material_quantity = $this->input->post('quantity');
@@ -97,7 +99,16 @@ class materialLog extends CI_Controller {
                     // resolved image issue s
                     // $challan_image = $_FILES['challan_file']['name'];
                     // resolved image issue e
-
+                    if($this->session->userdata('user_designation') == 'Superadmin' || $this->session->userdata('user_designation') == 'admin')
+                    {
+                        $log_status = "Approved";
+                        $comment = $this->input->post('comment');
+                    }
+                    else 
+                    {
+                        $log_status = "Pending";
+                        $comment = "";
+                    }
                     $createdate = date_create($challan_date);
                     $date = date_format($createdate,'Y-m-d');
                     // insert material log 
@@ -109,7 +120,8 @@ class materialLog extends CI_Controller {
                         'receiver_id'   => $supervisor_name,
                         'project_id'   => $project_name,
                         'company_id' => $this->session->userdata('company_id'),
-                        'status'   => 'Pending',
+                        'comment' => $comment,
+                        'status'   => $log_status
                     );
                     $materialLogId = $this->MaterialLog_model->materialLogsave($materialLogArr);
                 
@@ -118,14 +130,28 @@ class materialLog extends CI_Controller {
 
                         $material_name=$this->input->post('material_name');
                         $material_quantity=$this->input->post('quantity');
+                        $material_rate = $this->input->post('rate');
+                        $material_amount=$this->input->post('amount');
+
                         $cntDetail=0;
 
                         foreach ($material_category as $key => $value) {
+
+                            if($this->session->userdata('user_designation') == 'Superadmin' || $this->session->userdata('user_designation') == 'admin'){
+                                $rate = $material_rate[$cntDetail];
+                                $total_rate = $material_amount[$cntDetail];
+                            }
+                            else{
+                                $rate = 0;
+                                $total_rate = 0;
+                            } 
                            $materialLogDetailArr = array(
                             'material_entry_log_id' => $materialLogId,
                             'material_id'   => $material_name[$cntDetail],
                             'quantity' => $material_quantity[$cntDetail],
                             'material_image'  => empty($material_image_arr[$cntDetail])?"":$material_image_arr[$cntDetail],
+                            'rate'   => $rate,
+                            'total_rate'   => $total_rate,
                             );
 
                             $insertId = $this->MaterialLog_model->materialLogDetailsave($materialLogDetailArr);
@@ -255,16 +281,19 @@ class materialLog extends CI_Controller {
                     $valid_quantity = false;
                 }
 
-                if(!empty($material_quantity_rate)){
-                    foreach ($material_quantity_rate as $value) {
-                       if($value <= 0){
-                          $valid_quantity_rate = false;
+                if($this->session->userdata('user_designation') == 'Superadmin' || $this->session->userdata('user_designation') == 'admin')
+                {
+                    // rate field only accessible to admin and superadmin
+                    if(!empty($material_quantity_rate)){
+                        foreach ($material_quantity_rate as $value) {
+                           if($value <= 0){
+                              $valid_quantity_rate = false;
+                            }
                         }
+                    }else{
+                        $valid_quantity_rate = false;
                     }
-                }else{
-                    $valid_quantity_rate = false;
-                }
-
+                }    
                 if($valid_quantity == true && $valid_quantity_rate == true){
 
                     $challan_image=$_FILES['challan_file']['name'];
@@ -477,10 +506,8 @@ class materialLog extends CI_Controller {
                             0 =>'material_entry_log.challan_no',
                             1 =>'material_entry_log.challan_date',
                             2 => 'supervisor_name',
-                            3 => 'category_name',
-                            4 => 'material_name',
-                            5 => 'supplier_name',
-                            6 => 'status'
+                            3 => 'supplier_name',
+                            4 => 'status'
                         );
         $limit = $this->input->post('length');
         $start = $this->input->post('start');
@@ -556,8 +583,6 @@ class materialLog extends CI_Controller {
         $data = array();
         if(!empty($materialLogs))
         {   
-            $debitImg = base_url('assets/admin/images/debit.png');
-            $creditImg = base_url('assets/admin/images/credit.png');
             foreach ($materialLogs as $materialLog)
             {   
                 

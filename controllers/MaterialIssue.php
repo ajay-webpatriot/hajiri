@@ -60,6 +60,16 @@ class MaterialIssue extends CI_Controller {
                         $fileResult = uploadStaffFile('uploads/MaterialIssue/', 'Issuefile');
                         $issue_image=$fileResult['filePath'];
                     }
+                    if($this->session->userdata('user_designation') == 'Superadmin' || $this->session->userdata('user_designation') == 'admin')
+                    {
+                        $log_status = "Verified";
+                        $verify_comment = $this->input->post('verifyComment');
+                    }
+                    else 
+                    {
+                        $log_status = "Issued";
+                        $verify_comment = "";
+                    }
                     
                     $createdate = date_create($this->input->post('issueDate'));
                     $date = date_format($createdate,'Y-m-d');
@@ -74,7 +84,9 @@ class MaterialIssue extends CI_Controller {
                         'material_image'   =>  $issue_image,
                         'consumption_place'   => $this->input->post('sites'),
                         'consumption_outsite_project_id'   => ($this->input->post('sites') == "outsite")?$this->input->post('Projects'):'',
-                        'issue_comment'   => $this->input->post('issueComment')
+                        'issue_comment'   => $this->input->post('issueComment'),
+                        'status'=>$log_status,
+                        'verify_comment' => $verify_comment
                     );
                     
                     $materialIssueId = $this->MaterialIssueModel->save($materialIssueArr);
@@ -112,16 +124,17 @@ class MaterialIssue extends CI_Controller {
             $result = $this->MaterialIssueModel->getMaterialIssueQuantitybyProjectId($project_id, $material_id);
             $entryResult = $this->MaterialLog_model->getMaterialEntryQuantitybyProjectId($project_id, $material_id);
             
-            if(count($issue) > 0){
+             // if(count($issue) > 0){
+            if($result->issueQuantity > 0){
                 $issue = $result->issueQuantity;
             }
-            if(count($entryResult) > 0){
+            // if(count($entryResult) > 0){
+            if($entryResult->entryQuantity > 0){
                 $entry = $entryResult->entryQuantity;
             }
         }
-
+       
         $totalQuantity =  $entry - $issue;
-         
         $data['totalQuantity'] = $totalQuantity;
          
         if (isset( $_POST['submit']) || isset($_POST['verify'])){
@@ -134,6 +147,7 @@ class MaterialIssue extends CI_Controller {
             $this->form_validation->set_rules('IssueQuantity', 'Quantity', 'required');
             $this->form_validation->set_rules('materialCategory', 'Material Category', 'required');
             $this->form_validation->set_rules('sites', 'Consumption Place', 'required');
+            $this->form_validation->set_rules('project_name', 'Project Name', 'required');
             // $this->form_validation->set_rules('issueComment', 'Issue Comment', 'required');  
             
             if($this->form_validation->run() == false ){
@@ -190,6 +204,7 @@ class MaterialIssue extends CI_Controller {
                         'date' => $date,
                         'issue_by'=>$this->session->userdata('id'),
                         'material_id'   => $this->input->post('MaterialName'),
+                        'project_id'   => $this->input->post('project_name'),
                         'company_id' => $this->session->userdata('company_id'),
                         'quantity' => $this->input->post('IssueQuantity'),
                         'material_image'   =>  $uploaded_material_img,
@@ -384,8 +399,6 @@ class MaterialIssue extends CI_Controller {
         $data = array();
         if(!empty($issues))
         {   
-            $debitImg = base_url('assets/admin/images/debit.png');
-            $creditImg = base_url('assets/admin/images/credit.png');
             foreach ($issues as $issue)
             {   
                 

@@ -27,9 +27,9 @@
             startDate:new Date(),
             format: "mm/dd/yyyy"
         });
-
+        /* date picker field for material management module */
         $('.datepicker-material').datepicker({
-            format: "mm/dd/yyyy"
+            format: "yyyy-mm-dd"
         });
     });
 </script>

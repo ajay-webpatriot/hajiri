@@ -1,3 +1,8 @@
+<style type="text/css">
+    .day_txt{
+        vertical-align: -webkit-baseline-middle !important;
+    }
+</style>
 <!-- Content Wrapper. Contains page content -->
 <div class="content-wrapper">
     <!-- Content Header (Page header) -->
@@ -8,7 +13,9 @@
     </section>
     <ol class="breadcrumb margin-bottom0">
         <li><a href="<?php echo base_url('admin'); ?>"><i class="fa fa-dashboard"></i> Dashboard</a></li>
-        <li><a href="<?php echo base_url('admin/materialLog'); ?>">Material Log</a></li>
+        <li><a href="<?php echo base_url('admin/MaterialInvoice'); ?>">Material Invoice</a></li>
+        <!-- <li><a href="<?php echo base_url('admin/MaterialInvoice/issueInvoice/'); ?>">Material Entry Invoice</a></li> -->
+        
         <li class="active"><?php echo (isset($title) ? $title : ''); ?></li>
     </ol>
 
@@ -36,53 +43,17 @@
                     }
                     ?>
                     <!-- form start -->
-                    <form action="" id="add-labour" class="form-horizontal" method="POST" enctype="multipart/form-data">
+                    <form action="" id="add-labour" class="form-horizontal formInvoiceSubmit" method="POST" autocomplete="off">
                         <div class="box-body">
-                            <h4 class="box-title">General Details :</h4>
+                            <h4 class="box-title">Issue Invoice :</h4>
                             <div class="form-group">
-                                <label for="title" class="col-sm-3 control-label">Challan Date:</label>
+                                <label for="project_name" class="col-sm-3 control-label">Project Name <font color="red">*</font></label>
                                 <div class="col-sm-9">
-                                    <input name="challan_date" id="date" placeholder="Challan Date" class="form-control datepicker" type="text" value="<?php echo (isset($_POST['date'])) ? $_POST['date'] : ''; ?>" required>
-                                    <span class="error"><?php echo (form_error('challan_date')) ? form_error('challan_date') : ''; ?></span>
-                                </div>
-                            </div> 
-
-                            <div class="form-group">
-                                <label for="title" class="col-sm-3 control-label">Challan No:</label>
-                                <div class="col-sm-9">
-                                    <input name="challan_no" placeholder="Challan No" class="form-control" type="text" value="<?php echo (isset($results->challan_date)) ? $results->challan_date : ''; ?>" required>
-                                    <span class="error"><?php echo (form_error('challan_date')) ? form_error('challan_date') : ''; ?></span>
-                                </div>
-                            </div> 
-                            <div class="form-group">
-                                <label for="title" class="col-sm-3 control-label">Challan Image:</label>
-                                <div class="col-sm-9">
-                                    <input type="file" accept="image/*" id="challan_file" name="challan_file"  />
-                                    <span class="error"><?php echo (form_error('challan_image')) ? form_error('challan_image') : ''; ?></span>
-                                </div>
-                            </div>
-                            
-                            <div class="form-group">
-                                <label for="supplier_name" class="col-sm-3 control-label">Supplier Name:</label>
-                                <div class="col-sm-9">
-                                    <select class="form-control supplier_name" name="supplier_name" required>
-                                        <option value="">Supplier Name </option>
-                                        <?php 
-                                        foreach ($supplier as $supp) {
-                                            ?>
-                                            <option value="<?php echo $supp->id; ?>"><?php echo $supp->name; ?></option>
-                                        <?php } ?>
-                                    </select>
-                                    <span class="error"><?php echo form_error('supplier_name') ?></span>
-                                </div>
-                            </div>
-                            <div class="form-group">
-                                <label for="project_name" class="col-sm-3 control-label">Project Name:</label>
-                                <div class="col-sm-9">
-                                    <select class="form-control project_name" name="project_name" required>
+                                    <select class="form-control invoice_project_name" name="project_name" required>
                                         <option value="">Project Name </option>
                                         <?php 
                                         foreach ($projects as $proj) {
+
                                             ?>
                                             <option value="<?php echo $proj->project_id; ?>"><?php echo $proj->project_name; ?></option>
                                         <?php } ?>
@@ -91,65 +62,140 @@
                                 </div>
                             </div>
                             <div class="form-group">
-                                <label for="supervisor_name" class="col-sm-3 control-label">Supervisor Name:</label>
+                                <label for="supplier_name" class="col-sm-3 control-label">Supplier Name <font color="red">*</font></label>
                                 <div class="col-sm-9">
-                                    <select class="form-control supervisor_name" name="supervisor_name" required>
-                                        <option value="">Supervisor Name </option>
-                                       
+                                    <select class="form-control supplier_name" name="supplier_name" required>
+                                       <option value="">Supplier Name </option>
+                                       <!--   <?php 
+                                        foreach ($supplier as $supp) {
+                                                $selected="";
+                                                if( isset($_POST['supplier_name']) && $supp->id == $_POST['supplier_name'] ){
+                                                        $selected = 'selected="selected"';
+                                                    }
+                                            ?>
+                                            <option <?=$selected?> value="<?php echo $supp->id; ?>"><?php echo $supp->name; ?></option>
+                                        <?php } ?> -->
                                     </select>
-                                    <span class="error"><?php echo form_error('supervisor_name') ?></span>
+                                    <span class="error"><?php echo (form_error('supplier_name')) ? form_error('supplier_name') : ''; ?></span>
                                 </div>
                             </div>
-                            <h4 class="box-title">Add Material Details :</h4>
-                            <div class="addMaterialDetail">
+                            <div class="form-group">
+                                <label for="title" class="col-sm-3 control-label">Invoice Date <font color="red">*</font></label>
+                                <div class="col-sm-9">
+                                    <input name="invoice_date" id="invoice_date" placeholder="Invoice Date" class="form-control datepicker-material" type="text" value="<?php echo (isset($_POST['invoice_date'])) ? $_POST['invoice_date'] : ''; ?>" required>
+                                    <span class="error"><?php echo (form_error('invoice_date')) ? form_error('invoice_date') : ''; ?></span>
+                                </div>
+                            </div> 
+
+                            <div class="form-group">
+                                <label for="title" class="col-sm-3 control-label">Invoice No <font color="red">*</font></label>
+                                <div class="col-sm-9">
+                                    <input name="invoice_no" placeholder="Invoice No" class="form-control" type="text" value="<?php echo (isset($_POST['invoice_no'])) ? $_POST['invoice_no'] : ''; ?>" required>
+                                    <span class="error"><?php echo (form_error('invoice_no')) ? form_error('invoice_no') : ''; ?></span>
+                                </div>
+                            </div> 
+                            
+                            <h4 class="box-title">Challan Details :</h4>
+                            <div class="challanDetail">
                                 <hr>
                                 <div class="form-group">
-                                    <label for="material_category" class="col-sm-3 control-label">Material Category:</label>
-                                    <div class="col-sm-9">
-                                        <select class="form-control material_category" name="material_category[]" required>
-                                            <option value="">Material Category</option>
-                                            <?php 
-                                            foreach ($material_category as $proj) {
-                                                ?>
-                                                <option value="<?php echo $proj->id; ?>"><?php echo $proj->category; ?></option>
-                                            <?php } ?>
-                                        </select>
-                                        <span class="error"><?php echo form_error('material_category') ?></span>
+                                    <label class="col-sm-2 control-label">Challan No</label>
+                                    <label class="col-sm-2 control-label">Date</label>
+                                    <label class="col-sm-2 control-label">Amount</label>
+                                    
+                                </div>
+                                <?php
+                                $total_amount=0;
+
+                                if(count($challanData) > 0)
+                                {
+                                    
+                                    foreach ($challanData as $key => $value) {
+                                        # code...
+                                    $total_amount+=$value->total_rate;
+                                 ?>
+                                    <div class="form-group">
+                                        <div class="col-sm-2 control-label">
+                                            <?=$value->challan_no?>
+                                            <input type="hidden" class="challan_log_id" name="challan_log_id[]" value="<?=$value->id?>">        
+                                        </div>
+                                        <div class="col-sm-2 control-label"><?=$value->challan_date?></div>
+                                        <div class="col-sm-2 control-label"><i class="fa fa-rupee" style="font-size: 13px;color: #808080;"  aria-hidden="true"></i><?=$value->total_rate?>/-
+                                            <input type="hidden" name="total_rate[]" class="total_rate" value="<?=$value->total_rate?>">
+                                        </div>
+                                        <div class="col-sm-1" style="padding-top: 7px;" >
+                                            <?php
+                                            if($value->challan_image != "")
+                                            {
+                                                $image =  ROOT_PATH.'/uploads/materialLog/challan/'.$value->challan_image;
+                                                if(file_exists($image)){
+                                                    ?>
+                                                    <a href="<?=base_url('admin/MaterialInvoice/DownloadChallan/').$value->challan_image?>"<i class="fa fa-file-o"  aria-hidden="true"></i>
+                                                    </a>
+                                            <?php
+                                                }
+                                            }
+                                            ?>
+                                            <i class="fa fa-trash" onclick="deleteChallan(this)" aria-hidden="true"></i>
+                                        </div>
+                                        
                                     </div>
+
+                                 <?php   
+                                        
+                                    }
+                                }
+                                ?>
+                                <div class="col-sm-6 pull-right">
+                                    <a href="<?php echo base_url('admin/MaterialInvoice/issueInvoice/'); ?>" class="btn btn-primary">Add More</a>
+                                </div>
+                                <span class="error challanError"><?php echo (form_error('challan_log_id[]')) ? form_error('challan_log_id[]') : ''; ?></span>
+                                <div class="form-group">
+                                    <div class="col-sm-2 control-label"></div>
+                                    <div class="col-sm-2 control-label"></div>
+                                    <div class="col-sm-2 control-label amount"><i class="fa fa-rupee" style="font-size: 13px;color: #808080;"  aria-hidden="true"></i><?=$total_amount?>/-
+                                        
+                                    </div>
+                                    <input type="hidden" value="<?=$total_amount?>" id="amount_without_tax" name="amount_without_tax">
                                 </div>
                                 <div class="form-group">
-                                    <label for="material_NAME" class="col-sm-3 control-label">Material Name:</label>
-                                    <div class="col-sm-9">
-                                        <select class="form-control material_name" name="material_name[]" required>
-                                            <option value="">Material Name</option>
-                                            
-                                        </select>
-                                        <span class="error"><?php echo form_error('material_name') ?></span>
-                                    </div>
+                                    <div class="col-sm-2 control-label"></div>
+                                    <div class="col-sm-2 control-label">Tax details</div>
+                                    <div class="col-sm-2 control-label"><i class="fa fa-rupee" style="font-size: 13px;color: #808080;"  aria-hidden="true"></i>0/-</div>
                                 </div>
                                 <div class="form-group">
-                                    <label for="quantity" class="col-sm-3 control-label">Quantity:</label>
-                                    <div class="col-sm-6">
-                                        <input name="quantity[]" placeholder="Quantity" class="form-control" type="number" value="<?php echo (isset($results->quantity)) ? $results->quantity : ''; ?>" required>
-                                        <span class="error"><?php echo (form_error('quantity')) ? form_error('quantity') : ''; ?></span>
-                                    </div>
+                                    <label class="col-sm-4 control-label">Total invoice amount <font color="red">*</font></label>
                                     <div class="col-sm-3">
-                                        <span><b class="unit"></b></span>
+                                        <input id="total_amount" name="total_amount" class="form-control" type="number" value="<?php echo (isset($_POST['total_amount'])) ?  $_POST['total_amount']: $total_amount; ?>" required>
+                                        <span class="error totalAmountError"><?php echo (form_error('total_amount')) ? form_error('total_amount') : ''; ?></span>
+                                    </div>
+                                </div>
+                                <!-- <div class="form-group" style="color: red;">
+                                    <div class="col-sm-6">Amount should be greater than or equal to sum of challan amount <br/>Amount Should be inclusive of all taxes</div>
+                                </div> -->
+                                <div class="form-group">
+                                    <label class="col-sm-4 control-label">Payment Cycle <font color="red">*</font></label>
+                                    <div class="col-sm-3">
+                                        <input onkeyup="displayDate(this)" id="payment_cycle" name="payment_cycle" class="form-control" type="number" value="<?php echo (isset($_POST['payment_cycle'])) ? $_POST['payment_cycle'] : ''; ?>" required>
+                                        <span class="error"><?php echo (form_error('payment_cycle')) ? form_error('payment_cycle') : ''; ?></span>
+                                    </div>
+                                    <div class="col-sm-2">
+                                        <span><b class="day_txt" >Days</b></span>
+                                    </div>
+                                </div>
+                                <div class="form-group">
+                                    <label class="col-sm-4 control-label">Payment Due <font color="red">*</font></label>
+                                    <div class="col-sm-3">
+                                        <input readonly="" name="payment_date" id="payment_date" placeholder="Date" class="form-control" type="text" value="<?php echo (isset($_POST['payment_date'])) ? $_POST['payment_date'] : ''; ?>" required>
+                                        <span class="error"><?php echo (form_error('payment_date')) ? form_error('payment_date') : ''; ?></span>
                                     </div>
                                 </div> 
-                                <div class="form-group">
-                                    <label for="title" class="col-sm-3 control-label">Material Image:</label>
-                                    <div class="col-sm-9">
-                                        <input type="file" id="material_file" accept="image/*" name="material_file[]"  />
-                                        <span class="error"><?php echo (form_error('material_file')) ? form_error('material_file') : ''; ?></span>
-                                    </div>
-                                </div>  
+                                  
 
                             </div>    
                         </div>
                         <!-- /.box-body -->
                         <div class="box-footer">
-                            <input type="button" id="add_more" class="btn btn-success" value="Add more">
                             <input type="submit" id="btnSave" name="submit" class="btn btn-primary" value="Save">
                         </div>
                         <!-- /.box-footer -->
@@ -167,68 +213,32 @@
 <script type="text/javascript">
 
     $(document).ready(function () {
-       $("#add_more").click(function(){
 
-        var $clone = $('.addMaterialDetail:last').clone();
-        $clone.find('input').val('');
-        $clone.find('select').val('');
-        $clone.find('img').remove();
-        $clone.insertAfter($('[class^="addMaterialDetail"]').last());
-    });
+        $(document).on("change",".invoice_project_name",function(){
 
+            var projectSupplierOption ="<option value=''>Supplier Name</option>";
+            
 
-        // load material name using ajax
-        $(document).on("change",".material_category",function(){
-
-            var optionHTML="<option value=''>Material Name</option>";
-            var category_id = $(this).val();
-            var ele=this;
-            if(category_id) {   
-                $.ajax({
-                    url: "<?php echo base_url().'admin/MaterialLog/getmaterialAjax/'?>"+category_id,
-                    type: "GET",
-                    dataType: "json",
-                    success:function(data) {
-                        // $('select[name="city"]').empty();
-                        $.each(data, function(key, value) {
-                            optionHTML+='<option  data-unit="'+value.unit_measurement+'"  value="'+ value.id +'">'+ value.name +'</option>';
-                        });
-                        $(ele).parents(".form-group").next().find("select").html(optionHTML);
-                    }
-                });
-            }else{
-                $(ele).parents(".form-group").next().find("select").html(optionHTML);
-            }
-        }); 
-        
-        $(document).on("change",".material_name",function(){
-            var unit_measurement = $(this).find('option:selected', this).attr('data-unit');
-            $(this).parents(".form-group").next().find(".unit").html(unit_measurement);
-        });
-
-        // load supervisor name using ajax
-        $(document).on("change",".project_name",function(){
-
-            var optionHTML="<option value=''>Supervisor Name</option>";
             var project_id = $(this).val();
             var ele=this;
             if(project_id) {   
                 $.ajax({
-                    url: "<?php echo base_url().'admin/MaterialLog/getSupervisorAjax/'?>"+project_id,
+                    url: "<?php echo base_url().'admin/MaterialInvoice/getSupplierAjax/'?>"+project_id,
                     type: "GET",
                     dataType: "json",
                     success:function(data) {
-                        // $('select[name="city"]').empty();
+                        
                         $.each(data, function(key, value) {
-                            optionHTML+='<option  value="'+ value.user_id +'">'+ value.supervisor_name +'</option>';
+                            projectSupplierOption+='<option  value="'+ value.id +'">'+ value.name +'</option>';
                         });
-                        $(ele).parents(".form-group").next().find("select").html(optionHTML);
+
+                        $('.supplier_name').html(projectSupplierOption);
                     }
                 });
             }else{
-                $(ele).parents(".form-group").next().find("select").html(optionHTML);
+                $('.supplier_name').html(projectSupplierOption);
+                
             }
         }); 
     });
-
 </script>

@@ -146,21 +146,3 @@
 </div>
 <!-- /.content-wrapper -->
 
-<script type="text/javascript">
-   $(document).on('submit','.validateSubmit',function (){ 
-
-        var bound_start_range = $('.bound_start_range').val();
-        var bound_end_range = $('.bound_end_range').val();
-        var status = false;
-
-        if(Number(bound_end_range) < Number(bound_start_range)){
-            $('.bond_range_Error').show();
-            $('.bond_range_Error').html('Please enter Bond end range is greater than or equal to the Bond start range.');
-            status =  false;
-        }else{
-            status =  true;
-            $('.bond_range_Error').hide();
-        }
-        return status;
-    });
-</script>

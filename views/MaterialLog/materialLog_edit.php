@@ -2,6 +2,10 @@
     .unit{
         vertical-align: -webkit-baseline-middle !important;
     }
+    .amountLabel{
+        display: block;
+        padding: 6px 12px;
+    }
 </style>
 <!-- Content Wrapper. Contains page content -->
 <div class="content-wrapper">
@@ -44,7 +48,7 @@
                         <div class="box-body">
                             <h4 class="box-title">General Details :</h4>
                             <div class="form-group">
-                                <label for="title" class="col-sm-3 control-label">Challan Date:</label>
+                                <label for="title" class="col-sm-3 control-label">Challan Date <font color="red">*</font></label>
                                 <div class="col-sm-9">
                                     <input name="challan_date" id="date" placeholder="Challan Date" class="form-control datepicker-material" type="text" value="<?php echo (isset($result->challan_date)) ? $result->challan_date : ''; ?>" required>
                                     <span class="error"><?php echo (form_error('challan_date')) ? form_error('challan_date') : ''; ?></span>
@@ -52,14 +56,14 @@
                             </div> 
 
                             <div class="form-group">
-                                <label for="title" class="col-sm-3 control-label">Challan No:</label>
+                                <label for="title" class="col-sm-3 control-label">Challan No <font color="red">*</font></label>
                                 <div class="col-sm-9">
                                     <input name="challan_no" placeholder="Challan No" class="form-control" type="text"value="<?php echo (isset($result->challan_no)) ? $result->challan_no : ''; ?>" required>
                                     <span class="error"><?php echo (form_error('challan_date')) ? form_error('challan_date') : ''; ?></span>
                                 </div>
                             </div> 
                             <div class="form-group">
-                                <label for="title" class="col-sm-3 control-label">Challan Image:</label>
+                                <label for="title" class="col-sm-3 control-label">Challan Image</label>
                                 <div class="col-sm-9">
                                     <input type="file" accept="image/*" id="challan_file" name="challan_file"  />
                                     <span class="error"><?php echo (form_error('challan_image')) ? form_error('challan_image') : ''; ?></span>
@@ -79,7 +83,7 @@
                                 </div>
                             </div>
                             <div class="form-group">
-                                <label for="project_name" class="col-sm-3 control-label">Project Name:</label>
+                                <label for="project_name" class="col-sm-3 control-label">Project Name <font color="red">*</font></label>
                                 <div class="col-sm-9">
                                     <select class="form-control project_name" name="project_name" required>
                                         <option value="">Project Name </option>
@@ -97,7 +101,7 @@
                                 </div>
                             </div>
                             <div class="form-group">
-                                <label for="supplier_name" class="col-sm-3 control-label">Supplier Name:</label>
+                                <label for="supplier_name" class="col-sm-3 control-label">Supplier Name <font color="red">*</font></label>
                                 <div class="col-sm-9">
                                     <select class="form-control supplier_name" name="supplier_name" required>
                                         <option value="">Supplier Name </option>
@@ -115,7 +119,7 @@
                                 </div>
                             </div>
                             <div class="form-group">
-                                <label for="supervisor_name" class="col-sm-3 control-label">Supervisor Name:</label>
+                                <label for="supervisor_name" class="col-sm-3 control-label">Supervisor Name <font color="red">*</font></label>
                                 <div class="col-sm-9">
                                     <select class="form-control supervisor_name" name="supervisor_name"required>
                                         <option value="">Supervisor Name </option>
@@ -143,7 +147,7 @@
                                 <div class="addMaterialDetail">
                                     <hr>
                                     <div class="form-group">
-                                        <label for="material_category" class="col-sm-3 control-label">Material Category:</label>
+                                        <label for="material_category" class="col-sm-3 control-label">Material Category <font color="red">*</font></label>
                                         <div class="col-sm-9">
                                             <select class="form-control material_category" name="material_category[]" required>
                                                 <option value="">Material Category</option>
@@ -163,7 +167,7 @@
                                 </div>
                             </div>
                             <div class="form-group">
-                                <label for="material_NAME" class="col-sm-3 control-label">Material Name:</label>
+                                <label for="material_NAME" class="col-sm-3 control-label">Material Name <font color="red">*</font></label>
                                 <div class="col-sm-9">
                                     <select class="form-control material_name" name="material_name[]" required>
 
@@ -190,7 +194,7 @@
                                 </div>
                             </div>
                             <div class="form-group">
-                                <label for="quantity" class="col-sm-3 control-label">Quantity:</label>
+                                <label for="quantity" class="col-sm-3 control-label">Quantity <font color="red">*</font></label>
                                 <div class="col-sm-6">
                                     <input name="quantity[]" min="1" placeholder="Quantity" onkeyup="quantity_change_fun(this)" onchange="quantity_change_fun(this)" class="form-control quantity" type="number" value="<?php echo (isset($value->quantity)) ? $value->quantity : ''; ?>" required>
                                     <span class="error"><?php echo (form_error('quantity')) ? form_error('quantity') : ''; ?></span>
@@ -203,7 +207,7 @@
                         if($this->session->userdata('user_designation') == 'Superadmin' || $this->session->userdata('user_designation') == 'admin'){
                         ?> 
                             <div class="form-group">
-                                <label for="rate" class="col-sm-3 control-label">Rate:</label>
+                                <label for="rate" class="col-sm-3 control-label">Rate <font color="red">*</font></label>
                                 <div class="col-sm-9">
                                     <input name="rate[]" min="1" onkeyup="rate_change_fun(this)" onchange="rate_change_fun(this)" placeholder="Rate" class="form-control rate" type="number" value="<?php echo (isset($value->rate)) ? $value->rate : ''; ?>" required>
                                    
@@ -219,7 +223,7 @@
                             <?php
                             }?>    
                                 <div class="form-group">
-                                    <label for="title" class="col-sm-3 control-label">Material Image:</label>
+                                    <label for="title" class="col-sm-3 control-label">Material Image</label>
                                     <div class="col-sm-9">
                                         <input type="file" id="material_file" accept="image/*" name="material_file[]"  />
                                         <span class="error"><?php echo (form_error('material_file')) ? form_error('material_file') : ''; ?></span>
@@ -238,12 +242,17 @@
                     </div>
                     <?php } ?>
                     <!-- comment -->
+                    <?php
+                        if($this->session->userdata('user_designation') == 'Superadmin' || $this->session->userdata('user_designation') == 'admin'){
+                        ?> 
                     <div class="form-group">
                         <label for="title" class="col-sm-3 control-label">Comment:</label>
                         <div class="col-sm-9">
                            <textarea rows="4" cols="50" name="comment"><?=$result->comment?></textarea>
                         </div>
                     </div> 
+                    <?php
+                    }?>
                     <!-- /.box-body -->
                     <div class="box-footer">
                         <input type="button" id="add_more" class="btn btn-success" value="Add more">
@@ -256,7 +265,7 @@
                         }
                         ?>
                         <?php
-                        if( $this->session->userdata('user_designation') != 'Superadmin' || $this->session->userdata('user_designation') != 'admin'){
+                        if( $this->session->userdata('user_designation') == 'Superadmin' || $this->session->userdata('user_designation') == 'admin'){
                         ?>
                         <input type="submit" id="btnverify" name="verify" class="btn btn-primary" value="Verify & Submit">
                         <?php

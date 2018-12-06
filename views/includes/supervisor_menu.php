@@ -18,7 +18,7 @@
 		
 		<li class="<?php echo ((($menu_title == 'Admin')) ? 'active' : ''); ?>"><a href="<?php echo base_url('/admin'); ?>"><i class="fa fa-dashboard"></i> <span>Dashboard</span></a></li>
 		
-		<li class="treeview <?php echo ( ( $menu_title == 'Register') || ($menu_title == 'Attendance register') || ($menu_title == 'Worker register') ? 'active' : ''); ?>">
+		<li class="treeview <?php echo ( ( $menu_title == 'Register') || ($menu_title == 'Attendance register') || ($menu_title == 'Worker register' || $menu_title == 'Entry Log' || $menu_title == 'Invoice Log' || $menu_title == 'Issue Log') ? 'active' : ''); ?>">
 			<a href="#">
 				<i class="fa fa-book"></i>
 				<span>Register</span>
@@ -26,10 +26,19 @@
 					<i class="fa fa-angle-left pull-right"></i>
 				</span>
 			</a>
-			<ul class="treeview-menu <?php echo ( ( $menu_title == 'Attendance register' || $menu_title == 'Worker register') ? 'menu open' : ''); ?>"
+			<ul class="treeview-menu <?php echo ( ( $menu_title == 'Attendance register' || $menu_title == 'Worker register' || $menu_title == 'Entry Log' || $menu_title == 'Invoice Log' || $menu_title == 'Issue Log') ? 'menu open' : ''); ?>"
 				<?php echo ( ( $menu_title == 'Attendance register' || $menu_title == 'Worker register' ) ? "style='display:block;'" : ""); ?>>
 				<li class="<?php echo ((($menu_title == 'Attendance register')) ? 'active' : ''); ?>"><a href="<?php echo base_url('/admin/attendanceRegister'); ?>"><i class="fa fa-check-square"></i>Attendance register</a></li>
 				<li class="<?php echo ((($menu_title == 'Worker register')) ? 'active' : ''); ?>"><a href="<?php echo base_url('/admin/workerRegister'); ?>"><i class="fa fa-address-book-o"></i>Worker register</a></li>
+				<?php if (in_array("9", $this->session->userdata('permissions'))){ ?>
+
+				<li class="<?php echo ((($menu_title == 'Entry Log')) ? 'active' : ''); ?>"><a href="<?php echo base_url('/admin/materialLog'); ?>"><i class="fa fa-address-book-o"></i>Entry Log</a></li>
+				<li class="<?php echo ((($menu_title == 'Issue Log')) ? 'active' : ''); ?>"><a href="<?php echo base_url('/admin/materialIssue'); ?>"><i class="fa fa-address-book-o"></i>Issue Log</a></li>
+				<li class="<?php echo ((($menu_title == 'Invoice Log')) ? 'active' : ''); ?>"><a href="<?php echo base_url('/admin/materialInvoice'); ?>"><i class="fa fa-address-book-o"></i>Invoice Log</a></li>
+
+				<?php
+				}
+				?>
 			</ul>
 		</li>	
 		
