@@ -86,7 +86,7 @@
                             <div class="form-group">
                                 <label for="title" class="col-sm-3 control-label">Material Name <font color="red">*</font></label>
                                 <div class="col-sm-9">
-                                    <input name="material_name" placeholder="Material Name" class="form-control" type="text" value="<?php echo (isset($_POST['material_name'])) ? $_POST['material_name'] : ''; ?>" required="required">
+                                    <input name="material_name" placeholder="Material Name" class="form-control" type="text" value="<?php echo (isset($_POST['material_name'])) ? $_POST['material_name'] : ''; ?>" >
                                     <span class="error"><?php echo (form_error('material_name')) ? form_error('material_name') : ''; ?></span>
                                 </div>
                             </div>

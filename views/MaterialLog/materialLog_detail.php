@@ -50,7 +50,7 @@
                             <div class="form-group">
                                 <label for="title" class="col-sm-3 control-label">Challan Date <font color="red">*</font></label>
                                 <div class="col-sm-9">
-                                    <input name="challan_date" id="date" placeholder="Challan Date" class="form-control datepicker-material" type="text" value="<?php echo (isset($result->challan_date)) ? $result->challan_date : date('Y-m-d'); ?>" required>
+                                    <input name="challan_date" id="date" placeholder="Challan Date" class="form-control datepicker-material" type="text" value="<?php echo (isset($result->challan_date)) ? $result->challan_date : ''; ?>" required>
                                     <span class="error"><?php echo (form_error('challan_date')) ? form_error('challan_date') : ''; ?></span>
                                 </div>
                             </div> 
@@ -118,33 +118,27 @@
                                     <span class="error"><?php echo form_error('supplier_name') ?></span>
                                 </div>
                             </div>
-                            <?php
-                            if($this->session->userdata('user_designation') != "Supervisor")
-                            { ?>  
-                                <div class="form-group">
-                                    <label for="supervisor_name" class="col-sm-3 control-label">Supervisor Name <font color="red">*</font></label>
-                                    <div class="col-sm-9">
-                                        <select class="form-control supervisor_name" name="supervisor_name"required>
-                                            <option value="">Supervisor Name </option>
-                                           <?php
-                                           $supervisors = $this->MaterialLog_model->getProjectSupervisor($result->project_id);
+                            <div class="form-group">
+                                <label for="supervisor_name" class="col-sm-3 control-label">Supervisor Name <font color="red">*</font></label>
+                                <div class="col-sm-9">
+                                    <select class="form-control supervisor_name" name="supervisor_name"required>
+                                        <option value="">Supervisor Name </option>
+                                       <?php
+                                       $supervisors = $this->MaterialLog_model->getProjectSupervisor($result->project_id);
 
-                                            foreach ($supervisors as $supervisor) {
-                                                $selected = '';
-                                                
-                                                if( isset( $result->receiver_id ) && $supervisor->user_id == $result->receiver_id ){
-                                                    $selected = 'selected="selected"';
-                                                }
-                                                echo '<option value="'.$supervisor->user_id.'" '.$selected.' >'.$supervisor->supervisor_name.'</option>';
+                                        foreach ($supervisors as $supervisor) {
+                                            $selected = '';
+                                            
+                                            if( isset( $result->receiver_id ) && $supervisor->user_id == $result->receiver_id ){
+                                                $selected = 'selected="selected"';
                                             }
-                                           ?>
-                                        </select>
-                                        <span class="error"><?php echo form_error('supervisor_name') ?></span>
-                                    </div>
+                                            echo '<option value="'.$supervisor->user_id.'" '.$selected.' >'.$supervisor->supervisor_name.'</option>';
+                                        }
+                                       ?>
+                                    </select>
+                                    <span class="error"><?php echo form_error('supervisor_name') ?></span>
                                 </div>
-                            <?php
-                            }
-                            ?>
+                            </div>
                             <h4 class="box-title">Add Material Details :</h4>
                             <?php
                             foreach ($result_detail as $key => $value) {
@@ -152,13 +146,6 @@
                                 ?>
                                 <div class="addMaterialDetail">
                                     <hr>
-                                    <div class='remove_button_div pull-right' style="padding-bottom: 5px;">
-                                        <button class='fa fa-times' type='button' id='remove'
-                                            onclick="removeEntryClone(this);" title="Remove material details" >
-                                            <i class="icon-minus-2 "></i>
-                                        </button>
-                                    </div>
-                                    <input type="hidden" class="isExistingMaterial" name="isExistingMaterial[]" value="true">
                                     <div class="form-group">
                                         <label for="material_category" class="col-sm-3 control-label">Material Category <font color="red">*</font></label>
                                         <div class="col-sm-9">
@@ -190,7 +177,7 @@
                                             if(isset($result->project_id) && isset($value->category_id)){
 
                                                 $materials = $this->MaterialLog_model->getMaterialByCategory($value->category_id, $result->project_id,$this->session->userdata('company_id'));
-                                                $selected_unit_measurement = '';
+
                                                 foreach ($materials as $key => $mat) {
                                                     $selected = '';
                                                     $selected_unit_measurement = '';
@@ -216,9 +203,7 @@
                                     <span><b class="unit" ><?=$selected_unit_measurement?></b></span>
                                 </div>
                             </div>
-                            <?php
-                        if($this->session->userdata('user_designation') == 'admin'){
-                        ?> 
+                        
                             <div class="form-group">
                                 <label for="rate" class="col-sm-3 control-label">Rate <font color="red">*</font></label>
                                 <div class="col-sm-9">
@@ -233,8 +218,7 @@
                                         <input name="amount[]" placeholder="Amount" class="form-control amount" type="hidden" value="<?php echo (isset($value->total_rate)) ? $value->total_rate : ''; ?>" required>
                                     </div>
                                 </div> 
-                            <?php
-                            }?>    
+                               
                                 <div class="form-group">
                                     <label for="title" class="col-sm-3 control-label">Material Image</label>
                                     <div class="col-sm-9">
@@ -246,7 +230,7 @@
                                         {   
                                             $material_image =  ROOT_PATH.'/uploads/materialLog/material_image/'.$value->material_image;
                                             if(file_exists($material_image)){ ?>
-                                                <img onclick="openImageModel(this)"  src="<?=base_url('uploads/')?>materialLog/material_image/<?=$value->material_image?>" width="100px" class="image"/>
+                                                <img onclick="openImageModel(this)" src="<?=base_url('uploads/')?>materialLog/material_image/<?=$value->material_image?>" width="100px" class="image"/>
                                                 <?php
                                             }
                                         }?>
@@ -254,41 +238,19 @@
                                 </div>  
                     </div>
                     <?php } ?>
-                    
-                    <!-- comment -->
-                    <?php
-                        if($this->session->userdata('user_designation') == 'admin'){
-                        ?> 
+                     
                     <div class="form-group">
                         <label for="title" class="col-sm-3 control-label">Comment:</label>
                         <div class="col-sm-9">
-                           <textarea class="form-control" rows="4" cols="50" name="comment"><?=$result->comment?></textarea>
+                           <textarea rows="4" cols="50" name="comment"><?=$result->comment?></textarea>
                         </div>
                     </div> 
-                    <?php
-                    }?>
+                    
                     <!-- /.box-body -->
                     <div class="box-footer">
-                        <input type="button" id="add_more" class="btn btn-success" value="Add more">
-                        <?php
-                        if($this->session->userdata('user_designation') != 'admin')
-                        {
-                        ?>
-                        <input type="submit" id="btnSave" name="submit" class="btn btn-primary" value="Save">
-                        <?php
-                        }
-                        ?>
-                        <?php
-                        if($this->session->userdata('user_designation') == 'admin'){
-                        ?>
-                        <input type="submit" id="btnverify" name="verify" class="btn btn-primary" value="Verify & Submit">
-                        <?php
-                        }
-                        ?>
+                       
                         <a href="<?php echo base_url('admin/materialLog'); ?>" id="btnClose" name="close" class="btn btn-primary" >Close</a>
-                        <?php if($result->status !== "Approved"){ ?>
-                            <a id="btndelete" name="delete" href="<?php echo base_url('admin/materialLog/ajax_delete/'.$result->id); ?>" class="btn btn-danger" >Delete</a>
-                        <?php } ?>
+                       
                     </div>
                     <!-- /.box-footer -->
                 </form>
@@ -312,160 +274,17 @@
     $(document).ready(function () {
          
         // projectByOption($('.project_name').val());
-        $( ".remove_button_div" ).first().hide();
 
-        var status="<?=$result->status?>";
-
-       if(status == "Approved")
-       {
-            $('input[type=text]').attr("disabled",true);
+       $('input[type=text]').attr("disabled",true);
             $('input[type=number]').attr("disabled",true);
             $('textarea').attr("disabled",true);
             $('select').attr("disabled",true);
-            $("#add_more").hide();
-            $("#btnSave").hide();
-            $("#btnverify").hide();
+        
             $("#btnClose").show();
             $('input[type=file]').hide();
-            $(".remove_button_div").hide();
-        }
-       else
-       {
-            $("#btnClose").hide();
-        } 
-       $("#add_more").click(function(){
-
-        var $clone = $('.addMaterialDetail:last').clone();
-        $clone.find('input').val('');
-        $clone.find('select').val('');
-        $clone.find('.isExistingMaterial').val('false');
-        $clone.find('.remove_button_div').show();
-        $clone.find('.amountLabel').html('');
-        $clone.find('.material-error').html('');
-        $clone.find('img').remove();
-        $clone.insertAfter($('[class^="addMaterialDetail"]').last());
+       
+       
     });
 
 
-        // load material name using ajax
-        $(document).on("change",".material_category",function(){
-
-            
-            var optionHTML="<option value=''>Material Name</option>";
-            var project_id = $('.project_name').val();
-            var category_id = $(this).val();
-            var ele=this;
-
-            $(ele).parents(".form-group").next().find('.material-error').html('');
-            if(category_id && project_id !== '') {   
-                $.ajax({
-                    url: "<?php echo base_url().'admin/MaterialLog/getmaterialAjax/'?>?category_id="+category_id+"&project_id="+project_id,
-                    type: "GET",
-                    dataType: "json",
-                    success:function(data) {
-                        if(data.status == true){
-                            $.each(data.material, function(key, value) {
-                                optionHTML+='<option data-unit="'+value.unit_measurement+'" value="'+ value.id +'">'+ value.name +'</option>';
-                            });
-                        }else{
-                            $('.material-error').html("Material not found in selected category");
-                            $(ele).parents(".form-group").next().find('.material-error').html("Material not found in selected category");
-                        }
-                        $(ele).parents(".form-group").next().find("select").html(optionHTML);
-                    }
-                });
-            }else{
-                $(ele).parents(".form-group").next().find("select").html(optionHTML);
-            }
-        }); 
-
-        // display unit measurement beside quantity textbox
-        $(document).on("change",".material_name",function(){
-
-            var unit_measurement = $(this).find('option:selected', this).attr('data-unit');
-            $(this).parents(".form-group").next().find(".unit").html(unit_measurement);
-        });
-
-
-        // load supervisor name using ajax
-        $(document).on("change",".project_name",function(){ 
-            var project_id = $(this).val();
-            projectByOption(project_id);
-        }); 
-        $(document).on("change",".supplier_name",function(){
-            
-            $('.material_name').html("<option value=''>Material Name</option>");
-            var CategoryOption ="<option value=''>Material Category</option>";
-            var supplier_id = $(this).val();
-            var project_id = $(".project_name").val();
-            var projectCategoryOption ="<option value=''>Material Category</option>";
-            var ele=this;
-            if(supplier_id) { 
-                $.ajax({
-                    url: "<?php echo base_url().'admin/MaterialLog/getSupplierCategoryAjax/'?>"+supplier_id+"/"+project_id,
-                    type: "GET",
-                    dataType: "json",
-                    success:function(data) {
-                        $.each(data.getProjectCategory, function(key, value) {
-                            projectCategoryOption+='<option  value="'+ value.id +'">'+ value.category +'</option>';
-                        });
-                        $('.material_category').html(projectCategoryOption);
-                    }
-                });
-            }else{
-                $('.material_category').html(projectCategoryOption);
-            }
-        });
-    });
-
-    function projectByOption(project_id){
-        var optionHTML="<option value=''>Supervisor Name</option>";
-        var projectSupplierOption ="<option value=''>Supplier Name</option>";
-        $('.material_category').html("<option value=''>Material Category</option>");
-        $('.material_name').html("<option value=''>Material Name</option>");
-         
-        if(project_id != '' && project_id != undefined){
-            $.ajax({
-                url: "<?php echo base_url().'admin/MaterialLog/getSupervisorAjax/'?>"+project_id,
-                type: "GET",
-                dataType: "json",
-                success:function(data) {
-                    
-                    $.each(data.getProjectSupervisor, function(key, value) {
-                        optionHTML+='<option  value="'+ value.user_id +'">'+ value.supervisor_name +'</option>';
-                    });
-
-                    $.each(data.getProjectSupplier, function(key, value) {
-                        projectSupplierOption+='<option  value="'+ value.id +'">'+ value.name +'</option>';
-                    });
-                    $('.supervisor_name').html(optionHTML);
-                    $('.supplier_name').html(projectSupplierOption);
-                }
-            });
-        }else{
-            $('.supervisor_name').html(optionHTML);
-            $('.supplier_name').html(projectSupplierOption);
-        }
-    }
-    
-    // Calculate total amount
-    function rate_change_fun(ele)
-    {
-        var quantity=$(ele).parents(".form-group").prev().find(".quantity").val();
-        var rate=$(ele).val();
-        var totalRate=quantity*rate;
-        
-
-        $(ele).parents(".form-group").next().find(".amountLabel").html(totalRate);
-        $(ele).parents(".form-group").next().find(".amount").val(totalRate);
-    }
-    function quantity_change_fun(ele)
-    {
-        var quantity=$(ele).val();
-        var rate=$(ele).parents(".form-group").next().find(".rate").val();
-        var totalRate=quantity*rate;
-        
-        $(ele).parents(".form-group").next().next().find(".amountLabel").html(totalRate);
-        $(ele).parents(".form-group").next().next().find(".amount").val(totalRate);
-    }
 </script>

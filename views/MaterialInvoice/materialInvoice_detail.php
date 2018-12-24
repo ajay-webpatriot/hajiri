@@ -49,7 +49,7 @@
                             <div class="form-group">
                                 <label for="project_name" class="col-sm-3 control-label">Project Name <font color="red">*</font></label>
                                 <div class="col-sm-9">
-                                    <select disabled="disabled" class="form-control invoice_project_name" name="project_name" required>
+                                    <select class="form-control invoice_project_name" name="project_name" required>
                                         <option value="">Project Name </option>
                                         <?php 
                                         foreach ($projects as $proj) {
@@ -61,46 +61,32 @@
                                             <option <?=$selected?> value="<?php echo $proj->project_id; ?>"><?php echo $proj->project_name; ?></option>
                                         <?php } ?>
                                     </select>
-                                    <?php
-                                    if($this->session->userdata("challan_project")){
-                                    ?>
-                                        <input type="hidden" name="project_name" value="<?=$this->session->userdata("challan_project")?>">
-                                    <?php    
-                                    }
-                                    ?>
                                     <span class="error"><?php echo form_error('project_name') ?></span>
                                 </div>
                             </div>
-                            <?php
-                            if($this->session->userdata('user_designation') != "Supervisor")
-                            { ?>  
-        
-                                <div class="form-group">
-                                    <label for="supervisor_name" class="col-sm-3 control-label">Supervisor Name <font color="red">*</font></label>
-                                    <div class="col-sm-9">
-                                        <select class="form-control supervisor_name" name="supervisor_name" required>
-                                            <option value="">Supervisor Name </option>
-                                            <?php
-                                                foreach ($supervisors as $supervisor) {
-                                                    $selected = '';
-                                                    
-                                                    if( isset( $invoiceDetail->supervisor_id ) && $supervisor->user_id == $invoiceDetail->supervisor_id ){
-                                                        $selected = 'selected="selected"';
-                                                    }
-                                                    echo '<option '.$selected.' value="'.$supervisor->user_id.'" '.$selected.' >'.$supervisor->supervisor_name.'</option>';
+                            <div class="form-group">
+                                <label for="supervisor_name" class="col-sm-3 control-label">Supervisor Name <font color="red">*</font></label>
+                                <div class="col-sm-9">
+                                    <select class="form-control supervisor_name" name="supervisor_name" required>
+                                        <option value="">Supervisor Name </option>
+                                        <?php
+                                            foreach ($supervisors as $supervisor) {
+                                                $selected = '';
+                                                
+                                                if( isset( $invoiceDetail->supervisor_id ) && $supervisor->user_id == $invoiceDetail->supervisor_id ){
+                                                    $selected = 'selected="selected"';
                                                 }
-                                            ?>
-                                        </select>
-                                        <span class="error"><?php echo form_error('supervisor_name') ?></span>
-                                    </div>
+                                                echo '<option '.$selected.' value="'.$supervisor->user_id.'" '.$selected.' >'.$supervisor->supervisor_name.'</option>';
+                                            }
+                                        ?>
+                                    </select>
+                                    <span class="error"><?php echo form_error('supervisor_name') ?></span>
                                 </div>
-                            <?php
-                            }
-                            ?>
+                            </div>
                             <div class="form-group">
                                 <label for="supplier_name" class="col-sm-3 control-label">Supplier Name <font color="red">*</font></label>
                                 <div class="col-sm-9">
-                                    <select disabled="disabled" class="form-control supplier_name" name="supplier_name" required>
+                                    <select class="form-control supplier_name" name="supplier_name" required>
                                        <option value="">Supplier Name </option>
                                         <?php 
                                         foreach ($suppliers as $supp) {
@@ -112,20 +98,13 @@
                                             <option <?=$selected?> value="<?php echo $supp->id; ?>"><?php echo $supp->name; ?></option>
                                         <?php } ?>
                                     </select>
-                                    <?php
-                                    if($this->session->userdata("challan_supplier")){
-                                    ?>
-                                        <input type="hidden" name="supplier_name" value="<?=$this->session->userdata("challan_supplier")?>">
-                                    <?php    
-                                    }
-                                    ?>
                                     <span class="error"><?php echo (form_error('supplier_name')) ? form_error('supplier_name') : ''; ?></span>
                                 </div>
                             </div>
                             <div class="form-group">
                                 <label for="title" class="col-sm-3 control-label">Invoice Date <font color="red">*</font></label>
                                 <div class="col-sm-9">
-                                    <input name="invoice_date" id="invoice_date" placeholder="Invoice Date" class="form-control datepicker-material" type="text" value="<?php echo (isset($invoiceDetail->invoice_date)) ? $invoiceDetail->invoice_date : date('Y-m-d'); ?>" required>
+                                    <input name="invoice_date" id="invoice_date" placeholder="Invoice Date" class="form-control datepicker-material" type="text" value="<?php echo (isset($invoiceDetail->invoice_date)) ? $invoiceDetail->invoice_date : ''; ?>" required>
                                     <span class="error"><?php echo (form_error('invoice_date')) ? form_error('invoice_date') : ''; ?></span>
                                 </div>
                             </div> 
@@ -156,9 +135,7 @@
                                     foreach ($allChallanData as $key => $value) {
                                         # code...
                                         $total_amount+=$value->total_rate;
-                                        if(in_array($value->id, $newChallan)){
-                                            $existing_amount+=$value->total_rate;
-                                        }
+                                        
                                  ?>
                                     <div class="form-group">
                                         <div class="col-sm-2 control-label">
@@ -176,13 +153,13 @@
                                                 $image =  ROOT_PATH.'/uploads/materialLog/challan/'.$value->challan_image;
                                                 if(file_exists($image)){
                                                     ?>
-                                                    <a href="<?=base_url('admin/MaterialInvoice/DownloadChallan/').$value->id?>"<i class="fa fa-file-o"  aria-hidden="true"></i>
+                                                    <a href="<?=base_url('admin/MaterialInvoice/DownloadChallan/').$value->challan_image?>"<i class="fa fa-file-o"  aria-hidden="true"></i>
                                                     </a>
                                             <?php
                                                 }
                                             }
                                             ?>
-                                            <i class="fa fa-trash" onclick="deleteChallan(this)" aria-hidden="true"></i>
+                                            
                                         </div>
                                         
                                     </div>
@@ -192,9 +169,6 @@
                                     }
                                 }
                                 ?>
-                                <div class="col-sm-6 pull-right">
-                                    <a href="<?php echo base_url('admin/MaterialInvoice/issueInvoice/?invoiceId=').$invoiceDetail->id; ?>" id="addMoreChallan" class="btn btn-primary">Add More</a>
-                                </div>
                                 <span class="error challanError"><?php echo (form_error('challan_log_id[]')) ? form_error('challan_log_id[]') : ''; ?></span>
                                 <div class="form-group">
                                     <div class="col-sm-2 control-label"></div>
@@ -242,11 +216,6 @@
                             </div>    
                         </div>
                         <!-- /.box-body -->
-                        <div class="box-footer">
-                            <input type="submit" id="btnSaveInvoice" name="submit" class="btn btn-primary" value="Save">
-                            <input type="submit" id="btnMakePayment" name="makePayment" class="btn btn-success" value="Make Payment">
-                            
-                        </div>
                         <div class="box-body">
                             <div class="form-group">
                                 <label for="title" class="col-sm-3 control-label">Payment Reference ID</label>
@@ -257,11 +226,9 @@
                             </div>
                         </div>
                         <div class="box-footer">
-                            <input type="submit" id="btnSubmitPayment" name="submitPayment" class="btn btn-primary" value="Submit">
+                            
                             <a href="<?php echo base_url('admin/MaterialInvoice'); ?>" id="btnInvoiceClose" name="close" class="btn btn-primary">Close</a>
-                            <?php if($invoiceDetail->status == "Verified"){ ?>
-                                <a id="btndelete" name="delete" href="<?php echo base_url('admin/MaterialInvoice/ajax_delete/'.$invoiceDetail->id); ?>" class="btn btn-danger" >Delete</a>
-                            <?php } ?>
+                            
                         </div>
                         <!-- /.box-footer -->
                     </form>
@@ -279,53 +246,11 @@
 
     $(document).ready(function () {
         var status="<?=$invoiceDetail->status?>";
-        // hide and disable input on status Approved
-        if(status == "Verified")
-        {
-            $('input[type=text]').attr("disabled",true);
-            $('input[type=number]').attr("disabled",true);
-            $('select').attr("disabled",true);
-            $("#addMoreChallan").hide();
-            $("#btnSaveInvoice").hide();
-            $("#btnMakePayment").hide();
-            $("#btnSubmitPayment").hide();
-            $("#btnInvoiceClose").show();
-        }
-        else
-        {
-            $("#btnInvoiceClose").hide();
-        } 
-        // retrieve supplier on project selection
-        $(document).on("change",".invoice_project_name",function(){
-
-            var projectSupplierOption ="<option value=''>Supplier Name</option>";
-            var projectSupervisorOption="<option value=''>Supervisor Name</option>";
-
-            var project_id = $(this).val();
-            var ele=this;
-            if(project_id) {   
-                $.ajax({
-                    url: "<?php echo base_url().'admin/MaterialInvoice/getFilterAjax/'?>"+project_id,
-                    type: "GET",
-                    dataType: "json",
-                    success:function(data) {
-                        
-                        $.each(data.getProjectSupplier, function(key, value) {
-                            projectSupplierOption+='<option  value="'+ value.id +'">'+ value.name +'</option>';
-                        });
-
-                        $('.supplier_name').html(projectSupplierOption);
-
-                        $.each(data.getProjectSupervisor, function(key, value) {
-                            projectSupervisorOption+='<option  value="'+ value.user_id +'">'+ value.supervisor_name +'</option>';
-                        });
-                        $('.supervisor_name').html(projectSupervisorOption);
-                    }
-                });
-            }else{
-                $('.supplier_name').html(projectSupplierOption);
-                $('.supervisor_name').html(projectSupervisorOption);
-            }
-        }); 
+        
+        $('input[type=text]').attr("disabled",true);
+        $('input[type=number]').attr("disabled",true);
+        $('select').attr("disabled",true);
+        
+        $("#btnInvoiceClose").show();
     });
 </script>

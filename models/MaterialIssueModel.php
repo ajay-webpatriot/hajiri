@@ -12,6 +12,16 @@ class MaterialIssueModel extends CI_Model {
         parent::__construct();
         $this->load->database();
     }
+    public function getMaxIssueDetail()
+    {
+        $this->db->select('max(id)')->from($this->table1);
+        $subQuery =  $this->db->get_compiled_select();
+    
+        // Main Query
+        $query=$this->db->select($this->table1 . '.*')->from($this->table1)->where("id = ($subQuery)", NULL, FALSE)->get();
+
+        return $result = $query->row();
+    }
     public function getIssueLog()
     {   
         $this->db->select($this->table1 . '.*,concat('.$this->table4.'.user_name," ",'.$this->table4.'.user_last_name) as issue_by_name,'.$this->table2.'.name as category_name,'.$this->table3.'.name as material_name');
@@ -47,10 +57,9 @@ class MaterialIssueModel extends CI_Model {
         return $this->db->insert_id();
     }
     public function update($table, $where, $data) {
-        $this->db->update($table, $data, $where);
-        return $this->db->affected_rows();
+        return $this->db->update($table, $data, $where);
     }
-    public function getMaterialIssueQuantitybyProjectId($project_id, $material_id){
+    public function getMaterialIssueQuantitybyProjectId($project_id, $material_id,$company_id){
         
         $this->db->select('SUM('.$this->table1.'.quantity) as issueQuantity');
         $this->db->from($this->table1);
@@ -58,7 +67,7 @@ class MaterialIssueModel extends CI_Model {
         $this->db->where($this->table1 . '.material_id', $material_id);
         $this->db->where($this->table1 . '.status =', 'Verified');
         $this->db->where($this->table1 . '.is_deleted', '0');
-        $this->db->where($this->table1.".company_id", $this->session->userdata('company_id'));
+        $this->db->where($this->table1.".company_id", $company_id);
         $query = $this->db->get();
         return $result = $query->row();
     }
@@ -170,4 +179,17 @@ class MaterialIssueModel extends CI_Model {
         return $query->result();
     }
     // data table query end
+    public function get_materialIssue_detail($id,$company_id){
+       
+        $this->db->select($this->table1 . '.*,CONCAT('.$this->table4.'.user_name," ",'.$this->table4.'.user_last_name) as supervisor_name,'.$this->table4.'.user_email as supervisor_email');
+        $this->db->from($this->table1);
+        $this->db->join($this->table4, $this->table4.'.user_id = '.$this->table1.'.supervisor_id');
+        $this->db->where($this->table1.".company_id", $company_id);
+        $this->db->where($this->table1 . '.id', $id);
+        $this->db->where($this->table1 . '.status != ', 'Deleted');
+        $this->db->where($this->table1 . '.is_deleted = ', '0');
+        
+        $query = $this->db->get();
+        return $query->row();
+    }
 }

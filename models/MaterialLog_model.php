@@ -45,14 +45,14 @@ class MaterialLog_model extends CI_Model {
         $query = $this->db->get();
         return $query->result();
     }
-    public function getMaterialByCategory($category_id, $project_id){
+    public function getMaterialByCategory($category_id, $project_id,$company_id){
         
         // SELECT * FROM `materials` WHERE `category_id1` = '1' AND `is_deleted` = '0'
         
         $this->db->select($this->table3.'.id, '.$this->table3.'.name, '.$this->table3.'.unit_measurement, '.$this->table3.'.is_deleted, '.$this->table3.'.status');
         $this->db->from($this->table3);
         $this->db->join($this->material_projects, $this->table3.'.id = '.$this->material_projects.'.material_id');
-        $this->db->where('company_id', $this->session->userdata('company_id'));
+        $this->db->where('company_id', $company_id);
         $this->db->where('project_id', $project_id);
         $this->db->where("category_id",$category_id);
         $this->db->where('is_deleted', '0');
@@ -74,11 +74,41 @@ class MaterialLog_model extends CI_Model {
         $query = $this->db->get();
         return $query->result();
     }
+    // send mail related query start
+    public function get_materiallog_detail($id,$company_id){
+        $this->db->select($this->table1 . '.*,sum('
+            .$this->table2.'.total_rate) as total_rate,CONCAT('.$this->table6.'.user_name," ",'.$this->table6.'.user_last_name) as supervisor_name,'.$this->table6.'.user_email as supervisor_email');
+
+        $this->db->from($this->table1);
+        $this->db->join($this->table2, $this->table1.'.id = '.$this->table2.'.material_entry_log_id');
+        $this->db->join($this->table6, $this->table1.'.receiver_id = '.$this->table6.'.user_id');
+        $this->db->where($this->table1.".company_id", $company_id);
+        $this->db->where($this->table1.".is_deleted", '0');
+        $this->db->where($this->table1 . '.id', $id);
+        $this->db->group_by($this->table1.'.id');
+        $query = $this->db->get();
+        return $query->row();
+
+    }
+    public function get_company_admin($company_id)
+    {
+        $this->db->select($this->table6.".*");
+        $this->db->from($this->table6);
+        $this->db->where($this->table6.".company_id", $company_id);
+        $this->db->where($this->table6.".status", "1");
+        $this->db->where($this->table6.".user_designation", "admin");
+        // $this->db->where($this->table6.".user_id", "190");
+        $query = $this->db->get();
+        return $query->result();
+    }
+    // send mail related query end
     public function get_materiallog_by_id($id){
         $this->db->select($this->table1 . '.*');
 
         $this->db->from($this->table1);
         $this->db->where($this->table1 . '.id', $id);
+        $this->db->where($this->table1 . '.status != ', 'Deleted');
+        $this->db->where($this->table1 . '.is_deleted = ', '0');
         $query = $this->db->get();
         return $query->row();
     }
@@ -98,16 +128,15 @@ class MaterialLog_model extends CI_Model {
         return $query->result();
     }
     public function update($table, $where, $data) {
-        $this->db->update($table, $data, $where);
-        return $this->db->affected_rows();
+        return $this->db->update($table, $data, $where);
     }
-    public function getMaterialEntryQuantitybyProjectId($project_id, $material_id){
+    public function getMaterialEntryQuantitybyProjectId($project_id, $material_id,$company_id){
 
         $this->db->select('SUM('.$this->table2.'.quantity) as entryQuantity');
         $this->db->from($this->table1);
         $this->db->join($this->table2, $this->table1. '.id = '. $this->table2.'.material_entry_log_id');
         $this->db->where($this->table1 . '.project_id', $project_id);
-        $this->db->where($this->table1.".company_id", $this->session->userdata('company_id'));
+        $this->db->where($this->table1.".company_id", $company_id);
         $this->db->where($this->table1 . '.status =', 'Approved');
         $this->db->where($this->table1 . '.is_deleted =', '0');
         $this->db->where($this->table2 . '.material_id =', $material_id);

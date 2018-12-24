@@ -8,6 +8,7 @@ class MaterialInvoice_model extends CI_Model {
     var $table_supplier = 'suppliers';
     var $table_entry = 'material_entry_log';
     var $table_entry_detail = 'material_entry_logdetail';
+    var $table_user = 'user';
     // var $table_material='materials';
     // var $table_category = 'categories';
     var $table_project = 'project';
@@ -127,6 +128,11 @@ class MaterialInvoice_model extends CI_Model {
     // invoice entry data table query start
     function allMaterialInvoiceEntry_count()
     {   
+        $this->db->select('material_entry_log_id')->from($this->table_invoice_detail)
+        ->join($this->table_invoice, $this->table_invoice.'.id = '.$this->table_invoice_detail.'.invoice_id')
+        ->where($this->table_invoice.'.is_deleted','0');
+        $subQuery =  $this->db->get_compiled_select();
+
         $this->db->select($this->table_entry . '.*,'
             .$this->table_supplier.'.name as supplier_name,sum('
             .$this->table_entry_detail.'.total_rate) as total_rate');
@@ -134,9 +140,12 @@ class MaterialInvoice_model extends CI_Model {
         $this->db->from($this->table_entry);
         $this->db->join($this->table_entry_detail, $this->table_entry.'.id = '.$this->table_entry_detail.'.material_entry_log_id');
         $this->db->join($this->table_supplier, $this->table_supplier.'.id = '.$this->table_entry.'.supplier_id');
+        // $this->db->join($this->table_invoice_detail, $this->table_entry.'.id != '.$this->table_invoice_detail.'.material_entry_log_id');
         $this->db->where($this->table_entry.".company_id", $this->session->userdata('company_id'));
         $this->db->where($this->table_entry.".status = ", "Approved");
         $this->db->where($this->table_entry.".is_deleted", '0');
+        $this->db->where($this->table_entry.".id not in ($subQuery)", NULL, FALSE);
+
         $this->db->group_by($this->table_entry.'.id');
 
         $query = $this->db->get();
@@ -146,6 +155,11 @@ class MaterialInvoice_model extends CI_Model {
     }
     public function allMaterialInvoiceEntry($limit,$start,$col,$dir){
 
+        $this->db->select('material_entry_log_id')->from($this->table_invoice_detail)
+        ->join($this->table_invoice, $this->table_invoice.'.id = '.$this->table_invoice_detail.'.invoice_id')
+        ->where($this->table_invoice.'.is_deleted','0');
+        $subQuery =  $this->db->get_compiled_select();
+
         $this->db->select($this->table_entry . '.*,'
             .$this->table_supplier.'.name as supplier_name,sum('
             .$this->table_entry_detail.'.total_rate) as total_rate');
@@ -153,9 +167,12 @@ class MaterialInvoice_model extends CI_Model {
         $this->db->from($this->table_entry);
         $this->db->join($this->table_entry_detail, $this->table_entry.'.id = '.$this->table_entry_detail.'.material_entry_log_id');
         $this->db->join($this->table_supplier, $this->table_supplier.'.id = '.$this->table_entry.'.supplier_id');
+        // $this->db->join($this->table_invoice_detail, $this->table_entry.'.id != '.$this->table_invoice_detail.'.material_entry_log_id');
+        
         $this->db->where($this->table_entry.".company_id", $this->session->userdata('company_id'));
         $this->db->where($this->table_entry.".status = ", "Approved");
         $this->db->where($this->table_entry.".is_deleted", '0');
+        $this->db->where($this->table_entry.".id not in ($subQuery)", NULL, FALSE);
 
         $this->db->limit($limit,$start);
         $this->db->group_by($this->table_entry.'.id');
@@ -174,6 +191,12 @@ class MaterialInvoice_model extends CI_Model {
     }
     public function materialInvoiceEntry_custom_search($limit,$start,$search,$col,$dir)
     {
+        $this->db->select('material_entry_log_id')->from($this->table_invoice_detail)
+        ->join($this->table_invoice, $this->table_invoice.'.id = '.$this->table_invoice_detail.'.invoice_id')
+        ->where($this->table_invoice.'.is_deleted','0');
+        $subQuery =  $this->db->get_compiled_select();
+
+
         $this->db->select($this->table_entry . '.*,'
             .$this->table_supplier.'.name as supplier_name,sum('
             .$this->table_entry_detail.'.total_rate) as total_rate');
@@ -184,6 +207,7 @@ class MaterialInvoice_model extends CI_Model {
         $this->db->where($this->table_entry.".company_id", $this->session->userdata('company_id'));
         $this->db->where($this->table_entry.".status = ", "Approved");
         $this->db->where($this->table_entry.".is_deleted", '0');
+        $this->db->where($this->table_entry.".id not in ($subQuery)", NULL, FALSE);
         $this->db->where($search);
         $this->db->limit($limit,$start);
         $this->db->group_by($this->table_entry.'.id');
@@ -202,6 +226,11 @@ class MaterialInvoice_model extends CI_Model {
 
     public function materialInvoiceEntry_custom_search_count($search)
     {
+        $this->db->select('material_entry_log_id')->from($this->table_invoice_detail)
+        ->join($this->table_invoice, $this->table_invoice.'.id = '.$this->table_invoice_detail.'.invoice_id')
+        ->where($this->table_invoice.'.is_deleted','0');
+        $subQuery =  $this->db->get_compiled_select();
+
         $this->db->select($this->table_entry . '.*,'
             .$this->table_supplier.'.name as supplier_name,sum('
             .$this->table_entry_detail.'.total_rate) as total_rate');
@@ -212,6 +241,7 @@ class MaterialInvoice_model extends CI_Model {
         $this->db->where($this->table_entry.".company_id", $this->session->userdata('company_id'));
         $this->db->where($this->table_entry.".status = ", "Approved");
         $this->db->where($this->table_entry.".is_deleted", '0');
+        $this->db->where($this->table_entry.".id not in ($subQuery)", NULL, FALSE);
         $this->db->where($search);
         $this->db->group_by($this->table_entry.'.id');
        
@@ -242,6 +272,19 @@ class MaterialInvoice_model extends CI_Model {
         $this->db->from($this->table_invoice);
         $this->db->where($this->table_invoice.".status != ", "Deleted");
         $this->db->where($this->table_invoice.".company_id", $this->session->userdata('company_id'));
+        $this->db->where($this->table_invoice.".id", $id);
+        $this->db->where($this->table_invoice.".is_deleted", '0');
+        $this->db->order_by($this->table_invoice . '.id', "ASC");
+        $query = $this->db->get();
+        return $query->row();
+    }
+    public function get_materialInvoice_detail($id,$company_id)
+    {
+        $this->db->select($this->table_invoice . '.*,CONCAT('.$this->table_user.'.user_name," ",'.$this->table_user.'.user_last_name) as supervisor_name,'.$this->table_user.'.user_email as supervisor_email');
+        $this->db->from($this->table_invoice);
+        $this->db->join($this->table_user, $this->table_invoice.'.supervisor_id = '.$this->table_user.'.user_id');
+        $this->db->where($this->table_invoice.".status != ", "Deleted");
+        $this->db->where($this->table_invoice.".company_id", $company_id);
         $this->db->where($this->table_invoice.".id", $id);
         $this->db->where($this->table_invoice.".is_deleted", '0');
         $this->db->order_by($this->table_invoice . '.id', "ASC");

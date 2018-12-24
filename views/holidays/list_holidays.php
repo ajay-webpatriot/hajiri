@@ -156,7 +156,8 @@
 
         $( ".datepicker" ).datepicker({
         format: 'dd-mm-yyyy',
-        startDate: date
+        startDate: date,
+        autoclose: true
         });
 
         $('.alert-success').fadeOut(3000); //remove suucess message

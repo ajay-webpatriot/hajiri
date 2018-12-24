@@ -35,11 +35,12 @@ class MaterialCategory_model extends CI_Model {
         return $query->result();
     }
     
-    public function get_active_material_category_byProject($supplier_id) {
+    public function get_active_material_category_byProject($supplier_id,$project_id,$company_id) {
         
        // $sql = "select name AS category, id,approximate_estimate_ratio,status FROM categories where id IN ( SELECT DISTINCT category_id FROM `materials` INNER JOIN material_projects on materials.id = material_projects.material_id WHERE material_projects.project_id = '".$project_id."') AND status = 1 AND is_deleted = '0'";
-        $sql = "select c.name AS category, c.id, c.approximate_estimate_ratio, c.status  from categories as C inner join supplier_categories sc on c.id = sc.category_id where c.company_id='".$this->session->userdata('company_id')."' and sc.supplier_id = '".$supplier_id."' AND c.is_deleted = '0'";
-
+        $sql = "select c.name AS category, c.id, c.approximate_estimate_ratio, c.status  from categories as c inner join supplier_categories sc on c.id = sc.category_id where c.company_id='".$company_id."' and sc.supplier_id = '".$supplier_id."' AND c.is_deleted = '0'  and (select count(*) from materials m inner join material_projects mp on m.id=mp.material_id where m.category_id=c.id and m.status='1' and mp.project_id='".$project_id."' and m.is_deleted='0') > 0";
+// and (select count(*) from materials m inner join material_projects mp on m.id=mp.material_id where m.category_id=c.id and m.status='1' and m.is_deleted='0') > 0 
+        // echo $sql;exit;
         return $this->db->query( $sql, '' )->result_array();
     }
     

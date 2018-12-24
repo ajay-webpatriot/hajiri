@@ -35,12 +35,14 @@
                                     <?php } ?>
                                 </select>
                             </div>
-                            <label class="col-md-1 control-label">Material:</label>
-                            <div class="col-md-3">
-                                <select class="form-control materialEntry" name="project">
-                                    <option value="">All Material </option>
-                                    
-                                </select>
+                            <div class="materialFilter" style="display: none;">
+                                <label class="col-md-1 control-label">Material:</label>
+                                <div class="col-md-3">
+                                    <select class="form-control materialEntry" name="project">
+                                        <option value="">All Material </option>
+                                        
+                                    </select>
+                                </div>
                             </div>
                             <label class="col-md-1 control-label">Date:</label>
                             <div class="col-md-3">
@@ -49,19 +51,23 @@
                             
                         </div>
                         <div class="col-md-12">
-                            <label class="col-md-1 control-label">Supervisor Name:</label>
-                            <div class="col-md-3">
-                                <select class="form-control supervisorEntry" name="supervisorEntry">
-                                    <option value="">All Supervisor </option>
-                                    
-                                </select>
+                            <div class="supervisorFilter" style="display: none;">
+                                <label class="col-md-1 control-label">Supervisor Name:</label>
+                                <div class="col-md-3">
+                                    <select class="form-control supervisorEntry" name="supervisorEntry">
+                                        <option value="">All Supervisor </option>
+                                        
+                                    </select>
+                                </div>
                             </div>
-                            <label class="col-md-1 control-label">Supplier Name:</label>
-                            <div class="col-md-3">
-                                <select class="form-control supplierEntry" name="supplierEntry">
-                                    <option value="">All Supplier </option>
-                                    
-                                </select>
+                            <div class="supplierFilter" style="display: none;">
+                                <label class="col-md-1 control-label">Supplier Name:</label>
+                                <div class="col-md-3">
+                                    <select class="form-control supplierEntry" name="supplierEntry">
+                                        <option value="">All Supplier </option>
+                                        
+                                    </select>
+                                </div>
                             </div>
                             <label class="col-md-1 control-label">Status:</label>
                             <div class="col-md-3">
@@ -267,18 +273,44 @@
                         dataType: "json",
                         success:function(data) {
                             // $('select[name="city"]').empty();
-                            $.each(data.getProjectSupervisor, function(key, value) {
-                                optionHTML+='<option  value="'+ value.user_id +'">'+ value.supervisor_name +'</option>';
-                            });
+                            if(data.getProjectSupervisor.length > 0)
+                            {
+                                $.each(data.getProjectSupervisor, function(key, value) {
+                                    optionHTML+='<option  value="'+ value.user_id +'">'+ value.supervisor_name +'</option>';
+                                });
 
-                            $.each(data.getProjectSupplier, function(key, value) {
-                                projectSupplierOption+='<option  value="'+ value.id +'">'+ value.name +'</option>';
-                            });
+                                $(".supervisorFilter").show();
+                            }
+                            else
+                            {
+                                $(".supervisorFilter").hide();
+                            }
+                            
 
-                            $.each(data.getProjectMaterial, function(key, value) {
-                                projectMaterialOption+='<option  value="'+ value.id +'">'+ value.name +'</option>';
-                            });
+                            if(data.getProjectSupplier.length > 0)
+                            {
+                                $.each(data.getProjectSupplier, function(key, value) {
+                                    projectSupplierOption+='<option  value="'+ value.id +'">'+ value.name +'</option>';
+                                });
 
+                                $(".supplierFilter").show();
+                            }
+                            else
+                            {
+                                $(".supplierFilter").hide();
+                            }
+                                
+                            if(data.getProjectSupplier.length > 0)
+                            {    
+                                $.each(data.getProjectMaterial, function(key, value) {
+                                    projectMaterialOption+='<option  value="'+ value.id +'">'+ value.name +'</option>';
+                                });
+                                $(".materialFilter").show();
+                            }
+                            else
+                            {
+                                $(".materialFilter").hide();   
+                            }    
                             $('.supervisorEntry').html(optionHTML);
                             $('.supplierEntry').html(projectSupplierOption);
                             $('.materialEntry').html(projectMaterialOption);
@@ -288,6 +320,10 @@
                     $('.supplierEntry').html(projectSupplierOption);
                     $('.supervisorEntry').html(optionHTML);
                     $('.materialEntry').html(projectMaterialOption);
+
+                    $(".supervisorFilter").hide();
+                    $(".supplierFilter").hide();
+                    $(".materialFilter").hide();
                 }
 
                 tableEntry.draw();

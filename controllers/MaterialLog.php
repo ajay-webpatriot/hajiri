@@ -13,13 +13,21 @@ class materialLog extends CI_Controller {
         $this->load->model('MaterialCategory_model', 'MaterialCategory_model');
         $this->load->model('Supplier_model', 'Supplier_model');
         $this->load->model('Admin_model', 'admin');
-        $this->load->model('project_model', 'project');        
+        $this->load->model('project_model', 'project');  
+        $this->load->model('Foreman_model', 'foreman');      
         checkAdmin();
     }
 
     public function index(){
         $data = $this->data;
-        $data['projects'] = $this->project->get_active_projects();
+        if($this->session->userdata('user_designation') == 'Supervisor'){
+            $data['projects'] = $this->foreman->get_project_foremanId($this->session->userdata('id'));
+        }
+        else
+        {
+            $data['projects'] = $this->project->get_active_projects();
+        }
+
         $data['materialLog'] = $this->MaterialLog_model->getMaterialLog();
         $data['title'] = 'Material Entry';
         $data['page'] = 'MaterialLog/materialLog_list';
@@ -32,13 +40,17 @@ class materialLog extends CI_Controller {
             $this->form_validation->set_rules('challan_date', 'Date', 'trim|required');
             $this->form_validation->set_rules('challan_no', 'challan no', 'trim|required');
             $this->form_validation->set_rules('project_name', 'Project Name', 'trim|required');
-            $this->form_validation->set_rules('supplier_name', 'supplier name', 'required');
-            $this->form_validation->set_rules('material_category[]', 'material category', 'required');
-            $this->form_validation->set_rules('material_name[]', 'material name', 'required');
-            $this->form_validation->set_rules('quantity[]', 'quantity', 'required');
-            if($this->session->userdata('user_designation') == 'Superadmin' || $this->session->userdata('user_designation') == 'admin'){
-                $this->form_validation->set_rules('rate[]', 'rate', 'required');
+            $this->form_validation->set_rules('supplier_name', 'Supplier name', 'required');
+            $this->form_validation->set_rules('material_category[]', 'Material category', 'required');
+            $this->form_validation->set_rules('material_name[]', 'Material name', 'required');
+            $this->form_validation->set_rules('quantity[]', 'Quantity', 'required');
+            if($this->session->userdata('user_designation') != 'Supervisor')
+            {
+                $this->form_validation->set_rules('supervisor_name', 'Supervisor name', 'required');
             }
+            // if($this->session->userdata('user_designation') == 'admin'){
+            //     $this->form_validation->set_rules('rate[]', 'Rate', 'required');
+            // }
             if ( $this->form_validation->run() == TRUE) {
 
                 $material_quantity = $this->input->post('quantity');
@@ -92,19 +104,26 @@ class materialLog extends CI_Controller {
                     $challan_no = $this->input->post('challan_no');
                     $supplier_name = $this->input->post('supplier_name');
                     $project_name = $this->input->post('project_name');
-                    $supervisor_name = $this->input->post('supervisor_name');
+                    if($this->session->userdata('user_designation') == 'Supervisor')
+                    {
+                        $supervisor_name = $this->session->userdata('id');
+                    }
+                    else
+                    {
+                        $supervisor_name = $this->input->post('supervisor_name');
+                    }
                     $material_category = $this->input->post('material_category');
                     $material_name = $this->input->post('material_name');
                     $quantity = $this->input->post('quantity');
                     // resolved image issue s
                     // $challan_image = $_FILES['challan_file']['name'];
                     // resolved image issue e
-                    if($this->session->userdata('user_designation') == 'Superadmin' || $this->session->userdata('user_designation') == 'admin')
-                    {
-                        $log_status = "Approved";
-                        $comment = $this->input->post('comment');
-                    }
-                    else 
+                    // if($this->session->userdata('user_designation') == 'admin')
+                    // {
+                    //     $log_status = "Approved";
+                    //     $comment = $this->input->post('comment');
+                    // }
+                    // else 
                     {
                         $log_status = "Pending";
                         $comment = "";
@@ -137,11 +156,12 @@ class materialLog extends CI_Controller {
 
                         foreach ($material_category as $key => $value) {
 
-                            if($this->session->userdata('user_designation') == 'Superadmin' || $this->session->userdata('user_designation') == 'admin'){
-                                $rate = $material_rate[$cntDetail];
-                                $total_rate = $material_amount[$cntDetail];
-                            }
-                            else{
+                            // if($this->session->userdata('user_designation') == 'admin'){
+                            //     $rate = $material_rate[$cntDetail];
+                            //     $total_rate = $material_amount[$cntDetail];
+                            // }
+                            // else
+                            {
                                 $rate = 0;
                                 $total_rate = 0;
                             } 
@@ -159,8 +179,14 @@ class materialLog extends CI_Controller {
                         }
                     }
                     if($insertId){
+                        if($this->session->userdata('user_designation') == 'Supervisor')
+                        {
+                            // $this->send_log_mail($materialLogId);
+                            $this->load->library("sendMailLog");
+                            $this->sendmaillog->send_entryLog_mail($materialLogId,$this->session->userdata('id'));
+                        }   
                         $this->session->set_flashdata('success', 'Material Log Added Successfully!');
-                        redirect(base_url('admin/materialLog/index'));
+                        redirect(base_url('admin/MaterialLog/index'));
                     }
                 }else{
                     $this->session->set_flashdata('error', 'Please enter quantity more than zero');
@@ -175,8 +201,13 @@ class materialLog extends CI_Controller {
         // exit();
         $data['material'] = $this->Material_model->get_active_material();
         // $data['supplier'] = $this->Supplier_model->get_active_supplier();
-
-        $data['projects'] = $this->project->get_active_projects();
+        if($this->session->userdata('user_designation') == 'Supervisor'){
+            $data['projects'] = $this->foreman->get_project_foremanId($this->session->userdata('id'));
+        }
+        else
+        {
+            $data['projects'] = $this->project->get_active_projects();
+        }
         // $data['supervisor'] = $this->MaterialLog_model->getProjectSupervisor(90);
         
         $data['title'] = 'Material Entry';
@@ -192,7 +223,7 @@ class materialLog extends CI_Controller {
         
         $materialLogId = $this->MaterialLog_model->update('material_entry_log', array('id' => $id), $materialLogStatus);
         
-        redirect(base_url('admin/materialLog/index'));
+        redirect(base_url('admin/MaterialLog/index'));
         // $this->MaterialLog_model->delete('material_entry_log', 'id', $id);
         // $this->MaterialLog_model->delete('material_entry_logdetail', 'material_entry_log_id', $id);
         $this->session->set_flashdata('success', 'Material Entry Log Deleted Successfully');
@@ -203,7 +234,7 @@ class materialLog extends CI_Controller {
         if(isset($_GET['category_id']) && isset($_GET['project_id'])){
             $category_id = $_GET['category_id'];
             $project_id = $_GET['project_id'];
-            $result = $this->MaterialLog_model->getMaterialByCategory($category_id, $project_id);
+            $result = $this->MaterialLog_model->getMaterialByCategory($category_id, $project_id,$this->session->userdata('company_id'));
         }
         if(count($result) > 0) {
             echo json_encode([
@@ -232,13 +263,54 @@ class materialLog extends CI_Controller {
             'getProjectSupplier' => $getSupplierByProjectId
         ]);  exit();
     }
-    public function getSupplierCategoryAjax($supplier_id){
+    public function getSupplierCategoryAjax($supplier_id,$project_id){
         $getCategoryByProjectId = array();
-        $getCategoryByProjectId = $this->MaterialCategory_model->get_active_material_category_byProject($supplier_id);
+        $getCategoryByProjectId = $this->MaterialCategory_model->get_active_material_category_byProject($supplier_id,$project_id,$this->session->userdata('company_id'));
         echo json_encode([
             'success'=> true, 
             'getProjectCategory' => $getCategoryByProjectId
         ]);  exit();
+    }
+    public function entryDetail($id) {
+
+        $data = $this->data;
+        $result = $this->MaterialLog_model->get_materiallog_by_id($id);
+        $data['result'] = $result;
+
+        $result_detail = $this->MaterialLog_model->get_materiallog_detail_by_id($id);
+        $data['result_detail'] = $result_detail;
+
+        $getProjectSupervisor = array();
+        $getSupplierByProjectId = array();
+
+        if(isset($data['result']->project_id) && !empty($data['result']->project_id)) {
+            
+            $project_id = $data['result']->project_id;
+
+            $getProjectSupervisor = $this->MaterialLog_model->getProjectSupervisor($project_id);
+            $getSupplierByProjectId = $this->Supplier_model->getProjectSupplier($project_id);
+        }
+        $getCategoryByProjectId = array();
+        if(isset($data['result']->supplier_id) && !empty($data['result']->supplier_id)){
+            $supplier_id = $data['result']->supplier_id;
+            $getCategoryByProjectId = $this->MaterialCategory_model->get_active_material_category_byProject($supplier_id,$project_id,$this->session->userdata('company_id'));
+        }
+        
+        $data['material_category'] = $getCategoryByProjectId;
+        $data['material'] = $this->Material_model->get_active_material();
+        $data['supplier'] = $getSupplierByProjectId ;
+        if($this->session->userdata('user_designation') == 'Supervisor'){
+            $data['projects'] = $this->foreman->get_project_foremanId($this->session->userdata('id'));
+        }
+        else
+        {
+            $data['projects'] = $this->project->get_active_projects();
+        }
+
+        $data['title'] = 'Material Entry Detail';
+        $data['description'] = 'Material Entry Detail';
+        $data['page'] = 'MaterialLog/materialLog_detail';
+        $this->load->view('includes/template', $data);
     }
     public function editEntry($id) {
 
@@ -253,17 +325,23 @@ class materialLog extends CI_Controller {
  
             $this->form_validation->set_rules('challan_date', 'Date', 'trim|required');
             $this->form_validation->set_rules('challan_no', 'challan no', 'trim|required');
-            $this->form_validation->set_rules('supplier_name', 'supplier name', 'required');
-            $this->form_validation->set_rules('material_category[]', 'material category', 'required');
-            $this->form_validation->set_rules('material_name[]', 'material name', 'required');
-            $this->form_validation->set_rules('quantity[]', 'quantity', 'required');
+            $this->form_validation->set_rules('project_name', 'Project Name', 'trim|required');
+            $this->form_validation->set_rules('supplier_name', 'Supplier name', 'required');
+            $this->form_validation->set_rules('material_category[]', 'Material category', 'required');
+            $this->form_validation->set_rules('material_name[]', 'Material name', 'required');
+            $this->form_validation->set_rules('quantity[]', 'Quantity', 'required');
+
+            if($this->session->userdata('user_designation') != 'Supervisor')
+            {
+                $this->form_validation->set_rules('supervisor_name', 'Supervisor name', 'required');
+            }
             if (isset($_POST['verify'])) {
-                $this->form_validation->set_rules('rate[]', 'rate', 'required');
+                $this->form_validation->set_rules('rate[]', 'Rate', 'required');
             }
 
             if ( $this->form_validation->run() == false ) {
                 $this->session->set_flashdata( 'error', 'Sorry,  Error while adding Material details.' );
-                redirect( base_url( 'admin/materialLog/editEntry/') );
+                redirect( base_url( 'admin/MaterialLog/editEntry/') );
             }else{
 
                 $material_quantity = $this->input->post('quantity');
@@ -281,9 +359,9 @@ class materialLog extends CI_Controller {
                     $valid_quantity = false;
                 }
 
-                if($this->session->userdata('user_designation') == 'Superadmin' || $this->session->userdata('user_designation') == 'admin')
+                if($this->session->userdata('user_designation') == 'admin')
                 {
-                    // rate field only accessible to admin and superadmin
+                    // rate field only accessible to admin
                     if(!empty($material_quantity_rate)){
                         foreach ($material_quantity_rate as $value) {
                            if($value <= 0){
@@ -335,7 +413,14 @@ class materialLog extends CI_Controller {
                     $challan_no = $this->input->post('challan_no');
                     $supplier_name = $this->input->post('supplier_name');
                     $project_name = $this->input->post('project_name');
-                    $supervisor_name = $this->input->post('supervisor_name');
+                    if($this->session->userdata('user_designation') == 'Supervisor')
+                    {
+                        $supervisor_name = $this->session->userdata('id');
+                    }
+                    else
+                    {
+                        $supervisor_name = $this->input->post('supervisor_name');
+                    }
                     $material_category = $this->input->post('material_category');
                     $material_name = $this->input->post('material_name');
                     $quantity = $this->input->post('quantity');
@@ -359,9 +444,12 @@ class materialLog extends CI_Controller {
                         // resolved image issue s
                         $uploaded_challan_img=$challan_image;
                         // resolved image issue e
-                        if (file_exists('./uploads/materialLog/challan/'.$data['result']->challan_image))
+                        if(trim($data['result']->challan_image) != "")
                         {
-                            unlink('./uploads/materialLog/challan/'.$data['result']->challan_image);
+                            if (file_exists(ROOT_PATH.'/uploads/materialLog/challan/'.$data['result']->challan_image))
+                            {
+                                unlink('./uploads/materialLog/challan/'.$data['result']->challan_image);
+                            }
                         }    
                     }
                     else if(!empty($data['result']))
@@ -390,6 +478,7 @@ class materialLog extends CI_Controller {
                         $material_quantity=$this->input->post('quantity');
                         $material_rate = $this->input->post('rate');
                         $material_amount=$this->input->post('amount');
+                        $isExistingMaterial=$this->input->post('isExistingMaterial');
 
                         $cntDetail=0;
 
@@ -411,16 +500,21 @@ class materialLog extends CI_Controller {
                                 $uploaded_material_img=$material_image_arr[$cntDetail];
 
                                 if(!empty($data['result_detail'][$cntDetail])){
-                                    if (file_exists('./uploads/materialLog/material_image/'.$data['result_detail'][$cntDetail]->material_image))
+                                    if(trim($data['result_detail'][$cntDetail]->material_image) != "")
                                     {
-                                        unlink('./uploads/materialLog/material_image/'.$data['result_detail'][$cntDetail]->material_image);
-                                        
+                                        if (file_exists(ROOT_PATH.'/uploads/materialLog/material_image/'.$data['result_detail'][$cntDetail]->material_image))
+                                        {
+                                            unlink('./uploads/materialLog/material_image/'.$data['result_detail'][$cntDetail]->material_image);
+                                        }
                                     } 
                                 }
                             }
                             else if(!empty($data['result_detail'][$cntDetail]))
                             {
-                                $uploaded_material_img=$data['result_detail'][$cntDetail]->material_image;
+                                if($isExistingMaterial[$cntDetail] == "true"){
+                                    $uploaded_material_img=$data['result_detail'][$cntDetail]->material_image;
+
+                                }
                             }
                 
                            $materialLogDetailArr = array(
@@ -437,8 +531,14 @@ class materialLog extends CI_Controller {
                         }
                     }
                     if($insertId){
-                         $this->session->set_flashdata('success', 'Material Log Updated Successfully!');
-                        redirect(base_url('admin/materialLog/index'));
+                        if($this->session->userdata('user_designation') == 'admin')
+                        {
+                            // $this->send_log_mail($id);
+                            $this->load->library("sendMailLog");
+                            $this->sendmaillog->send_entryLog_mail($id,$this->session->userdata('id'));
+                        }
+                        $this->session->set_flashdata('success', 'Material Log Updated Successfully!');
+                        redirect(base_url('admin/MaterialLog/index'));
                     }
                 }else{
                     if($valid_quantity == false){
@@ -464,7 +564,7 @@ class materialLog extends CI_Controller {
         $getCategoryByProjectId = array();
         if(isset($data['result']->supplier_id) && !empty($data['result']->supplier_id)){
             $supplier_id = $data['result']->supplier_id;
-            $getCategoryByProjectId = $this->MaterialCategory_model->get_active_material_category_byProject($supplier_id);
+            $getCategoryByProjectId = $this->MaterialCategory_model->get_active_material_category_byProject($supplier_id,$project_id,$this->session->userdata('company_id'));
         }
         
         // $data['material_category'] = $this->MaterialCategory_model->get_active_material_category();
@@ -474,15 +574,104 @@ class materialLog extends CI_Controller {
         // $data['supplier'] = $this->Supplier_model->get_active_supplier();
         $data['supplier'] = $getSupplierByProjectId ;
         
-        $data['projects'] = $this->project->get_active_projects();
+        if($this->session->userdata('user_designation') == 'Supervisor'){
+            $data['projects'] = $this->foreman->get_project_foremanId($this->session->userdata('id'));
+        }
+        else
+        {
+            $data['projects'] = $this->project->get_active_projects();
+        }
         // $data['supervisor'] = $this->MaterialLog_model->getProjectSupervisor();
 
         $data['title'] = 'Edit Material Entry';
         $data['description'] = 'Edit Material Entry';
-        $data['page'] = 'materialLog/materialLog_edit';
+        $data['page'] = 'MaterialLog/materialLog_edit';
         $this->load->view('includes/template', $data);
     }
+    public function send_log_mail($entry_log_id){
+        
+        $result = $this->MaterialLog_model->get_materiallog_detail($entry_log_id,$this->session->userdata('company_id'));
+        
+        $amount="";
+        if($this->session->userdata('user_designation') == 'admin')
+        {
+            $receiverDetails=array("user_email"=>$result->supervisor_email,
+                                   "user_name" =>  $result->supervisor_name
+                                );
 
+            $content = "<p>New material entry has been approved by admin.</p>";
+            $amount="<p><b>Total amount: </b>".$result->total_rate."</p>";
+        }
+        else
+        {
+            $receiverDetails = $this->MaterialLog_model->get_company_admin($this->session->userdata('company_id'));
+            $content = "<p>New material entry has been maid by supervisor.</p>";
+        }
+       
+        // $result_detail = $this->MaterialLog_model->get_materiallog_detail_by_id($entry_log_id);
+        // echo "<pre>";
+        // print_r($result);
+        // print_r($receiverDetails);
+        // exit;
+        if(count($receiverDetails) > 0)
+        {
+            $subject = "Material Entry | The Hajiri App";
+            
+            $content .= "<p><b><u>Material Entry Detail:</u></b></p>";
+            
+            $content .= "<p><b>Challan Date: </b>".$result->challan_date."</p>";
+            $content .= "<p><b>Challan No: </b>".$result->challan_no."</p>";
+            $content .= $amount;
+            $content .= "<p>For more detail:</p>";
+            $content .= "<p><a href='" . base_url('admin/MaterialLog/entryDetail/').$result->id. "' >Please click here</a></p>";
+            $content .= "<p>Regards,</p>";
+            $content .= "<p>Team Aasaan</p>";
+            $content .= "<p>http://www.aasaan.co/</p>";
+            $content .= "<img src='" . base_url('assets/admin/images/aasaan-footer-logo.jpg') . "' height='80' width='250'/>";
+
+            
+            $this->load->library("PHPMailer_Library");
+            $mail = $this->phpmailer_library->load();
+            $mail->IsSMTP();                              // send via SMTP
+            // $mail->Host = "ssl://smtp.zoho.com";
+            $mail->Host = "smtp.gmail.com";
+            $mail->SMTPAuth = true;                       // turn on SMTP authentication
+            // $mail->Username = "hajiri@aasaan.co";        // SMTP username
+            $mail->Username = "info.emailtest1@gmail.com";
+            // $mail->Password = "hajiriaasaan"; // SMTP password
+            $mail->Password = "rwnzucezczusfezs";
+            $webmaster_email = "hajiri@aasaan.co";       //Reply to this email ID
+                                          // Recipient's name
+            $mail->From = $webmaster_email;
+            // $mail->Port = 465;
+            $mail->Port = 587;
+            $mail->FromName = "The Hajiri App";
+            if($this->session->userdata('user_designation') == 'admin')
+            {
+                foreach ($receiverDetails as $key => $value) {
+                    $mail->AddAddress($value['user_email'],$value['user_name']);
+                }    
+            }
+            else
+            {
+                foreach ($receiverDetails as $key => $value) {
+                    $mail->AddAddress($value->user_email,$value->user_name);
+                }
+            }
+            $mail->AddAddress("hinal.webpatriot@gmail.com",'aa');
+            // $mail->AddReplyTo($webmaster_email,"The Hajiri App");
+            $mail->WordWrap = 50;                         // set word wrap
+            $mail->IsHTML(true);                          // send as HTML
+            $mail->Subject = $subject;
+            $mail->Body = $content;  
+              
+            if(!$mail->Send()){
+                return false;
+            } else {
+                return true;
+            }
+        }
+    }
     public function getFilterDetailAjax($id) {
         
         $getProjectSupervisor = array();

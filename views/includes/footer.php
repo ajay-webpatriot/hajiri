@@ -25,11 +25,13 @@
         $('.alert-success').fadeOut(3000); //remove suucess message
         $('.datepicker').datepicker({
             startDate:new Date(),
-            format: "mm/dd/yyyy"
+            format: "mm/dd/yyyy",
+            autoclose: true
         });
         /* date picker field for material management module */
         $('.datepicker-material').datepicker({
-            format: "yyyy-mm-dd"
+            format: "yyyy-mm-dd",
+            autoclose: true
         });
     });
 </script>

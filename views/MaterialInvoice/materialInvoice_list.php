@@ -43,12 +43,14 @@
                             
                         </div>
                         <div class="col-md-12">
-                            <label class="col-md-1 control-label">Supplier name:</label>
-                            <div class="col-md-3">
-                                <select class="form-control supplierInvoice" name="supplierInvoice">
-                                    <option value="">All Supplier </option>
-                                    
-                                </select>
+                            <div class="supplierFilter" style="display: none;">
+                                <label class="col-md-1 control-label">Supplier name:</label>
+                                <div class="col-md-3">
+                                    <select class="form-control supplierInvoice" name="supplierInvoice">
+                                        <option value="">All Supplier </option>
+                                        
+                                    </select>
+                                </div>
                             </div>
                             <label class="col-md-1 control-label">Payment Date:</label>
                             <div class="col-md-3">
@@ -255,7 +257,7 @@
 
             $(document).on("change",".projectInvoice",function(){
 
-                var projectSupplierOption ="<option value=''>Supplier Name</option>";
+                var projectSupplierOption ="<option value=''>All Supplier</option>";
                 
 
                 var project_id = $(this).val();
@@ -267,16 +269,24 @@
                         dataType: "json",
                         success:function(data) {
                             
-                            $.each(data, function(key, value) {
-                                projectSupplierOption+='<option  value="'+ value.id +'">'+ value.name +'</option>';
-                            });
+                            if(data.getProjectSupplier.length > 0)
+                            {
+                                $.each(data.getProjectSupplier, function(key, value) {
+                                    projectSupplierOption+='<option  value="'+ value.id +'">'+ value.name +'</option>';
+                                });
 
-                            $('.supplierInvoice').html(projectSupplierOption);
+                                $('.supplierInvoice').html(projectSupplierOption);
+                                $(".supplierFilter").show();
+                            }
+                            else
+                            {
+                                $(".supplierFilter").hide();
+                            }
                         }
                     });
                 }else{
                     $('.supplierInvoice').html(projectSupplierOption);
-                    
+                    $(".supplierFilter").hide();
                 }
 
                 tableInvoice.draw();

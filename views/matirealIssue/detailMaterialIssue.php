@@ -63,22 +63,22 @@
                             <div class="form-group">
                                 <label for="date" class="col-sm-3 control-label">Issue Date <font color="red">*</font></label>
                                 <div class="col-sm-9">
-                                    <input name="issueDate" id="date" placeholder="Issue Date" class="form-control datepicker-material" type="text" value="<?php echo (isset($date)) ? $result->date : date('Y-m-d'); ?>" required>
+                                    <input name="issueDate" id="date" placeholder="Issue Date" class="form-control datepicker-material" type="text" value="<?php echo (isset($date)) ? $date : ''; ?>" required>
                                     <span class="error"><?php echo (form_error('issueDate')) ? form_error('issueDate') : ''; ?></span>
                                 </div>
                             </div>
                             <!-- Issue Date end -->
-                            <!-- <div class="form-group">
+                            <div class="form-group">
                                 <label for="date" class="col-sm-3 control-label">Issue No <font color="red">*</font></label>
                                 <div class="col-sm-9">
                                     <input name="issueNo" id="issueNo" placeholder="Issue No" class="form-control" type="text" value="<?php echo (isset($result->issue_no)) ? $result->issue_no : ''; ?>" required>
                                     <span class="error"><?php echo (form_error('issueNo')) ? form_error('issueNo') : ''; ?></span>
                                 </div>
-                            </div> -->
+                            </div>
                             <div class="form-group">
                                 <label for="project_name" class="col-sm-3 control-label">Project Name <font color="red">*</font></label>
                                 <div class="col-sm-9">
-                                    <select disabled="disabled" class="form-control project_name" name="" required>
+                                    <select class="form-control project_name" name="project_name" required>
                                         <option value="">Project Name </option>
                                         <?php 
                                         foreach($ActiveProjects as $value){
@@ -90,42 +90,35 @@
                                           <option <?=$selected?> value="<?php echo $value->project_id; ?>"><?php echo $value->project_name; ?></option>
                                         <?php } ?>
                                     </select>
-                                    <input type="hidden" name="project_name" value="<?=$result->project_id?>">
                                     <span class="error"><?php echo form_error('project_name') ?></span>
                                 </div>
                             </div>
-                            <?php
-                            if($this->session->userdata('user_designation') != "Supervisor")
-                            { ?>  
-        
-                                <div class="form-group">
-                                    <label for="supervisor_name" class="col-sm-3 control-label">Supervisor Name <font color="red">*</font></label>
-                                    <div class="col-sm-9">
-                                        <select class="form-control supervisor_name" name="supervisor_name" required>
-                                            <option value="">Supervisor Name </option>
-                                            <?php
-                                               
+                            <div class="form-group">
+                                <label for="supervisor_name" class="col-sm-3 control-label">Supervisor Name <font color="red">*</font></label>
+                                <div class="col-sm-9">
+                                    <select class="form-control supervisor_name" name="supervisor_name" required>
+                                        <option value="">Supervisor Name </option>
+                                        <?php
+                                           
 
-                                                foreach ($supervisors as $supervisor) {
-                                                    $selected = '';
-                                                    
-                                                    if( isset( $result->supervisor_id ) && $supervisor->user_id == $result->supervisor_id ){
-                                                        $selected = 'selected="selected"';
-                                                    }
-                                                    echo '<option '.$selected.' value="'.$supervisor->user_id.'" '.$selected.' >'.$supervisor->supervisor_name.'</option>';
+                                            foreach ($supervisors as $supervisor) {
+                                                $selected = '';
+                                                
+                                                if( isset( $result->supervisor_id ) && $supervisor->user_id == $result->supervisor_id ){
+                                                    $selected = 'selected="selected"';
                                                 }
-                                               ?>
-                                        </select>
-                                        <span class="error"><?php echo form_error('supervisor_name') ?></span>
-                                    </div>
+                                                echo '<option '.$selected.' value="'.$supervisor->user_id.'" '.$selected.' >'.$supervisor->supervisor_name.'</option>';
+                                            }
+                                           ?>
+                                    </select>
+                                    <span class="error"><?php echo form_error('supervisor_name') ?></span>
                                 </div>
-                            <?php
-                            }
-                            ?>     
+                            </div>
+                               
                             <div class="form-group">
                                     <label for="materialCategory" class="col-sm-3 control-label">Material Category <font color="red">*</font></label>
                                     <div class="col-sm-9">
-                                        <select disabled="disabled" class="form-control material_category" id="MaterialCategory" name="" required>
+                                        <select class="form-control material_category" id="MaterialCategory" name="materialCategory" required>
                                             <option value="">Material Category</option>
                                             <?php 
                                             if($materialCategory != ''){
@@ -142,14 +135,13 @@
                                             }
                                             ?>
                                         </select>
-                                        <input type="hidden" name="materialCategory" value="<?=$result->category_id?>">
                                         <span class="error"><?php echo form_error('materialCategory') ?></span>
                                     </div>
                                 </div>
                             <div class="form-group selectclass">
                                 <label for="MaterialName" class="col-sm-3 control-label">Material Name <font color="red">*</font></label>
                                 <div class="col-sm-9" id="MaterialNames">
-                                    <select disabled="disabled" class="form-control materialName" name="" required>
+                                    <select class="form-control materialName" name="MaterialName" required>
                                         <option value="">Material Name</option>
                                         <?php 
                                         $materials = array();
@@ -166,7 +158,6 @@
                                         }
                                         ?>
                                     </select>
-                                    <input type="hidden" name="MaterialName" value="<?=$result->material_id?>">
                                     <span class="error empty_material_error"><?php echo form_error('MaterialName') ?></span>
                                 </div>
                             </div>
@@ -252,47 +243,26 @@
                                 <?php if($this->session->userdata('user_designation') == 'admin'){
                                 ?> 
                                 <div class="col-sm-6">
-                                   <textarea class="form-control" name="issueComment" id="" cols="30" rows="5" readonly="readonly"><?=$result->issue_comment?></textarea>
+                                   <textarea name="issueComment" id="" cols="30" rows="5" disabled="disabled"><?=$result->issue_comment?></textarea>
                                 </div>
                             <?php } else{ ?>
                                     <div class="col-sm-6">
-                                   <textarea class="form-control" name="issueComment" id="" cols="30" rows="5"><?=$result->issue_comment?></textarea>
+                                   <textarea name="issueComment" id="" cols="30" rows="5"><?=$result->issue_comment?></textarea>
                                 </div>
                             <?php } ?>
                             </div> 
-                            <?php
-                            if($this->session->userdata('user_designation') == 'admin'){
-                            ?> 
                             <div class="form-group">
                                 <label for="quantity" class="col-sm-3 control-label">Verify Comment:</label>
                                 <div class="col-sm-6">
-                                   <textarea class="form-control" name="verifyComment" id="" cols="30" rows="5"><?=$result->verify_comment?></textarea>
+                                   <textarea name="verifyComment" id="" cols="30" rows="5"><?=$result->verify_comment?></textarea>
                                 </div>
-                            </div> 
-                            <?php
-                            }?>
+                            </div>
                         </div>
                         <!-- /.box-body -->
                         <div class="box-footer">
-                             <?php
-                            if($this->session->userdata('user_designation') != 'admin')
-                            {
-                            ?>
-                            <input type="submit" id="btnSave" name="submit" class="btn btn-primary" value="Save">
-                            <?php
-                            }?>
-
-                            <?php
-                            if($this->session->userdata('user_designation') == 'admin'){
-                            ?>
-                            <input type="submit" id="btnverify" name="verify" class="btn btn-primary" value="Verify & Submit">
-                            <?php
-                            }
-                            ?>
+                            
                             <a href="<?php echo base_url('admin/MaterialIssue'); ?>" id="btnClose" name="close" class="btn btn-primary" >Close</a>
-                            <?php if($result->status !== 'Verified' ) { ?>
-                                <a id="btndelete" name="delete" href="<?php echo base_url('admin/MaterialIssue/ajax_delete/'.$result->id); ?>" class="btn btn-danger" >Delete</a>
-                            <?php } ?>
+                           
                         </div>
                         <!-- /.box-footer -->
                     </form>
@@ -315,157 +285,17 @@
 <script type="text/javascript">
 
     $(document).ready(function () {
-        var status="<?=$result->status?>";
-
-       if(status == "Verified")
-       {
+        
             $('input[type=text]').attr("disabled",true);
             $('input[type=number]').attr("disabled",true);
             $('textarea').attr("disabled",true);
             $('select').attr("disabled",true);
             $('input[type=radio]').attr("disabled",true);
-            $("#btnSave").hide();
-            $("#btnverify").hide();
+            
             $("#btnClose").show();
-            $("#btndelete").show();
 
             $('input[type=file]').hide();
-        }
-       else
-        {
-            $("#btnClose").hide();
-        } 
-    });
-    $("input[type='radio']").change(function(){
-        if($(this).val()=="outsite")
-        {
-            $("#OutsideSiteMenuHide").removeAttr('style');
-        }
-        else
-        {
-            $("#OutsideSiteMenuHide").attr("style", "display: none;"); 
-        }
-    });
-    $(document).on("change",".project_name",function(){
-        var project_id = $('.project_name').val();
-        getSupervisor(project_id);
-    });
-    $(document).on("change",".material_category",function(){
-        var project_id = $('.project_name').val();
-        var material_category = $('.material_category').val();
-        $('.empty_material_error').html("");
-        getMaterial(project_id, material_category);
-    });
-
-    // get material by project and category
-    function getMaterial(project_id, material_category){
-
-        var projectMaterialOption ="<option value=''>Material Name</option>";
-
-        if(project_id && material_category) {   
-            $.ajax({
-                url: "<?php echo base_url().'admin/MaterialIssue/getProjectMaterialAjax/'?>?project_id="+project_id+'&category_id='+material_category,
-                type: "GET",
-                dataType: "json",
-                success:function(data) {
-                    if(data.status == true){
-                        $.each(data.material, function(key, value) {
-                            projectMaterialOption+='<option  value="'+ value.id +'">'+ value.name +'</option>';
-                        });
-                    }else{
-                       $('.empty_material_error').html("Material not found in selected category and project.");
-                    }
-                    $('.materialName').html(projectMaterialOption);
-                }
-            });
-        }
-        else{
-            $('.materialName').html(projectMaterialOption);
-        }
-    }
-    // get supervisor by project 
-    function getSupervisor(project_id){
-
-        var projectSupervisorOption ="<option value=''>Supervisor Name</option>";
         
-
-        if(project_id) {   
-            $.ajax({
-                url: "<?php echo base_url().'admin/MaterialIssue/getFilterSupervisorAjax/'?>"+project_id,
-                type: "GET",
-                dataType: "json",
-                success:function(data) {
-                    $.each(data.getProjectSupervisor, function(key, value) {
-                        projectSupervisorOption+='<option  value="'+ value.user_id +'">'+ value.supervisor_name +'</option>';
-                    });
-                    
-                    $('.supervisor_name').html(projectSupervisorOption);
-                }
-            });
-        }
-        else{
-            $('.supervisor_name').html(projectSupervisorOption);
-        }
-    }
-    $(document).on("change",".materialName",function(){
-        $('.QuantityError').html('');
-        var material_id = $(".materialName").val();
-        var project_id = $(".project_name").val();
-        $('.totalQuantity').attr('id', 0);
-
-        var alreadyEnteredQuantity =  <?php echo $result->quantity; ?>;
-        
-        if(material_id != '' && project_id != ''){
-            $.ajax({
-                type:"GET",
-                url: "<?php echo base_url('admin/MaterialIssue/getMaterialIssueQuantity/'); ?>?material_id="+material_id+"&project_id="+project_id,
-                dataType: "json",
-                success: function(data) {
-                    if(data.status == true){
-                        // var id = data;
-                        $('.totalQuantity').removeClass('totalQuantityClassError');
-                        $('.totalQuantity').addClass('totalQuantityClass');
-                        $('.totalQuantity').html('Available quantity '+data.quantity+' bags');
-                        $('.totalQuantity').attr('id', data.quantity);
-                    }else{
-                         // var id = data;
-                        $('.totalQuantity').removeClass('totalQuantityClass');
-                        $('.totalQuantity').addClass('totalQuantityClassError');
-                        $('.totalQuantity').html('No issue quantity available');
-                    }
-                }
-            });
-        }
-            var unit_measurement = $(this).find('option:selected', this).attr('data-unit');
-            $(".unit").html(unit_measurement);
     });
-
-    $(document).on('submit','.validateDontSubmit',function (){
-        // quantity validation
-        $('.QuantityError').html('');
-        var totalQuantity = $('.totalQuantity').attr('id');
-        var issueQuantity = $('.issueQuantity').val();
-        var status = false;
-
-        if(Number(totalQuantity) >= Number(issueQuantity)){
-             
-            status = true;
-            
-        }else{
-            
-            if(totalQuantity == 0){
-                $('.QuantityError').html('Quantity not available in selected category and project.');
-            }else{
-                $('.QuantityError').html('Quantity not available more than '+totalQuantity);
-            }
-            status = false;
-        }
-        return status;
-    });
-
-    $(document).on("change",".materialName",function(){
-        // displayed unit measurement beside quantity field
-        var unit_measurement = $(this).find('option:selected', this).attr('data-unit');
-        $(this).parents(".form-group").next().find(".unit").html(unit_measurement);
-    });
+    
 </script>

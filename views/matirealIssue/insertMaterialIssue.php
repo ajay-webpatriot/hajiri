@@ -38,18 +38,18 @@
                             <div class="form-group">
                                 <label for="date" class="col-sm-3 control-label">Issue Date <font color="red">*</font></label>
                                 <div class="col-sm-9">
-                                    <input name="issueDate" id="date" placeholder="Issue Date" class="form-control datepicker-material" type="text" value="<?php echo (isset($_POST['issueDate'])) ? $_POST['issueDate'] : ''; ?>" required>
+                                    <input name="issueDate" id="date" placeholder="Issue Date" class="form-control datepicker-material" type="text" value="<?php echo (isset($_POST['issueDate'])) ? $_POST['issueDate'] : date('Y-m-d'); ?>" required>
                                     <span class="error"><?php echo (form_error('issueDate')) ? form_error('issueDate') : ''; ?></span>
                                 </div>
                             </div>
                             <!-- Issue Date end -->
-                            <div class="form-group">
+                            <!-- <div class="form-group">
                                 <label for="date" class="col-sm-3 control-label">Issue No <font color="red">*</font></label>
                                 <div class="col-sm-9">
                                     <input name="issueNo" id="issueNo" placeholder="Issue No" class="form-control" type="text" value="<?php echo (isset($_POST['issueNo'])) ? $_POST['issueNo'] : ''; ?>" required>
                                     <span class="error"><?php echo (form_error('issueNo')) ? form_error('issueNo') : ''; ?></span>
                                 </div>
-                            </div>
+                            </div> -->
                             <div class="form-group">
                                 <label for="project_name" class="col-sm-3 control-label">Project Name <font color="red">*</font></label>
                                 <div class="col-sm-9">
@@ -64,6 +64,23 @@
                                     <span class="error"><?php echo form_error('project_name') ?></span>
                                 </div>
                             </div>
+                            <?php
+                            if($this->session->userdata('user_designation') != "Supervisor")
+                            { ?>  
+        
+                                <div class="form-group">
+                                    <label for="supervisor_name" class="col-sm-3 control-label">Supervisor Name <font color="red">*</font></label>
+                                    <div class="col-sm-9">
+                                        <select class="form-control supervisor_name" name="supervisor_name" required>
+                                            <option value="">Supervisor Name </option>
+                                           
+                                        </select>
+                                        <span class="error"><?php echo form_error('supervisor_name') ?></span>
+                                    </div>
+                                </div>
+                            <?php
+                            }
+                            ?>
                             <div class="form-group">
                                     <label for="materialCategory" class="col-sm-3 control-label">Material Category <font color="red">*</font></label>
                                     <div class="col-sm-9">
@@ -162,17 +179,7 @@
                                    <textarea name="issueComment" id="" cols="30" rows="5"></textarea>
                                 </div>
                             </div> 
-                            <?php
-                            if($this->session->userdata('user_designation') == 'Superadmin' || $this->session->userdata('user_designation') == 'admin'){
-                            ?> 
-                            <div class="form-group">
-                                <label for="quantity" class="col-sm-3 control-label">Verify Comment:</label>
-                                <div class="col-sm-6">
-                                   <textarea name="verifyComment" id="" cols="30" rows="5"></textarea>
-                                </div>
-                            </div> 
-                            <?php
-                            }?>
+                            
                         </div>
                         <!-- /.box-body -->
                         <div class="box-footer">
@@ -252,7 +259,7 @@
                 }
                 status =  false;
             }
-            $('.totalQuantity').attr('id', 0);
+            // $('.totalQuantity').attr('id', 0);
             return status;
         });
 
@@ -261,6 +268,7 @@
             var material_category = $('.material_category').val();
             $('.empty_material_error').html("");
             getMaterial(project_id, material_category);
+            getSupervisor(project_id);
         });
 
         $(document).on("change",".material_category",function(){
@@ -295,6 +303,31 @@
             }
             else{
                 $('.materialName').html(projectMaterialOption);
+            }
+        }
+
+        // get supervisor by project 
+        function getSupervisor(project_id){
+
+            var projectSupervisorOption ="<option value=''>Supervisor Name</option>";
+            
+
+            if(project_id) {   
+                $.ajax({
+                    url: "<?php echo base_url().'admin/MaterialIssue/getFilterSupervisorAjax/'?>"+project_id,
+                    type: "GET",
+                    dataType: "json",
+                    success:function(data) {
+                        $.each(data.getProjectSupervisor, function(key, value) {
+                            projectSupervisorOption+='<option  value="'+ value.user_id +'">'+ value.supervisor_name +'</option>';
+                        });
+                        
+                        $('.supervisor_name').html(projectSupervisorOption);
+                    }
+                });
+            }
+            else{
+                $('.supervisor_name').html(projectSupervisorOption);
             }
         }
 

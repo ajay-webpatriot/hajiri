@@ -33,12 +33,14 @@
                                 <?php } ?>
                             </select>
                         </div>
-                        <label class="col-md-1 control-label">Material:</label>
-                        <div class="col-md-3">
-                            <select class="form-control materialIssue" name="project">
-                                <option value="">All Material </option>
-                                
-                            </select>
+                        <div class="materialFilter" style="display: none;">
+                            <label class="col-md-1 control-label">Material:</label>
+                            <div class="col-md-3">
+                                <select class="form-control materialIssue" name="project">
+                                    <option value="">All Material </option>
+                                    
+                                </select>
+                            </div>
                         </div>
                         <label class="col-md-1 control-label">Date:</label>
                         <div class="col-md-3">
@@ -47,12 +49,14 @@
                         
                     </div>
                     <div class="col-md-12">
-                        <label class="col-md-1 control-label">Supervisor Name:</label>
-                        <div class="col-md-3">
-                            <select class="form-control supervisorIssue" name="supervisorIssue">
-                                <option value="">All Supervisor </option>
-                                
-                            </select>
+                        <div class="supervisorFilter" style="display: none;">
+                            <label class="col-md-1 control-label">Supervisor Name:</label>
+                            <div class="col-md-3">
+                                <select class="form-control supervisorIssue" name="supervisorIssue">
+                                    <option value="">All Supervisor </option>
+                                    
+                                </select>
+                            </div>
                         </div>
                         <label class="col-md-1 control-label">Status:</label>
                         <div class="col-md-3">
@@ -263,13 +267,28 @@ $(function () {
                 dataType: "json",
                 success:function(data) {
                     // $('select[name="city"]').empty();
-                    $.each(data.getProjectSupervisor, function(key, value) {
-                        optionHTML+='<option  value="'+ value.user_id +'">'+ value.supervisor_name +'</option>';
-                    });
-
-                    $.each(data.getProjectMaterial, function(key, value) {
-                        projectMaterialOption+='<option  value="'+ value.id +'">'+ value.name +'</option>';
-                    });
+                    if(data.getProjectSupervisor.length > 0)
+                    {
+                        $.each(data.getProjectSupervisor, function(key, value) {
+                            optionHTML+='<option  value="'+ value.user_id +'">'+ value.supervisor_name +'</option>';
+                        });
+                        $(".supervisorFilter").show();
+                    }
+                    else
+                    {
+                        $(".supervisorFilter").hide();
+                    }
+                    if(data.getProjectMaterial.length > 0)
+                    {    
+                        $.each(data.getProjectMaterial, function(key, value) {
+                            projectMaterialOption+='<option  value="'+ value.id +'">'+ value.name +'</option>';
+                        });
+                        $(".materialFilter").show();
+                    }
+                    else
+                    {
+                        $(".materialFilter").hide();
+                    }
 
                     $('.supervisorIssue').html(optionHTML);
                     $('.materialIssue').html(projectMaterialOption);
@@ -278,6 +297,9 @@ $(function () {
         }else{
             $('.supervisorIssue').html(optionHTML);
             $('.materialIssue').html(projectMaterialOption);
+
+            $(".supervisorFilter").hide();
+            $(".materialFilter").hide();
         }
 
         tableIssue.draw();

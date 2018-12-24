@@ -15,6 +15,9 @@
 
   <!-- Daterange picker -->
   <link rel="stylesheet" href="<?php echo base_url('assets/admin/plugins/daterangepicker/daterangepicker.css'); ?>">
+
+  <!-- custom css -->
+  <link rel="stylesheet" href="<?php echo base_url('assets/admin/dist/css/custom.css'); ?>">
 <!-- END PAGE LEVEL PLUGINS -->
 </head>
 

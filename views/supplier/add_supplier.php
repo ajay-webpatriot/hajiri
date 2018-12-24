@@ -1,3 +1,9 @@
+<style type="text/css">
+    .select2-container--default .select2-selection--multiple .select2-selection__choice
+    {
+        color: #000 !important;
+    }
+</style>
 <!-- Content Wrapper. Contains page content -->
 <div class="content-wrapper">
     <!-- Content Header (Page header) -->

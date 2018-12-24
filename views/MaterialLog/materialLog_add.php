@@ -51,7 +51,7 @@
                             <div class="form-group">
                                 <label for="title" class="col-sm-3 control-label">Challan Date <font color="red">*</font></label>
                                 <div class="col-sm-9">
-                                    <input name="challan_date" id="date" placeholder="Challan Date" class="form-control datepicker-material" type="text" value="<?php echo (isset($_POST['date'])) ? $_POST['date'] : ''; ?>" required>
+                                    <input name="challan_date" id="date" placeholder="Challan Date" class="form-control datepicker-material" type="text" value="<?php echo (isset($_POST['date'])) ? $_POST['date'] : date('Y-m-d'); ?>" required>
                                     <span class="error"><?php echo (form_error('challan_date')) ? form_error('challan_date') : ''; ?></span>
                                 </div>
                             </div> 
@@ -59,8 +59,8 @@
                             <div class="form-group">
                                 <label for="title" class="col-sm-3 control-label">Challan No <font color="red">*</font></label>
                                 <div class="col-sm-9">
-                                    <input name="challan_no" placeholder="Challan No" class="form-control" type="text" value="<?php echo (isset($_POST['challan_date'])) ? $_POST['challan_date'] : ''; ?>" required>
-                                    <span class="error"><?php echo (form_error('challan_date')) ? form_error('challan_date') : ''; ?></span>
+                                    <input name="challan_no" placeholder="Challan No" class="form-control" type="text" value="<?php echo (isset($_POST['challan_no'])) ? $_POST['challan_no'] : ''; ?>" >
+                                    <span class="error"><?php echo (form_error('challan_no')) ? form_error('challan_no') : ''; ?></span>
                                 </div>
                             </div> 
                             <div class="form-group">
@@ -99,21 +99,32 @@
                                     <span class="error"><?php echo form_error('supplier_name') ?></span>
                                 </div>
                             </div>
-                            
-                            <div class="form-group">
-                                <label for="supervisor_name" class="col-sm-3 control-label">Supervisor Name <font color="red">*</font></label>
-                                <div class="col-sm-9">
-                                    <select class="form-control supervisor_name" name="supervisor_name" required>
-                                        <option value="">Supervisor Name </option>
-                                       
-                                    </select>
-                                    <span class="error"><?php echo form_error('supervisor_name') ?></span>
+                            <?php
+                            if($this->session->userdata('user_designation') != "Supervisor")
+                            { ?>  
+        
+                                <div class="form-group">
+                                    <label for="supervisor_name" class="col-sm-3 control-label">Supervisor Name <font color="red">*</font></label>
+                                    <div class="col-sm-9">
+                                        <select class="form-control supervisor_name" name="supervisor_name" required>
+                                            <option value="">Supervisor Name </option>
+                                           
+                                        </select>
+                                        <span class="error"><?php echo form_error('supervisor_name') ?></span>
+                                    </div>
                                 </div>
-                            </div>
-
+                            <?php
+                            }
+                            ?>    
                             <h4 class="box-title">Add Material Details :</h4>
                             <div class="addMaterialDetail">
                                 <hr>
+                                <div class='remove_button_div pull-right' style="padding-bottom: 5px;display: none;">
+                                    <button class='fa fa-times' type='button' id='remove'
+                                        onclick="removeEntryClone(this);" title="Remove material details" >
+                                        <i class="icon-minus-2 "></i>
+                                    </button>
+                                </div>
                                 <div class="form-group">
                                     <label for="material_category" class="col-sm-3 control-label">Material Category <font color="red">*</font></label>
                                     <div class="col-sm-9">
@@ -138,35 +149,17 @@
                                         <span class="error material-error"><?php echo form_error('material_name') ?></span>
                                     </div>
                                 </div>
+
                                 <div class="form-group">
                                     <label for="quantity" class="col-sm-3 control-label">Quantity <font color="red">*</font></label>
                                     <div class="col-sm-6">
-                                        <input name="quantity[]" min="1" placeholder="Quantity" class="form-control quantity" type="number" value="<?php echo (isset($_POST['quantity'])) ? $_POST['quantity'] : ''; ?>" required>
+                                        <input name="quantity[]" min="1" placeholder="Quantity" class="form-control quantity" type="number" value="<?php echo (isset($_POST['quantity'][0])) ? $_POST['quantity'][0] : ''; ?>" required>
                                         <span class="error"><?php echo (form_error('quantity')) ? form_error('quantity') : ''; ?></span>
                                     </div>
                                     <div class="col-sm-3">
                                         <span><b class="unit"></b></span>
                                     </div>
                                 </div> 
-                                <?php
-                                if($this->session->userdata('user_designation') == 'Superadmin' || $this->session->userdata('user_designation') == 'admin'){
-                                ?> 
-                                    <div class="form-group">
-                                        <label for="rate" class="col-sm-3 control-label">Rate <font color="red">*</font></label>
-                                        <div class="col-sm-9">
-                                            <input name="rate[]" min="1" onkeyup="rate_change_fun(this)" onchange="rate_change_fun(this)" placeholder="Rate" class="form-control rate" type="number" value="<?php echo (isset($value->rate)) ? $value->rate : ''; ?>" required>
-                                           
-                                        </div>
-                                    </div>
-                                    <div class="form-group">
-                                        <label for="amount" class="col-sm-3 control-label">Amount:</label>
-                                        <div class="col-sm-9">
-                                            <span class="amountLabel"><?php echo (isset($value->total_rate)) ? $value->total_rate : ''; ?></span>
-                                            <input name="amount[]" placeholder="Amount" class="form-control amount" type="hidden" value="<?php echo (isset($value->total_rate)) ? $value->total_rate : ''; ?>" required>
-                                        </div>
-                                    </div> 
-                                <?php
-                                }?> 
                                 <div class="form-group">
                                     <label for="title" class="col-sm-3 control-label">Material Image </label>
                                     <div class="col-sm-9">
@@ -177,17 +170,6 @@
 
                             </div>    
                         </div>
-                        <?php
-                        if($this->session->userdata('user_designation') == 'Superadmin' || $this->session->userdata('user_designation') == 'admin'){
-                            ?> 
-                        <div class="form-group">
-                            <label for="title" class="col-sm-3 control-label">Comment:</label>
-                            <div class="col-sm-9">
-                               <textarea rows="4" cols="50" name="comment"></textarea>
-                            </div>
-                        </div> 
-                        <?php
-                        }?>
                         <!-- /.box-body -->
                         <div class="box-footer">
                             <input type="button" id="add_more" class="btn btn-success" value="Add more">
@@ -213,17 +195,22 @@
         var $clone = $('.addMaterialDetail:last').clone();
         $clone.find('input').val('');
         $clone.find('select').val('');
+        // $clone.find('.amountLabel').html('');
+        $clone.find('.material-error').html('');
         $clone.find('img').remove();
+        $clone.find('.remove_button_div').show();
+        
         $clone.insertAfter($('[class^="addMaterialDetail"]').last());
     });
         // load material name using ajax
         $(document).on("change",".material_category",function(){ 
 
-            $('.material-error').html('');
+            
             var project_id = $('.project_name').val();
             var optionHTML="<option value=''>Material Name</option>";
             var category_id = $(this).val();
             var ele=this;
+            $(ele).parents(".form-group").next().find('.material-error').html('');
             if(category_id && project_id !== '') {   
                 $.ajax({
                     url: "<?php echo base_url().'admin/MaterialLog/getmaterialAjax/'?>?category_id="+category_id+"&project_id="+project_id,
@@ -235,7 +222,7 @@
                                 optionHTML+='<option  data-unit="'+value.unit_measurement+'"  value="'+ value.id +'">'+ value.name +'</option>';
                             });
                         }else{
-                            $('.material-error').html("Material not found in selected category");
+                            $(ele).parents(".form-group").next().find('.material-error').html("Material not found in selected category");
                         }
                         $(ele).parents(".form-group").next().find("select").html(optionHTML);
                     }
@@ -288,11 +275,12 @@
             var CategoryOption ="<option value=''>Material Category</option>";
             $('.material_name').html("<option value=''>Material Name</option>");
             var supplier_id = $(this).val();
+            var project_id = $(".project_name").val();
             var projectCategoryOption ="<option value=''>Material Category</option>";
             var ele=this;
             if(supplier_id) { 
                 $.ajax({
-                    url: "<?php echo base_url().'admin/MaterialLog/getSupplierCategoryAjax/'?>"+supplier_id,
+                    url: "<?php echo base_url().'admin/MaterialLog/getSupplierCategoryAjax/'?>"+supplier_id+"/"+project_id,
                     type: "GET",
                     dataType: "json",
                     success:function(data) {
